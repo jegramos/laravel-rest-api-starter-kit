@@ -17,6 +17,7 @@
         "laravel/pint": "^1.0",
         "laravel/sail": "^1.0.1",
         "mockery/mockery": "^1.4.4",
+        "neronmoon/scriptsdev": "^0.1.9",
         "nunomaduro/collision": "^6.1",
         "phpunit/phpunit": "^9.5.10",
         "spatie/laravel-ignition": "^1.0",
@@ -40,17 +41,7 @@
             "@php artisan package:discover --ansi"
         ],
         "post-update-cmd": [
-            "@php artisan vendor:publish --tag=laravel-assets --ansi --force",
-            "@php artisan ide-helper:generate",
-            "@php artisan ide-helper:meta",
-            "@php artisan ide-helper:models --nowrite",
-            "@php artisan fixer:fix"
-        ],
-        "post-install-cmd": [
-            "@php artisan ide-helper:generate",
-            "@php artisan ide-helper:meta",
-            "@php artisan ide-helper:models --nowrite",
-            "@php artisan fixer:fix"
+            "@php artisan vendor:publish --tag=laravel-assets --ansi --force"
         ],
         "post-root-package-install": [
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
@@ -62,6 +53,20 @@
     "extra": {
         "laravel": {
             "dont-discover": []
+        },
+        "scripts-dev": {
+            "post-install-cmd": [
+                "@php artisan ide-helper:generate",
+                "@php artisan ide-helper:meta",
+                "@php artisan ide-helper:models --nowrite",
+                "@php artisan fixer:fix"
+            ],
+            "post-update-cmd": [
+                "@php artisan ide-helper:generate",
+                "@php artisan ide-helper:meta",
+                "@php artisan ide-helper:models --nowrite",
+                "@php artisan fixer:fix"
+            ]
         }
     },
     "config": {
@@ -69,7 +74,8 @@
         "preferred-install": "dist",
         "sort-packages": true,
         "allow-plugins": {
-            "pestphp/pest-plugin": true
+            "pestphp/pest-plugin": true,
+            "neronmoon/scriptsdev": true
         }
     },
     "minimum-stability": "dev",
