@@ -41,9 +41,11 @@ class StyleFixer extends Command
             $commands[] = ['cmd' => 'ide-helper:models', 'args' => ['--nowrite' => true]];
         }
 
-        $this->withProgressBar($commands, function ($command) {
+        $this->info('🧹 Cleaning up your dirty code...');
+        foreach ($commands as $command) {
             $this->call($command['cmd'], $command['args']);
-        });
+        }
+        $this->info("🧺 Code cleanup done!");
 
         return CommandBase::SUCCESS;
     }
