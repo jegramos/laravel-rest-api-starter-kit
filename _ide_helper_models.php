@@ -14,7 +14,6 @@ namespace App\Models{
 /**
  * App\Models\User
  *
- * @mixin IdeHelperUser
  * @property int $id
  * @property string $name
  * @property string $email
