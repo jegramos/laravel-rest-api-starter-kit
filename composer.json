@@ -41,16 +41,16 @@
         ],
         "post-update-cmd": [
             "@php artisan vendor:publish --tag=laravel-assets --ansi --force",
-            "@php artisan fixer:fix --dry-run",
             "@php artisan ide-helper:generate",
             "@php artisan ide-helper:meta",
-            "@php artisan ide-helper:models --nowrite"
+            "@php artisan ide-helper:models --nowrite",
+            "@php artisan fixer:fix --dry-run"
         ],
         "post-install-cmd": [
-            "@php artisan fixer:fix --dry-run",
             "@php artisan ide-helper:generate",
             "@php artisan ide-helper:meta",
-            "@php artisan ide-helper:models -M"
+            "@php artisan ide-helper:models --nowrite",
+            "@php artisan fixer:fix --dry-run"
         ],
         "post-root-package-install": [
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
