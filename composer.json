@@ -9,8 +9,7 @@
         "guzzlehttp/guzzle": "^7.2",
         "laravel/framework": "^9.19",
         "laravel/sanctum": "^3.0",
-        "laravel/tinker": "^2.7",
-        "stechstudio/laravel-php-cs-fixer": "^3.1"
+        "laravel/tinker": "^2.7"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^2.12",
@@ -20,7 +19,8 @@
         "mockery/mockery": "^1.4.4",
         "nunomaduro/collision": "^6.1",
         "phpunit/phpunit": "^9.5.10",
-        "spatie/laravel-ignition": "^1.0"
+        "spatie/laravel-ignition": "^1.0",
+        "stechstudio/laravel-php-cs-fixer": "^3.1"
     },
     "autoload": {
         "psr-4": {
@@ -44,13 +44,13 @@
             "@php artisan ide-helper:generate",
             "@php artisan ide-helper:meta",
             "@php artisan ide-helper:models --nowrite",
-            "@php artisan fixer:fix --dry-run"
+            "@php artisan fixer:fix"
         ],
         "post-install-cmd": [
             "@php artisan ide-helper:generate",
             "@php artisan ide-helper:meta",
             "@php artisan ide-helper:models --nowrite",
-            "@php artisan fixer:fix --dry-run"
+            "@php artisan fixer:fix"
         ],
         "post-root-package-install": [
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""

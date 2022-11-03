@@ -13,7 +13,8 @@ class StyleFixer extends Command
      * @var string
      */
     protected $signature = 'fixer:style
-                           {--I|ide_helper : Run style fixer with barryvdh/laravel-ide-helper}';
+                           {--i|ide_helper : Run style fixer with barryvdh/laravel-ide-helper}
+                           {--c|check      : Run the style fixer without changing the files}';
 
     /**
      * The console command description.
@@ -31,8 +32,9 @@ class StyleFixer extends Command
      */
     public function handle(): int
     {
+        $fixer_args = $this->option('check') ? ['--dry-run' => true, '--diff' => true] : [];
         $commands = [
-            ['cmd' => 'fixer:fix', 'args' => []]
+            ['cmd' => 'fixer:fix', 'args' => $fixer_args]
         ];
 
         if ($this->option('ide_helper')) {
