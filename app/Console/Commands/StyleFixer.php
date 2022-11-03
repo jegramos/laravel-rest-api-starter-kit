@@ -37,7 +37,7 @@ class StyleFixer extends Command
 
         if ($this->option('ide_helper')) {
             $commands[] = ['cmd' => 'ide-helper:generate', 'args' => []];
-            $commands[] =  ['cmd' => 'ide-helper:meta', 'args' => []];
+            $commands[] = ['cmd' => 'ide-helper:meta', 'args' => []];
             $commands[] = ['cmd' => 'ide-helper:models', 'args' => ['--nowrite' => true]];
         }
 
