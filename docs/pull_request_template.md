@@ -12,15 +12,18 @@
 ## 📦 Packages
 - Installed package A: https://link-to-package.com
 
+
 ## 📝  Changelog
 **Brief summary of changes**
 - Added new QR scanner client
 - Removed unused dependencies
 - Improved database query on some module
 
+
 ## 📸 Attach screenshots if needed
 
 <hr>
+
 
 ## ☑️ Coding Standard Checklist
 
