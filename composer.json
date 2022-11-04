@@ -21,6 +21,7 @@
         "neronmoon/scriptsdev": "^0.1.9",
         "nunomaduro/collision": "^6.1",
         "phpro/grumphp": "^1.13",
+        "phpstan/phpstan": "^1.9",
         "phpunit/phpunit": "^9.5.10",
         "spatie/laravel-ignition": "^1.0",
         "squizlabs/php_codesniffer": "^3.7",

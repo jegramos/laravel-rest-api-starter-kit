@@ -5,19 +5,20 @@ grumphp:
   tasks:
     laravel_cs_fixer:
       ide_helper: true
-      metadata:
     phpunit:
       always_execute: true
-      metadata:
     securitychecker_enlightn:
       lockfile: ./composer.lock
       run_always: true
-      metadata:
     phpcs:
       standard: [ PSR1, PSR2, PSR12 ]
       whitelist_patterns: [ /^app\/(.*)/ ]
       report: full
-      metadata:
+    phpstan:
+      ignore_patterns: [ '/^(?!app)/' ]
+      level: max
+      memory_limit: "-1"
+      phpunit:
 services:
   App\Automation\Grump\LaravelPhpCsFixer:
     arguments:
