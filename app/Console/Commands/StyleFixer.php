@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use Symfony\Component\Console\Command\Command as CommandBase;
+use Throwable;
 
 class StyleFixer extends Command
 {
@@ -13,7 +14,8 @@ class StyleFixer extends Command
      * @var string
      */
     protected $signature = 'fixer:style
-                           {--I|ide_helper : Run style fixer with barryvdh/laravel-ide-helper}';
+                           {--i|ide_helper : Run style fixer with barryvdh/laravel-ide-helper}
+                           {--c|check      : Run the style fixer without changing the files}';
 
     /**
      * The console command description.
@@ -31,20 +33,31 @@ class StyleFixer extends Command
      */
     public function handle(): int
     {
+        $fixer_args = $this->option('check') ? ['--dry-run' => true, '--diff' => true] : [];
         $commands = [
-            ['cmd' => 'fixer:fix', 'args' => []]
+            ['cmd' => 'fixer:fix', 'args' => $fixer_args]
         ];
 
         if ($this->option('ide_helper')) {
             $commands[] = ['cmd' => 'ide-helper:generate', 'args' => []];
-            $commands[] =  ['cmd' => 'ide-helper:meta', 'args' => []];
+            $commands[] = ['cmd' => 'ide-helper:meta', 'args' => []];
             $commands[] = ['cmd' => 'ide-helper:models', 'args' => ['--nowrite' => true]];
         }
 
-        $this->withProgressBar($commands, function ($command) {
-            $this->call($command['cmd'], $command['args']);
-        });
+        $this->info('🧹 Cleaning up your dirty code...');
 
-        return CommandBase::SUCCESS;
+        $exitCode = CommandBase::SUCCESS;
+        foreach ($commands as $command) {
+            try {
+                $this->call($command['cmd'], $command['args']);
+            } catch (Throwable $th) {
+                $this->error($th->getMessage());
+                $exitCode = CommandBase::FAILURE;
+            }
+        }
+
+        $this->info('🧺 Code cleanup done!');
+
+        return $exitCode;
     }
 }
