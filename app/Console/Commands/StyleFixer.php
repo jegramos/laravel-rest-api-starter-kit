@@ -56,7 +56,7 @@ class StyleFixer extends Command
             }
         }
 
-        $this->info('🧺 Code cleanup done!');
+        $this->info('🧺 Code cleanup done');
 
         return $exitCode;
     }
