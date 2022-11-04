@@ -12,12 +12,6 @@ grumphp:
       standard: [ PSR1, PSR2, PSR12 ]
       whitelist_patterns: [ /^app\/(.*)/ ]
       report: full
-    phpstan:
-      ignore_patterns: [ '/^(?!app)/' ]
-      level: 3
-      memory_limit: "-1"
-      metadata:
-        priority: 1
     phpunit:
       always_execute: true
 services:
