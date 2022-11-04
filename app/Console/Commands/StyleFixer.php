@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use Symfony\Component\Console\Command\Command as CommandBase;
+use Throwable;
 
 class StyleFixer extends Command
 {
@@ -44,11 +45,19 @@ class StyleFixer extends Command
         }
 
         $this->info('🧹 Cleaning up your dirty code...');
-        foreach ($commands as $command) {
-            $this->call($command['cmd'], $command['args']);
-        }
-        $this->info("🧺 Code cleanup done!");
 
-        return CommandBase::SUCCESS;
+        $exitCode = CommandBase::SUCCESS;
+        foreach ($commands as $command) {
+            try {
+                $this->call($command['cmd'], $command['args']);
+            } catch (Throwable $th) {
+                $this->error($th->getMessage());
+                $exitCode = CommandBase::FAILURE;
+            }
+        }
+
+        $this->info("🧺 Code cleanup done!" . "yeat");
+
+        return $exitCode;
     }
 }

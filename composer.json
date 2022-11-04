@@ -13,14 +13,17 @@
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^2.12",
+        "enlightn/security-checker": "^1.10",
         "fakerphp/faker": "^1.9.1",
         "laravel/pint": "^1.0",
         "laravel/sail": "^1.0.1",
         "mockery/mockery": "^1.4.4",
         "neronmoon/scriptsdev": "^0.1.9",
         "nunomaduro/collision": "^6.1",
+        "phpro/grumphp": "^1.13",
         "phpunit/phpunit": "^9.5.10",
         "spatie/laravel-ignition": "^1.0",
+        "squizlabs/php_codesniffer": "^3.7",
         "stechstudio/laravel-php-cs-fixer": "^3.1"
     },
     "autoload": {
@@ -56,16 +59,10 @@
         },
         "scripts-dev": {
             "post-install-cmd": [
-                "@php artisan ide-helper:generate",
-                "@php artisan ide-helper:meta",
-                "@php artisan ide-helper:models --nowrite",
-                "@php artisan fixer:fix"
+                "./vendor/bin/grumphp run"
             ],
             "post-update-cmd": [
-                "@php artisan ide-helper:generate",
-                "@php artisan ide-helper:meta",
-                "@php artisan ide-helper:models --nowrite",
-                "@php artisan fixer:fix"
+                "./vendor/bin/grumphp run"
             ]
         }
     },
@@ -75,7 +72,8 @@
         "sort-packages": true,
         "allow-plugins": {
             "pestphp/pest-plugin": true,
-            "neronmoon/scriptsdev": true
+            "neronmoon/scriptsdev": true,
+            "phpro/grumphp": true
         }
     },
     "minimum-stability": "dev",

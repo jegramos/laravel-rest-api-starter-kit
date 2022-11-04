@@ -1,0 +1,31 @@
+grumphp:
+  fixer:
+    enabled: true
+    fix_by_default: true
+  tasks:
+    laravel_cs_fixer:
+      ide_helper: true
+      metadata:
+        priority: 3
+    phpunit:
+      always_execute: true
+      metadata:
+        priority: 2
+    securitychecker_enlightn:
+      lockfile: ./composer.lock
+      run_always: true
+      metadata:
+        priority: 1
+    phpcs:
+      standard: [ PSR1, PSR2, PSR12 ]
+      whitelist_patterns: [ /^app\/(.*)/ ]
+      report: full
+      metadata:
+        priority: 0
+services:
+  App\Automation\Grump\LaravelPhpCsFixer:
+    arguments:
+      - '@process_builder'
+      - '@formatter.raw_process'
+    tags:
+      - { name: grumphp.task, task: laravel_cs_fixer, priority: 3 }
