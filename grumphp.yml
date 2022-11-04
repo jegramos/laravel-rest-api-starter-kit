@@ -16,6 +16,8 @@ grumphp:
       ignore_patterns: [ '/^(?!app)/' ]
       level: 3
       memory_limit: "-1"
+      metadata:
+        priority: 1
     phpunit:
       always_execute: true
 services:
