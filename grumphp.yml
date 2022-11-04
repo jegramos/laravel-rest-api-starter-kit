@@ -14,7 +14,7 @@ grumphp:
       report: full
     phpstan:
       ignore_patterns: [ '/^(?!app)/' ]
-      level: max
+      level: 3
       memory_limit: "-1"
     phpunit:
       always_execute: true
