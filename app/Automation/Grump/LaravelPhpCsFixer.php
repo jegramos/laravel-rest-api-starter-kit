@@ -2,6 +2,7 @@
 
 namespace App\Automation\Grump;
 
+use App\Console\Commands\StyleFixer;
 use GrumPHP\Runner\TaskResult;
 use GrumPHP\Runner\TaskResultInterface;
 use GrumPHP\Task\AbstractExternalTask;
@@ -46,8 +47,9 @@ class LaravelPhpCsFixer extends AbstractExternalTask
         exec($command, $output, $exitCode);
 
         if ($exitCode !== 0) {
+            $styleFixerClass = StyleFixer::class;
             $errorMessage =
-                "A command threw an exception in '\App\Console\Commands\StyleFixer'. All I can say is good luck";
+                "A command threw an exception (code: $exitCode)  in $styleFixerClass. All I can say is good luck";
 
             return TaskResult::createFailed($this, $context, $errorMessage);
         }
