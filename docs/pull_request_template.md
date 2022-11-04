@@ -14,7 +14,7 @@
 
 ## 📝  Changelog
 **Summary**
-- Added new QR scanner
+- Added new QR scanner client
 - Removed unused dependencies
 - Improved database query on some module
 
