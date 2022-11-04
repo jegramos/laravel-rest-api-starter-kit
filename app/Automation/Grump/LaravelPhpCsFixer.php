@@ -9,6 +9,7 @@ use GrumPHP\Task\AbstractExternalTask;
 use GrumPHP\Task\Context\ContextInterface;
 use GrumPHP\Task\Context\GitPreCommitContext;
 use GrumPHP\Task\Context\RunContext;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -46,7 +47,7 @@ class LaravelPhpCsFixer extends AbstractExternalTask
 
         exec($command, $output, $exitCode);
 
-        if ($exitCode !== 0) {
+        if ($exitCode !== Command::SUCCESS) {
             $styleFixerClass = StyleFixer::class;
             $errorMessage =
                 "A command threw an exception (code: $exitCode)  in $styleFixerClass. All I can say is good luck";
