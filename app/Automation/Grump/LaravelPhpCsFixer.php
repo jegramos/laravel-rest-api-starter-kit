@@ -46,7 +46,9 @@ class LaravelPhpCsFixer extends AbstractExternalTask
         }
 
         exec($command, $output, $exitCode);
-        echo $output;
+        foreach ($output as $message) {
+            echo $message . PHP_EOL;
+        }
 
         if ($exitCode !== Command::SUCCESS) {
             $styleFixerClass = StyleFixer::class;
