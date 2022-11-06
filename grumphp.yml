@@ -12,6 +12,8 @@ grumphp:
       standard: [ PSR1, PSR2, PSR12, PEAR, Zend, Squiz ]
       whitelist_patterns: [ /^app\/(.*)/ ]
       report: full
+      metadata:
+        priority: 1
     phpunit:
       always_execute: true
 services:
