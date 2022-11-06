@@ -12,7 +12,9 @@ class UserRepository implements UserRepositoryInterface
 {
     public const MAX_TRANSACTION_DEADLOCK_ATTEMPTS = 5;
 
-    /** @inheritDoc */
+    /**
+     * @inheritDoc
+     */
     public function all(array $filters = null, bool $paginated = false): array
     {
         return User::with('userProfile')->get()->toArray();
@@ -24,24 +26,39 @@ class UserRepository implements UserRepositoryInterface
      */
     public function create(array $userInfo): array
     {
-        DB::transaction(function () {
+        return DB::transaction(function () use ($userInfo) {
+            $user = User::create([
+                'email' => $userInfo['email'],
+                'username' => $userInfo['username'],
+                'password' => $userInfo['password']
+            ]);
+
+            $exemptedAttributes = ['email', 'username', 'password'];
+            $user->userProfile()->create(Arr::except($userInfo, $exemptedAttributes));
+
+            return $user->load('userProfile')->toArray();
         }, self::MAX_TRANSACTION_DEADLOCK_ATTEMPTS);
-        return [];
     }
 
-    /** @inheritDoc */
+    /**
+     * @inheritDoc
+     */
     public function read($id): array
     {
         return [];
     }
 
-    /** @inheritDoc */
+    /**
+     * @inheritDoc
+     */
     public function update($id, array $newUserInfo): array
     {
         return [];
     }
 
-    /** @inheritDoc */
+    /**
+     * @inheritDoc
+     */
     public function destroy($id): array
     {
         return [];

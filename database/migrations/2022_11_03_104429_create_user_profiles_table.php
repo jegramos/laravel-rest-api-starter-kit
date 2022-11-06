@@ -20,7 +20,7 @@ return new class () extends Migration {
             $table->string('middle_name')->nullable();
             $table->string('mobile_number')->nullable();
             $table->string('telephone_number')->nullable();
-            $table->enum('sex', ['make', 'female'])->nullable();
+            $table->enum('sex', ['male', 'female'])->nullable();
             $table->date('birthday')->nullable();
             // Address columns are created in a way that will enable us to work with multiple countries
             $table->string('address_line_1')->nullable(); // Building number, Building name

@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Hash;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
@@ -21,8 +22,8 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        'name',
         'email',
+        'username',
         'password',
     ];
 
@@ -53,5 +54,16 @@ class User extends Authenticatable
     public function userProfile(): HasOne
     {
         return $this->hasOne(UserProfile::class);
+    }
+
+    /**
+     * Hash the password whenever it is changed
+     *
+     * @param string $password
+     * @return void
+     */
+    public function setPasswordAttribute(string $password): void
+    {
+        $this->attributes['password'] = Hash::make($password);
     }
 }

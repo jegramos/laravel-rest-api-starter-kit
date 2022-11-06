@@ -17,6 +17,6 @@ class AppHelper
      */
     public function getMaxStringValidationValue(): string
     {
-        return 'max:' . self::STRING_DB_MAX_LENGTH;
+        return 'max:' . static::STRING_DB_MAX_LENGTH;
     }
 }

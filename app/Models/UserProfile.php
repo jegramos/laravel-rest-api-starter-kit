@@ -37,6 +37,16 @@ class UserProfile extends Model
     ];
 
     /**
+     * The attributes that should be hidden for serialization.
+     *
+     * @var array<int, string>
+     */
+    protected $hidden = [
+        'id',
+        'user_id',
+    ];
+
+    /**
      * Dynamic computed attributes
      *
      * @var array<int, string>
