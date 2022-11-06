@@ -4,6 +4,7 @@ namespace App\Repositories\Eloquent;
 
 use App\Interfaces\Repositories\UserRepositoryInterface;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 
 class UserRepository implements UserRepositoryInterface
 {
@@ -16,7 +17,7 @@ class UserRepository implements UserRepositoryInterface
     /** @inheritDoc */
     public function create(array $userInfo): array
     {
-        return [];
+        // DB::transaction()
     }
 
     /** @inheritDoc */

@@ -49,12 +49,6 @@ abstract class ApiController extends Controller
             'errors' => $errors
         ];
 
-        $logErrorMsg = $errors ? $message . ' - ' . implode('|', $errors) : $message;
-
-        if ($statusCode >= Response::HTTP_INTERNAL_SERVER_ERROR) {
-            Log::error($logErrorMsg);
-        }
-
         return response()->json($errorMessage, $statusCode, $headers);
     }
 }
