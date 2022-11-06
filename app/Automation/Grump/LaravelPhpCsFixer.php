@@ -46,6 +46,7 @@ class LaravelPhpCsFixer extends AbstractExternalTask
         }
 
         exec($command, $output, $exitCode);
+
         foreach ($output as $message) {
             echo $message . PHP_EOL;
         }
@@ -53,7 +54,7 @@ class LaravelPhpCsFixer extends AbstractExternalTask
         if ($exitCode !== Command::SUCCESS) {
             $styleFixerClass = StyleFixer::class;
             $errorMessage =
-                "A command threw an exception (code: $exitCode)  in $styleFixerClass. All I can say is good luck";
+                "A command threw an exception (code: $exitCode)  in $styleFixerClass. Please see the logs above";
 
             return TaskResult::createFailed($this, $context, $errorMessage);
         }

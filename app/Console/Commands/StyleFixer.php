@@ -51,7 +51,7 @@ class StyleFixer extends Command
             try {
                 $this->call($command['cmd'], $command['args']);
             } catch (Throwable $th) {
-                $this->error($th->getMessage());
+                $this->error('🙅 Error: ' . $th->getMessage());
                 $exitCode = CommandBase::FAILURE;
             }
         }
