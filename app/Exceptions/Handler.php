@@ -137,7 +137,8 @@ class Handler extends ExceptionHandler
                 // if we f** up somewhere else
                 // TODO: Reporting
                 $errorMessage = $e->getMessage();
-                Log::error('An error was encountered',
+                Log::error(
+                    'An error was encountered',
                     ['error_message' => $e->getMessage(), 'error' => $e->getTraceAsString()]
                 );
 
