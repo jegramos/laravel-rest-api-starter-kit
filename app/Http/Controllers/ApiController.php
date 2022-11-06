@@ -39,7 +39,8 @@ abstract class ApiController extends Controller
         ApiErrorCode $errorCode = null,
         array $errors = null,
         array $headers = []
-    ): JsonResponse {
+    ): JsonResponse
+    {
         $data = [
             'error_code' => $errorCode,
             'message' => $message,
