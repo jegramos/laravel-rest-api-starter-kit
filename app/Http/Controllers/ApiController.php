@@ -31,7 +31,7 @@ abstract class ApiController extends Controller
      * @param string $message
      * @param int $statusCode
      * @param ApiErrorCode|null $errorCode
-     * @param array|null $errors
+     * @param array $errors
      * @param array $headers
      * @return JsonResponse
      */
@@ -42,7 +42,6 @@ abstract class ApiController extends Controller
         array $errors = [],
         array $headers = []
     ): JsonResponse {
-
         $errorMessage = [
             'success' => false,
             'error_code' => $errorCode,
