@@ -30,8 +30,8 @@ return new class () extends Migration {
             $table->string('city')->nullable(); // or Municipality
             $table->string('province')->nullable();
             $table->string('postal_code')->nullable();
-            $table->string('profile_picture_url')->nullable();
             $table->string('country')->nullable();
+            $table->string('profile_picture_url')->nullable();
             $table->timestamps();
         });
     }
