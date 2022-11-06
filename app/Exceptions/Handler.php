@@ -133,9 +133,9 @@ class Handler extends ExceptionHandler
                     Response::HTTP_NOT_FOUND
                 );
                 break;
-                // TODO: Reporting
-                // if we f** up somewhere else
             default:
+                // if we f** up somewhere else
+                // TODO: Reporting
                 $errorMessage = $e->getMessage();
                 Log::error('An error was encountered',
                     ['error_message' => $e->getMessage(), 'error' => $e->getTraceAsString()]
