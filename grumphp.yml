@@ -3,6 +3,8 @@ grumphp:
   fixer:
     enabled: true
     fix_by_default: true
+  parallel:
+    enabled: false
   tasks:
     laravel_cs_fixer:
       ide_helper: true
