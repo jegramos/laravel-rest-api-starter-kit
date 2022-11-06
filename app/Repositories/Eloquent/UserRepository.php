@@ -18,6 +18,7 @@ class UserRepository implements UserRepositoryInterface
     public function create(array $userInfo): array
     {
         // DB::transaction()
+        return [];
     }
 
     /** @inheritDoc */
