@@ -9,7 +9,7 @@ grumphp:
       lockfile: ./composer.lock
       run_always: true
     phpcs:
-      standard: [ PSR1, PSR2, PSR12, PEAR, PHPCS, Zend, Squiz ]
+      standard: [ PSR1, PSR2, PSR12, PEAR, Zend, Squiz ]
       whitelist_patterns: [ /^app\/(.*)/ ]
       report: full
     phpunit:
