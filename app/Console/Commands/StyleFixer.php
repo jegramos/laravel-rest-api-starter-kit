@@ -44,19 +44,19 @@ class StyleFixer extends Command
             $commands[] = ['cmd' => 'ide-helper:models', 'args' => ['--nowrite' => true]];
         }
 
-        $this->info('🧹 Cleaning up your dirty code...');
+        $this->info("\u{1F9F9} Cleaning up your dirty code...");
 
         $exitCode = CommandBase::SUCCESS;
         foreach ($commands as $command) {
             try {
                 $this->call($command['cmd'], $command['args']);
             } catch (Throwable $th) {
-                $this->error('🙅 Error: ' . $th->getMessage());
+                $this->error("\u{1F645}  Error: " . $th->getMessage());
                 $exitCode = CommandBase::FAILURE;
             }
         }
 
-        $this->info('🧺 Code cleanup done!');
+        $this->info("\u{1F9FA} Code cleanup done!");
 
         return $exitCode;
     }
