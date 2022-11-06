@@ -6,6 +6,7 @@ use App\Enums\ApiErrorCode;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Symfony\Component\HttpFoundation\Response;
 
 abstract class ApiController extends Controller
 {
@@ -20,7 +21,8 @@ abstract class ApiController extends Controller
      */
     protected function success($data, int $statusCode, array $headers = []): JsonResponse
     {
-        return response()->json($data, $statusCode, $headers);
+        $successMessage = ['success' => true, 'data' => $data];
+        return response()->json($successMessage, $statusCode, $headers);
     }
 
     /**
@@ -37,24 +39,23 @@ abstract class ApiController extends Controller
         string $message,
         int $statusCode,
         ApiErrorCode $errorCode = null,
-        array $errors = null,
+        array $errors = [],
         array $headers = []
     ): JsonResponse {
-        $data = [
+
+        $errorMessage = [
+            'success' => false,
             'error_code' => $errorCode,
-            'message' => $message,
+            'error_message' => $message,
             'errors' => $errors
         ];
 
         $logErrorMsg = $errors ? $message . ' - ' . implode('|', $errors) : $message;
 
-        if ($statusCode >= 500) {
+        if ($statusCode >= Response::HTTP_INTERNAL_SERVER_ERROR) {
             Log::error($logErrorMsg);
-
-            // Hide the actual error from the client
-            $data['errors'] = null;
         }
 
-        return response()->json($data, $statusCode, $headers);
+        return response()->json($errorMessage, $statusCode, $headers);
     }
 }
