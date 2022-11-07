@@ -65,7 +65,7 @@ class User extends Authenticatable
     public function password(): Attribute
     {
         return Attribute::set(
-            fn($value) => Hash::make($value)
+            fn ($value) => Hash::make($value)
         );
     }
 }
