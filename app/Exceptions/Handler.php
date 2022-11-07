@@ -93,14 +93,14 @@ class Handler extends ExceptionHandler
                     Response::HTTP_NOT_FOUND
                 );
                 break;
-                // if we hit the app-level rate-limit
+            // if we hit the app-level rate-limit
             case $e instanceof ThrottleRequestsException:
                 $response = response()->json(
                     ['message' => 'Too many requests', 'error_code' => ApiErrorCode::RATE_LIMIT, 'errors' => null],
                     Response::HTTP_TOO_MANY_REQUESTS
                 );
                 break;
-                // if we throw a validation error
+            // if we throw a validation error
             case $e instanceof ValidationException:
                 $response = response()->json(
                     [
@@ -111,7 +111,7 @@ class Handler extends ExceptionHandler
                     Response::HTTP_UNPROCESSABLE_ENTITY
                 );
                 break;
-                // if we throw an authentication error
+            // if we throw an authentication error
             case $e instanceof AuthenticationException:
                 $response = response()->json(
                     [
@@ -122,13 +122,14 @@ class Handler extends ExceptionHandler
                     Response::HTTP_UNAUTHORIZED
                 );
                 break;
-                // if a model is not found (e.g. from Model::findOrFail)
+            // if a model is not found (e.g. from Model::findOrFail)
             case $e instanceof ModelNotFoundException:
+                $modelName = class_basename($e->getModel());
                 $response = response()->json(
                     [
-                        'message' => 'Resource not found',
+                        'message' => "$modelName not found",
                         'error_code' => ApiErrorCode::RESOURCE_NOT_FOUND,
-                        'errors' => null
+                        'errors' => null,
                     ],
                     Response::HTTP_NOT_FOUND
                 );

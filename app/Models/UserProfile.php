@@ -76,13 +76,13 @@ class UserProfile extends Model
     }
 
     /**
-     * Append full_name attribute. This is a Laravel 9 syntax
+     * Create full_name attribute
      *
      * @return Attribute
      */
     public function fullName(): Attribute
     {
-        return new Attribute(function () {
+        return Attribute::get(function () {
             $firstName = $this->first_name;
             $lastName = $this->last_name;
             $middle_name = $this->middle_name;

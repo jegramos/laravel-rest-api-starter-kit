@@ -43,24 +43,46 @@ class UserRepository implements UserRepositoryInterface
     /**
      * @inheritDoc
      */
-    public function read($id): array
+    public function read($id, bool $include_profile = true): array
     {
-        return [];
+        $query = User::query();
+
+        if ($include_profile) {
+            $query->with('userProfile');
+        }
+
+        return $query->findOrFail($id)->toArray();
     }
 
     /**
      * @inheritDoc
+     * @throws Throwable
      */
     public function update($id, array $newUserInfo): array
     {
-        return [];
+        return DB::transaction(function () use ($id, $newUserInfo) {
+            /** @var User $user */
+            $user = User::with('userProfile')->findOrFail($id);
+
+            $user->update(Arr::only($newUserInfo, ['email', 'username', 'password']));
+            $user->userProfile()->update(Arr::except($newUserInfo, ['email', 'username', 'password']));
+            $user->save();
+
+            $user->refresh();
+
+            return $user->toArray();
+        }, self::MAX_TRANSACTION_DEADLOCK_ATTEMPTS);
     }
 
     /**
      * @inheritDoc
+     * @throws Throwable
      */
     public function destroy($id): array
     {
-        return [];
+        $user = User::with('userProfile')->findOrFail($id);
+        $user->delete();
+
+        return $user->toArray();
     }
 }

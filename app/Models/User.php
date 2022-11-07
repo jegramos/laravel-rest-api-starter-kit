@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -59,11 +60,12 @@ class User extends Authenticatable
     /**
      * Hash the password whenever it is changed
      *
-     * @param string $password
-     * @return void
+     * @return Attribute
      */
-    public function setPasswordAttribute(string $password): void
+    public function password(): Attribute
     {
-        $this->attributes['password'] = Hash::make($password);
+        return Attribute::set(
+            fn($value) => Hash::make($value)
+        );
     }
 }

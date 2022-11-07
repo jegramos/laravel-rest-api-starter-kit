@@ -9,7 +9,7 @@ use App\Http\Controllers\UserController;
 Route::controller(UserController::class)->name('users.')->group(function () {
     Route::get('', 'index')->name('index');
     Route::post('', 'store')->name('store');
-    Route::get('{id}', 'show')->name('show');
+    Route::get('{id}', 'read')->name('read');
     Route::put('{id}', 'update')->name('update');
     Route::delete('{id}', 'destroy')->name('destroy');
 });
