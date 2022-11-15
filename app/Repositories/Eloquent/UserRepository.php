@@ -43,11 +43,11 @@ class UserRepository implements UserRepositoryInterface
     /**
      * @inheritDoc
      */
-    public function read($id, bool $include_profile = true): array
+    public function read($id, bool $includeProfile = true): array
     {
         $query = User::query();
 
-        if ($include_profile) {
+        if ($includeProfile) {
             $query->with('userProfile');
         }
 
