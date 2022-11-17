@@ -33,6 +33,7 @@ return new class () extends Migration {
             $table->string('country')->nullable();
             $table->string('profile_picture_url')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
