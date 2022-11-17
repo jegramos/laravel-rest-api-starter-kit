@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use AppHelper;
 use Dyrynda\Database\Support\CascadeSoftDeletes;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -21,7 +22,7 @@ class User extends Authenticatable
     use SoftDeletes;
     use CascadeSoftDeletes;
 
-    protected $cascadeDeletes = ['userProfile'];
+    protected array $cascadeDeletes = ['userProfile'];
     protected $dates = ['deleted_at'];
 
     /**
@@ -53,6 +54,17 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function (User $user) {
+            $user->email = AppHelper::appendTimestamp($user->email, '::deleted_');
+            $user->username = AppHelper::appendTimestamp($user->username, '::deleted_');
+            $user->saveQuietly();
+        });
+    }
 
     /**
      * A User has exactly one profile information
