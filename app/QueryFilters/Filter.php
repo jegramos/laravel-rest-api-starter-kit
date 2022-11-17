@@ -23,7 +23,7 @@ abstract class Filter
         return $this->applyFilter($builder);
     }
 
-    protected abstract function getFilterName(): string;
+    abstract protected function getFilterName(): string;
 
-    protected abstract function applyFilter(Builder $builder): Builder;
+    abstract protected function applyFilter(Builder $builder): Builder;
 }

@@ -8,7 +8,7 @@ use Closure;
 
 class Active extends Filter
 {
-    const FILTER_NAME = 'active';
+    public const FILTER_NAME = 'active';
 
     protected function applyFilter(Builder $builder): Builder
     {
