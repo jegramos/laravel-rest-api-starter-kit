@@ -4,7 +4,11 @@ namespace App\Repositories\Eloquent;
 
 use App\Interfaces\Repositories\UserRepositoryInterface;
 use App\Models\User;
+use App\QueryFilters\Active;
+use App\QueryFilters\Sort;
+use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Throwable;
 
@@ -17,7 +21,17 @@ class UserRepository implements UserRepositoryInterface
      */
     public function all(array $filters = null, bool $paginated = false): array
     {
-        return User::with('userProfile')->get()->toArray();
+        /** @var Collection $users */
+        $users = app(Pipeline::class)
+            ->send(User::query()->with('userProfile'))
+            ->through([
+                Sort::class,
+                Active::class
+            ])
+            ->thenReturn()
+            ->get();
+
+        return $users->toArray();
     }
 
     /**
@@ -30,10 +44,11 @@ class UserRepository implements UserRepositoryInterface
             $user = User::create([
                 'email' => $userInfo['email'],
                 'username' => $userInfo['username'],
-                'password' => $userInfo['password']
+                'password' => $userInfo['password'],
+                'active' => $userInfo['active']
             ]);
 
-            $exemptedAttributes = ['email', 'username', 'password'];
+            $exemptedAttributes = ['email', 'username', 'password', 'active'];
             $user->userProfile()->create(Arr::except($userInfo, $exemptedAttributes));
 
             return $user->load('userProfile')->toArray();

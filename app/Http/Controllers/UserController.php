@@ -21,9 +21,10 @@ class UserController extends ApiController
     /**
      * Display a listing of users
      *
+     * @param UserRequest $request
      * @return JsonResponse
      */
-    public function index(): JsonResponse
+    public function index(UserRequest $request): JsonResponse
     {
         $users = $this->userRepository->all();
         return $this->success($users, Response::HTTP_OK);

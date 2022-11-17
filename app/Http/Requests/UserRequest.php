@@ -47,6 +47,8 @@ class UserRequest extends FormRequest
 
         return match ($routeName) {
             'users.store' => $this->getStoreUserRules(),
+            'users.update' => $this->getUpdateUserRules(),
+            'users.index' => $this->getFetchUsersRules(),
             default => [],
         };
     }
@@ -77,13 +79,14 @@ class UserRequest extends FormRequest
             'postal_code' => ['string', 'nullable', AppHelper::getMaxStringValidationValue()],
             'country' => ['string', 'nullable', AppHelper::getMaxStringValidationValue()],
             'profile_picture_url' => ['nullable', 'active_url', AppHelper::getMaxStringValidationValue()],
+            'active' => ['nullable', 'boolean']
         ];
     }
 
     /**
      * User update rules
      */
-    private function getUserUpdateRules(): array
+    private function getUpdateUserRules(): array
     {
         return [
             'email' => ['nullable', 'email', 'unique:users,email'],
@@ -106,6 +109,19 @@ class UserRequest extends FormRequest
             'postal_code' => ['string', 'nullable', AppHelper::getMaxStringValidationValue()],
             'country' => ['string', 'nullable', AppHelper::getMaxStringValidationValue()],
             'profile_picture_url' => ['nullable', 'active_url', AppHelper::getMaxStringValidationValue()],
+            'active' => ['nullable', 'boolean']
+        ];
+    }
+
+    /**
+     * User update rules
+     */
+    private function getFetchUsersRules(): array
+    {
+        return [
+            'active' => ['nullable', 'boolean'],
+            'sort' => ['nullable', 'in:asc,desc'],
+
         ];
     }
 
@@ -118,6 +134,8 @@ class UserRequest extends FormRequest
     {
         return [
             'mobile_number.regex' => 'The :attribute field should follow this format: +63XXXXXXXXXX.',
+            'sort.in' => 'The :attribute parameter must be either `asc` or `desc`',
+            'active.boolean' => 'The :attribute parameter must be either `1` (for true) or `0` (for false)',
 
             // As of writing, we need to add the namespace for the enum rule
             'sex.Illuminate\Validation\Rules\Enum' => 'Valid values for the :attribute field are `male` and `female`.'

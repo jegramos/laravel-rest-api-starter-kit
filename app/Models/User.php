@@ -34,6 +34,7 @@ class User extends Authenticatable
         'email',
         'username',
         'password',
+        'active',
     ];
 
     /**
@@ -53,6 +54,7 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'active' => 'boolean'
     ];
 
     protected static function boot()

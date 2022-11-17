@@ -3,21 +3,22 @@
 namespace App\QueryFilters;
 
 use Illuminate\Contracts\Database\Query\Builder;
-use Illuminate\Http\Request;
-use Closure;
 
-class Active extends Filter
+class Sort extends Filter
 {
-    const FILTER_NAME = 'active';
-
     protected function applyFilter(Builder $builder): Builder
     {
         $filterName = $this->getFilterName();
-        return $builder->where('active', request($filterName));
+
+        if (!in_array(request($filterName), ['asc', 'desc'])) {
+            return $builder;
+        }
+
+        return $builder->orderBy('created_at', request($filterName));
     }
 
     protected function getFilterName(): string
     {
-        return static::FILTER_NAME;
+        return 'sort';
     }
 }
