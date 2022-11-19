@@ -89,14 +89,14 @@ class Handler extends ExceptionHandler
             case $e instanceof NotFoundHttpException:
             case $e instanceof MethodNotAllowedHttpException:
                 $response = response()->json(
-                    ['message' => 'Route not found', 'error_code' => ApiErrorCode::UNKNOWN_ROUTE, 'errors' => null],
+                    ['success' => false, 'message' => 'Route not found', 'error_code' => ApiErrorCode::UNKNOWN_ROUTE],
                     Response::HTTP_NOT_FOUND
                 );
                 break;
                 // if we hit the app-level rate-limit
             case $e instanceof ThrottleRequestsException:
                 $response = response()->json(
-                    ['message' => 'Too many requests', 'error_code' => ApiErrorCode::RATE_LIMIT, 'errors' => null],
+                    ['success' => false, 'message' => 'Too many requests', 'error_code' => ApiErrorCode::RATE_LIMIT],
                     Response::HTTP_TOO_MANY_REQUESTS
                 );
                 break;
@@ -104,6 +104,7 @@ class Handler extends ExceptionHandler
             case $e instanceof ValidationException:
                 $response = response()->json(
                     [
+                        'success' => false,
                         'message' => 'A validation error has occurred',
                         'error_code' => ApiErrorCode::VALIDATION_ERROR,
                         'errors' => $this->transformErrors($e)
@@ -115,9 +116,9 @@ class Handler extends ExceptionHandler
             case $e instanceof AuthenticationException:
                 $response = response()->json(
                     [
+                        'success' => false,
                         'message' => 'Authentication error',
                         'error_code' => ApiErrorCode::UNAUTHORIZED_ERROR,
-                        'errors' => null
                     ],
                     Response::HTTP_UNAUTHORIZED
                 );
@@ -127,9 +128,9 @@ class Handler extends ExceptionHandler
                 $modelName = class_basename($e->getModel());
                 $response = response()->json(
                     [
+                        'success' => false,
                         'message' => "$modelName not found",
                         'error_code' => ApiErrorCode::RESOURCE_NOT_FOUND,
-                        'errors' => null,
                     ],
                     Response::HTTP_NOT_FOUND
                 );
@@ -137,20 +138,23 @@ class Handler extends ExceptionHandler
             default:
                 // if we f** up somewhere else
                 // TODO: Reporting
-                $errorMessage = $e->getMessage();
                 Log::error(
                     'An error was encountered',
                     ['error_message' => $e->getMessage(), 'error' => $e->getTraceAsString()]
                 );
 
+                $body = [
+                    'message' => $e->getMessage(),
+                    'error_code' => ApiErrorCode::SERVER_ERROR,
+                    'stack_trace' => $e->getTraceAsString(),
+                ];
+
                 if (app()->environment('production')) {
-                    $errorMessage = 'An unknown error has occurred';
+                    $body['message'] = 'An unknown error has occurred';
+                    unset($body['stack_trace']);
                 }
 
-                $response = response()->json(
-                    ['message' => $errorMessage, 'error_code' => ApiErrorCode::SERVER_ERROR, 'errors' => null],
-                    Response::HTTP_INTERNAL_SERVER_ERROR
-                );
+                $response = response()->json($body, Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         return $response;

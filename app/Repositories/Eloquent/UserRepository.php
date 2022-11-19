@@ -21,16 +21,7 @@ class UserRepository implements UserRepositoryInterface
      */
     public function all(array $filters = null, bool $paginated = false): array
     {
-        /** @var Collection $users */
-        $users = app(Pipeline::class)
-            ->send(User::query()->with('userProfile'))
-            ->through([
-                Sort::class,
-                Active::class
-            ])
-            ->thenReturn()
-            ->get();
-
+        $users = User::getAllUsersFromPipeline(['userProfile']);
         return $users->toArray();
     }
 
