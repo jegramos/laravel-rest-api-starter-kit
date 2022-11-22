@@ -37,10 +37,11 @@ abstract class ApiController extends Controller
      * @return JsonResponse
      */
     protected function successWithPagination(
-        PaginationType $type, array $data, int $statusCode, array $headers = []
-    ): JsonResponse
-    {
-
+        PaginationType $type,
+        array $data,
+        int $statusCode,
+        array $headers = []
+    ): JsonResponse {
         if ($type === PaginationType::LENGTH_AWARE) {
             $results = PaginationHelper::formatLengthAwarePagination($data);
         }
