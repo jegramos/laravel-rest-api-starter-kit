@@ -46,6 +46,18 @@ abstract class ApiController extends Controller
             $results = PaginationHelper::formatLengthAwarePagination($data);
         }
 
+        switch ($type) {
+            case PaginationType::LENGTH_AWARE:
+                $results = PaginationHelper::formatLengthAwarePagination($data);
+                break;
+            case PaginationType::SIMPLE:
+                $results = PaginationHelper::formatSimplePagination($data);
+                break;
+            case PaginationType::CURSOR:
+                $results = PaginationHelper::formatCursorPagination($data);
+                break;
+        }
+
         $results['success'] = true;
         return response()->json($results, $statusCode, $headers);
     }

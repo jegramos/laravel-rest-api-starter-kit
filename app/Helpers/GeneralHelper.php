@@ -6,7 +6,7 @@ namespace App\Helpers;
  * Please use the facade registered
  * @see \App\Providers\FacadeServiceProvider
  */
-class AppHelper
+class GeneralHelper
 {
     public const STRING_DB_MAX_LENGTH = 255;
 

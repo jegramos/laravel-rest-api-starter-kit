@@ -2,7 +2,7 @@
 
 namespace App\Providers;
 
-use App\Helpers\AppHelper;
+use App\Helpers\GeneralHelper;
 use App\Helpers\PaginationHelper;
 use Illuminate\Support\ServiceProvider;
 
@@ -18,8 +18,8 @@ class FacadeServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->bind('AppHelper', function ($app) {
-            return new AppHelper();
+        $this->app->bind('GeneralHelper', function ($app) {
+            return new GeneralHelper();
         });
         $this->app->bind('PaginationHelper', function ($app) {
             return new PaginationHelper();

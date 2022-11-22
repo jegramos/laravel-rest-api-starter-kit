@@ -5,7 +5,7 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\QueryFilters\Active;
 use App\QueryFilters\Sort;
-use AppHelper;
+use GeneralHelper;
 use Dyrynda\Database\Support\CascadeSoftDeletes;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -67,8 +67,8 @@ class User extends Authenticatable
         parent::boot();
 
         static::deleting(function (User $user) {
-            $user->email = AppHelper::appendTimestamp($user->email, '::deleted_');
-            $user->username = AppHelper::appendTimestamp($user->username, '::deleted_');
+            $user->email = GeneralHelper::appendTimestamp($user->email, '::deleted_');
+            $user->username = GeneralHelper::appendTimestamp($user->username, '::deleted_');
             $user->saveQuietly();
         });
     }

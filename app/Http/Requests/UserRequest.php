@@ -3,7 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Enums\Sex;
-use AppHelper;
+use GeneralHelper;
 use Date;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rules\Enum;
@@ -62,23 +62,23 @@ class UserRequest extends FormRequest
             'email' => ['required', 'email', 'unique:users,email'],
             'username' => ['string', 'required', 'unique:users,username', 'alpha_dash', 'max:15'],
             'password' => ['string', 'required', 'confirmed', Password::min(8)->mixedCase()->numbers()],
-            'first_name' => ['string', 'required', AppHelper::getMaxStringValidationValue()],
-            'last_name' => ['string', 'required', AppHelper::getMaxStringValidationValue()],
-            'middle_name' => ['string', 'nullable', AppHelper::getMaxStringValidationValue()],
+            'first_name' => ['string', 'required', GeneralHelper::getMaxStringValidationValue()],
+            'last_name' => ['string', 'required', GeneralHelper::getMaxStringValidationValue()],
+            'middle_name' => ['string', 'nullable', GeneralHelper::getMaxStringValidationValue()],
             /** @TODO: add international validation */
             'mobile_number' => ['string', 'nullable', 'regex:/^(\+63)\d{10}$/'],
-            'telephone_number' => ['string', 'nullable', AppHelper::getMaxStringValidationValue()],
+            'telephone_number' => ['string', 'nullable', GeneralHelper::getMaxStringValidationValue()],
             'sex' => ['nullable', new Enum(Sex::class)],
             'birthday' => ['nullable', 'date_format:Y-m-d', 'before_or_equal:' . $this->dateToday],
-            'address_line_1' => ['string', 'nullable', AppHelper::getMaxStringValidationValue()],
-            'address_line_2' => ['string', 'nullable', AppHelper::getMaxStringValidationValue()],
-            'address_line_3' => ['string', 'nullable', AppHelper::getMaxStringValidationValue()],
-            'district' => ['string', 'nullable', AppHelper::getMaxStringValidationValue()],
-            'city' => ['string', 'nullable', AppHelper::getMaxStringValidationValue()],
-            'province' => ['string', 'nullable', AppHelper::getMaxStringValidationValue()],
-            'postal_code' => ['string', 'nullable', AppHelper::getMaxStringValidationValue()],
-            'country' => ['string', 'nullable', AppHelper::getMaxStringValidationValue()],
-            'profile_picture_url' => ['nullable', 'active_url', AppHelper::getMaxStringValidationValue()],
+            'address_line_1' => ['string', 'nullable', GeneralHelper::getMaxStringValidationValue()],
+            'address_line_2' => ['string', 'nullable', GeneralHelper::getMaxStringValidationValue()],
+            'address_line_3' => ['string', 'nullable', GeneralHelper::getMaxStringValidationValue()],
+            'district' => ['string', 'nullable', GeneralHelper::getMaxStringValidationValue()],
+            'city' => ['string', 'nullable', GeneralHelper::getMaxStringValidationValue()],
+            'province' => ['string', 'nullable', GeneralHelper::getMaxStringValidationValue()],
+            'postal_code' => ['string', 'nullable', GeneralHelper::getMaxStringValidationValue()],
+            'country' => ['string', 'nullable', GeneralHelper::getMaxStringValidationValue()],
+            'profile_picture_url' => ['nullable', 'active_url', GeneralHelper::getMaxStringValidationValue()],
             'active' => ['nullable', 'boolean']
         ];
     }
@@ -92,23 +92,23 @@ class UserRequest extends FormRequest
             'email' => ['nullable', 'email', 'unique:users,email'],
             'username' => ['string', 'nullable', 'unique:users,username', 'alpha_dash', 'max:15'],
             'password' => ['string', 'nullable', 'confirmed', Password::min(8)->mixedCase()->numbers()],
-            'first_name' => ['string', 'nullable', AppHelper::getMaxStringValidationValue()],
-            'last_name' => ['string', 'nullable', AppHelper::getMaxStringValidationValue()],
-            'middle_name' => ['string', 'nullable', AppHelper::getMaxStringValidationValue()],
+            'first_name' => ['string', 'nullable', GeneralHelper::getMaxStringValidationValue()],
+            'last_name' => ['string', 'nullable', GeneralHelper::getMaxStringValidationValue()],
+            'middle_name' => ['string', 'nullable', GeneralHelper::getMaxStringValidationValue()],
             /** @TODO: add international validation */
             'mobile_number' => ['string', 'nullable', 'regex:/^(\+63)\d{10}$/'],
-            'telephone_number' => ['string', 'nullable', AppHelper::getMaxStringValidationValue()],
+            'telephone_number' => ['string', 'nullable', GeneralHelper::getMaxStringValidationValue()],
             'sex' => ['nullable', new Enum(Sex::class)],
             'birthday' => ['nullable', 'date_format:Y-m-d', 'before_or_equal:' . $this->dateToday],
-            'address_line_1' => ['string', 'nullable', AppHelper::getMaxStringValidationValue()],
-            'address_line_2' => ['string', 'nullable', AppHelper::getMaxStringValidationValue()],
-            'address_line_3' => ['string', 'nullable', AppHelper::getMaxStringValidationValue()],
-            'district' => ['string', 'nullable', AppHelper::getMaxStringValidationValue()],
-            'city' => ['string', 'nullable', AppHelper::getMaxStringValidationValue()],
-            'province' => ['string', 'nullable', AppHelper::getMaxStringValidationValue()],
-            'postal_code' => ['string', 'nullable', AppHelper::getMaxStringValidationValue()],
-            'country' => ['string', 'nullable', AppHelper::getMaxStringValidationValue()],
-            'profile_picture_url' => ['nullable', 'active_url', AppHelper::getMaxStringValidationValue()],
+            'address_line_1' => ['string', 'nullable', GeneralHelper::getMaxStringValidationValue()],
+            'address_line_2' => ['string', 'nullable', GeneralHelper::getMaxStringValidationValue()],
+            'address_line_3' => ['string', 'nullable', GeneralHelper::getMaxStringValidationValue()],
+            'district' => ['string', 'nullable', GeneralHelper::getMaxStringValidationValue()],
+            'city' => ['string', 'nullable', GeneralHelper::getMaxStringValidationValue()],
+            'province' => ['string', 'nullable', GeneralHelper::getMaxStringValidationValue()],
+            'postal_code' => ['string', 'nullable', GeneralHelper::getMaxStringValidationValue()],
+            'country' => ['string', 'nullable', GeneralHelper::getMaxStringValidationValue()],
+            'profile_picture_url' => ['nullable', 'active_url', GeneralHelper::getMaxStringValidationValue()],
             'active' => ['nullable', 'boolean']
         ];
     }
@@ -122,8 +122,7 @@ class UserRequest extends FormRequest
             'active' => ['nullable', 'boolean'],
             'sort' => ['nullable', 'in:asc,desc'],
             'limit' => ['nullable', 'int'],
-            'page' => ['nullable', 'int']
-
+            'page' => ['nullable', 'int'],
         ];
     }
 

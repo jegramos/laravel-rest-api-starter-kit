@@ -31,7 +31,7 @@ class UserRepository implements UserRepositoryInterface
                 Active::class
             ])
             ->thenReturn()
-            ->paginate(request('limit'));
+            ->cursorPaginate(request('limit'));
 
         return $users->toArray();
     }

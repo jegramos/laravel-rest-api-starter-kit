@@ -211,7 +211,7 @@ return [
     */
 
     'aliases' => Facade::defaultAliases()->merge([
-        'AppHelper' => \App\Facades\AppHelperFacade::class,
+        'GeneralHelper' => \App\Facades\GeneralHelperFacade::class,
         'PaginationHelper' => \App\Facades\PaginationHelperFacade::class,
     ])->toArray(),
 
