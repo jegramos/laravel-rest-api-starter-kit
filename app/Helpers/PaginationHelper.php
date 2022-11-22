@@ -101,7 +101,7 @@ class PaginationHelper
             'next_cursor' => $results['next_cursor'],
             'prev_cursor' => $results['prev_cursor'],
             'prev_page_url' => $this->appendUrlQueryInputs($results['prev_page_url'], ['cursor']),
-            'next_page_url' => $this->appendUrlQueryInputs( $results['next_page_url'], ['cursor']),
+            'next_page_url' => $this->appendUrlQueryInputs($results['next_page_url'], ['cursor']),
             'per_page' => $results['per_page'],
             'path' => $results['path'],
         ];
