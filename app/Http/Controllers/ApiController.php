@@ -3,26 +3,50 @@
 namespace App\Http\Controllers;
 
 use App\Enums\ApiErrorCode;
+use App\Enums\PaginationType;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
-use Symfony\Component\HttpFoundation\Response;
+use InvalidArgumentException;
+use PaginationHelper;
 
 abstract class ApiController extends Controller
 {
     /**
      * Return a success JSON success response.
      *
-     * @param $data
+     * @param array $data
      * @param int $statusCode
      * @param array $headers
      *
      * @return JsonResponse
      */
-    protected function success($data, int $statusCode, array $headers = []): JsonResponse
+    protected function success(array $data, int $statusCode, array $headers = []): JsonResponse
     {
-        $successMessage = ['success' => true, 'data' => $data];
-        return response()->json($successMessage, $statusCode, $headers);
+        $results = ['success' => true, 'data' => $data];
+        return response()->json($results, $statusCode, $headers);
+    }
+
+    /**
+     * Return a success JSON success response with pagination
+     *
+     * @param PaginationType $type
+     * @param array $data
+     * @param int $statusCode
+     * @param array $headers
+     *
+     * @return JsonResponse
+     */
+    protected function successWithPagination(
+        PaginationType $type, array $data, int $statusCode, array $headers = []
+    ): JsonResponse
+    {
+
+        if ($type === PaginationType::LENGTH_AWARE) {
+            $results = PaginationHelper::formatLengthAwarePagination($data);
+        }
+
+        $results['success'] = true;
+        return response()->json($results, $statusCode, $headers);
     }
 
     /**

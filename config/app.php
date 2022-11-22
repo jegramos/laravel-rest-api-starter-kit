@@ -212,6 +212,7 @@ return [
 
     'aliases' => Facade::defaultAliases()->merge([
         'AppHelper' => \App\Facades\AppHelperFacade::class,
+        'PaginationHelper' => \App\Facades\PaginationHelperFacade::class,
     ])->toArray(),
 
 ];

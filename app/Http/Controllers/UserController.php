@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\PaginationType;
 use App\Http\Requests\UserRequest;
 use App\Interfaces\Repositories\UserRepositoryInterface;
 use App\Models\User;
@@ -27,7 +28,7 @@ class UserController extends ApiController
     public function index(UserRequest $request): JsonResponse
     {
         $users = $this->userRepository->all();
-        return $this->success($users, Response::HTTP_OK);
+        return $this->successWithPagination(PaginationType::LENGTH_AWARE, $users, Response::HTTP_OK);
     }
 
     /**

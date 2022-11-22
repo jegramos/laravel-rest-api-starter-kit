@@ -6,10 +6,12 @@ use App\Interfaces\Repositories\UserRepositoryInterface;
 use App\Models\User;
 use App\QueryFilters\Active;
 use App\QueryFilters\Sort;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use PaginationHelper;
 use Throwable;
 
 class UserRepository implements UserRepositoryInterface
@@ -21,7 +23,16 @@ class UserRepository implements UserRepositoryInterface
      */
     public function all(array $filters = null, bool $paginated = false): array
     {
-        $users = User::getAllUsersFromPipeline(['userProfile']);
+        /** @var LengthAwarePaginator $users */
+        $users = app(Pipeline::class)
+            ->send(User::query()->with('userProfile'))
+            ->through([
+                Sort::class,
+                Active::class
+            ])
+            ->thenReturn()
+            ->paginate(request('limit'));
+
         return $users->toArray();
     }
 

@@ -8,13 +8,14 @@ use App\QueryFilters\Sort;
 use AppHelper;
 use Dyrynda\Database\Support\CascadeSoftDeletes;
 use Illuminate\Database\Eloquent\Casts\Attribute;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Pipeline\Pipeline;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Sanctum\HasApiTokens;
 
@@ -92,30 +93,5 @@ class User extends Authenticatable
         return Attribute::set(
             fn ($value) => Hash::make($value)
         );
-    }
-
-    /**
-     * Get all users with included query filters
-     *
-     * @param array ...$eagerLoadRelations
-     * @return Collection
-     */
-    public static function getAllUsersFromPipeline(array ...$eagerLoadRelations): Collection
-    {
-        $query = User::query();
-
-        if (!empty($eagerLoadRelations)) {
-            $query->with(...$eagerLoadRelations);
-        }
-
-        /** @var \Illuminate\Support\Collection $users */
-        return app(Pipeline::class)
-            ->send($query)
-            ->through([
-                Sort::class,
-                Active::class
-            ])
-            ->thenReturn()
-            ->get();
     }
 }

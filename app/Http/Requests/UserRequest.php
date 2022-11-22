@@ -121,6 +121,8 @@ class UserRequest extends FormRequest
         return [
             'active' => ['nullable', 'boolean'],
             'sort' => ['nullable', 'in:asc,desc'],
+            'limit' => ['nullable', 'int'],
+            'page' => ['nullable', 'int']
 
         ];
     }
