@@ -4,7 +4,6 @@ namespace App\Http\Requests;
 
 use App\Enums\Sex;
 use ValidationHelper;
-use Date;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rules\Enum;
 use Illuminate\Validation\Rules\Password;
@@ -89,8 +88,8 @@ class UserRequest extends FormRequest
     private function getUpdateUserRules(): array
     {
         return [
-            'email' => ['nullable', 'email', 'unique:users,email'],
-            'username' => ['string', 'nullable', 'unique:users,username', 'alpha_dash', 'max:15'],
+            'email' => ['nullable', 'email', 'unique:users,email,' . request('id')],
+            'username' => ['string', 'nullable', 'alpha_dash', 'max:15', 'unique:users,username,' . request('id')],
             'password' => ['string', 'nullable', 'confirmed', Password::min(8)->mixedCase()->numbers()],
             'first_name' => ['string', 'nullable', ValidationHelper::getMaxStringValidationValue()],
             'last_name' => ['string', 'nullable', ValidationHelper::getMaxStringValidationValue()],

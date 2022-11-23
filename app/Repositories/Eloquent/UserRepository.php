@@ -86,6 +86,8 @@ class UserRepository implements UserRepositoryInterface
             /** @var User $user */
             $user = User::with('userProfile')->findOrFail($id);
 
+            unset($newUserInfo['password_confirmation']);
+
             $user->update(Arr::only($newUserInfo, ['email', 'username', 'password', 'active']));
             $user->userProfile()->update(Arr::except($newUserInfo, ['email', 'username', 'password', 'active']));
             $user->save();

@@ -15,16 +15,15 @@ class UserManagementTest extends TestCase
     use RefreshDatabase;
 
     /** @dataProvider validCreateUserInputs */
-    public function test_it_should_create_a_user($input, $statusCode)
+    public function test_it_can_create_a_user($input, $statusCode)
     {
         $response = $this->postJson('/api/v1/users', $input);
         $response->assertStatus($statusCode);
     }
 
     /** @throws Throwable */
-    public function test_it_should_validate_unique_fields()
+    public function test_it_should_validate_unique_fields_when_creating_a_user()
     {
-        $repository = new UserRepository();
         $input = [
             'email' => 'sample_email@email.com',
             'username' => 'username1',
@@ -33,7 +32,7 @@ class UserManagementTest extends TestCase
             'first_name' => 'Jeg',
             'last_name' => 'Ramos'
         ];
-        $repository->create($input);
+        $this->createUser($input);
 
         $response = $this->postJson('/api/v1/users', $input);
         $response->assertStatus(422);
@@ -44,12 +43,9 @@ class UserManagementTest extends TestCase
         }
     }
 
-    /**
-     * @throws Throwable
-     */
+    /** @throws Throwable */
     public function test_it_should_update_a_user()
     {
-        $repository = new UserRepository();
         $input = [
             'email' => 'sample_email@email.com',
             'username' => 'username1',
@@ -58,9 +54,7 @@ class UserManagementTest extends TestCase
             'first_name' => 'Jeg',
             'last_name' => 'Ramos'
         ];
-        $repository->create($input);
-
-        $user = User::first();
+        $user = $this->createUser($input);
 
         $edits = [
             'email' => 'sample_email_edited@email.com',
@@ -84,7 +78,7 @@ class UserManagementTest extends TestCase
             'profile_picture_url' => 'https://yahoo.com'
         ];
 
-        $response = $this->putJson("/api/v1/users/{$user->id}", $edits);
+        $response = $this->putJson("/api/v1/users/{$user['id']}", $edits);
         $response->assertStatus(200);
 
         $response = json_decode($response->decodeResponseJson()->json, true);
@@ -102,6 +96,73 @@ class UserManagementTest extends TestCase
 
             $this->assertEquals($value, $actual);
         }
+    }
+
+    /** @throws Throwable */
+    public function test_it_should_validate_unique_fields_when_updating_a_user()
+    {
+        $input = [
+            'email' => 'sample_email@email.com',
+            'username' => 'username1',
+            'password' => 'Sample_Password_1',
+            'password_confirmation' => 'Sample_Password_1',
+            'first_name' => 'Jeg',
+            'last_name' => 'Ramos'
+        ];
+        $user1 = $this->createUser($input);
+
+        $input2 = [
+            'email' => 'sample_email2@email.com',
+            'username' => 'username2',
+            'password' => 'Sample_Password_1',
+            'password_confirmation' => 'Sample_Password_1',
+            'first_name' => 'Jego',
+            'last_name' => 'Ramos'
+        ];
+        $this->createUser($input2);
+
+        $response = $this->putJson("/api/v1/users/{$user1['id']}", $input2);
+        $response->assertStatus(422);
+    }
+
+    /** @throws Throwable */
+    public function test_it_should_ignore_unique_validation_when_updating_the_same_user()
+    {
+        $input = [
+            'email' => 'sample_email@email.com',
+            'username' => 'username1',
+            'password' => 'Sample_Password_1',
+            'password_confirmation' => 'Sample_Password_1',
+            'first_name' => 'Jeg',
+            'last_name' => 'Ramos'
+        ];
+        $user = $this->createUser($input);
+
+        $response = $this->putJson("/api/v1/users/{$user['id']}", $input);
+        $response->assertStatus(200);
+    }
+
+    /** @throws Throwable */
+    public function test_it_can_delete_a_user()
+    {
+        $user = $this->createUser([
+            'email' => 'sample_email@email.com',
+            'username' => 'username1',
+            'password' => 'Sample_Password_1',
+            'password_confirmation' => 'Sample_Password_1',
+            'first_name' => 'Jeg',
+            'last_name' => 'Ramos'
+        ]);
+
+        $response = $this->delete("api/v1/users/{$user['id']}");
+        $response->assertStatus(200);
+    }
+
+    /** @throws Throwable */
+    private function createUser(array $input): array
+    {
+        $repository = new UserRepository();
+        return $repository->create($input);
     }
 
     public function validCreateUserInputs(): array
