@@ -10,7 +10,7 @@ grumphp:
       ide_helper: true
     securitychecker_enlightn:
       lockfile: ./composer.lock
-      run_always: true
+      run_always: false
     phpcs:
       standard: [ PSR1, PSR2, PSR12 ]
       whitelist_patterns: [ /^app\/(.*)/ ]
