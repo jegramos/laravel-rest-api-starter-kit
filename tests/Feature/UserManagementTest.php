@@ -87,7 +87,6 @@ class UserManagementTest extends TestCase
 
         // compare the input edits to the actual response data
         foreach ($edits as $key => $value) {
-
             // ignore hidden fields in the response
             if (in_array($key, ['password', 'password_confirmation'])) {
                 continue;
