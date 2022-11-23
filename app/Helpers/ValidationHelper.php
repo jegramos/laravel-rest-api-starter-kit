@@ -6,7 +6,7 @@ namespace App\Helpers;
  * Please use the facade registered
  * @see \App\Providers\FacadeServiceProvider
  */
-class GeneralHelper
+class ValidationHelper
 {
     public const STRING_DB_MAX_LENGTH = 255;
 
@@ -18,18 +18,5 @@ class GeneralHelper
     public function getMaxStringValidationValue(): string
     {
         return 'max:' . static::STRING_DB_MAX_LENGTH;
-    }
-
-    /**
-     * Append a timestamp at the end of a string. Useful for
-     * soft deleting unique records
-     *
-     * @param string $value
-     * @param string $separator
-     * @return string
-     */
-    public function appendTimestamp(string $value, string $separator = '::'): string
-    {
-        return $value . $separator . time();
     }
 }

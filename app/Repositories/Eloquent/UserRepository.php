@@ -31,7 +31,7 @@ class UserRepository implements UserRepositoryInterface
                 Active::class
             ])
             ->thenReturn()
-            ->cursorPaginate(request('limit'));
+            ->paginate(request('limit'));
 
         return $users->toArray();
     }
@@ -43,12 +43,17 @@ class UserRepository implements UserRepositoryInterface
     public function create(array $userInfo): array
     {
         return DB::transaction(function () use ($userInfo) {
-            $user = User::create([
+            $userCredentials = [
                 'email' => $userInfo['email'],
                 'username' => $userInfo['username'],
                 'password' => $userInfo['password'],
-                'active' => $userInfo['active']
-            ]);
+            ];
+
+            if (isset($userInfo['active'])) {
+                $userCredentials['active'] = $userInfo['active'];
+            }
+
+            $user = User::create($userCredentials);
 
             $exemptedAttributes = ['email', 'username', 'password', 'active'];
             $user->userProfile()->create(Arr::except($userInfo, $exemptedAttributes));
@@ -81,8 +86,8 @@ class UserRepository implements UserRepositoryInterface
             /** @var User $user */
             $user = User::with('userProfile')->findOrFail($id);
 
-            $user->update(Arr::only($newUserInfo, ['email', 'username', 'password']));
-            $user->userProfile()->update(Arr::except($newUserInfo, ['email', 'username', 'password']));
+            $user->update(Arr::only($newUserInfo, ['email', 'username', 'password', 'active']));
+            $user->userProfile()->update(Arr::except($newUserInfo, ['email', 'username', 'password', 'active']));
             $user->save();
 
             $user->refresh();

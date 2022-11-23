@@ -28,7 +28,7 @@ class UserController extends ApiController
     public function index(UserRequest $request): JsonResponse
     {
         $users = $this->userRepository->all();
-        return $this->successWithPagination(PaginationType::CURSOR, $users, Response::HTTP_OK);
+        return $this->successWithPagination(PaginationType::LENGTH_AWARE, $users, Response::HTTP_OK);
     }
 
     /**

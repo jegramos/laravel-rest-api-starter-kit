@@ -79,13 +79,16 @@ abstract class ApiController extends Controller
         array $errors = [],
         array $headers = []
     ): JsonResponse {
-        $errorMessage = [
+        $results = [
             'success' => false,
             'error_code' => $errorCode,
             'error_message' => $message,
-            'errors' => $errors
         ];
 
-        return response()->json($errorMessage, $statusCode, $headers);
+        if (!empty($errors)) {
+            $results['errors'] = $errors;
+        }
+
+        return response()->json($results, $statusCode, $headers);
     }
 }

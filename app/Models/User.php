@@ -3,19 +3,14 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
-use App\QueryFilters\Active;
-use App\QueryFilters\Sort;
-use GeneralHelper;
+use DateTimeHelper;
 use Dyrynda\Database\Support\CascadeSoftDeletes;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Query\Builder;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Pipeline\Pipeline;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Sanctum\HasApiTokens;
 
@@ -27,6 +22,7 @@ class User extends Authenticatable
     use SoftDeletes;
     use CascadeSoftDeletes;
 
+    /** @see https://github.com/shiftonelabs/laravel-cascade-deletes */
     protected array $cascadeDeletes = ['userProfile'];
     protected $dates = ['deleted_at'];
 
@@ -67,8 +63,8 @@ class User extends Authenticatable
         parent::boot();
 
         static::deleting(function (User $user) {
-            $user->email = GeneralHelper::appendTimestamp($user->email, '::deleted_');
-            $user->username = GeneralHelper::appendTimestamp($user->username, '::deleted_');
+            $user->email = DateTimeHelper::appendTimestamp($user->email, '::deleted_');
+            $user->username = DateTimeHelper::appendTimestamp($user->username, '::deleted_');
             $user->saveQuietly();
         });
     }

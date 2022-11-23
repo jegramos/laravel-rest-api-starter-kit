@@ -2,7 +2,8 @@
 
 namespace App\Providers;
 
-use App\Helpers\GeneralHelper;
+use App\Helpers\DateTimeHelper;
+use App\Helpers\ValidationHelper;
 use App\Helpers\PaginationHelper;
 use Illuminate\Support\ServiceProvider;
 
@@ -18,11 +19,14 @@ class FacadeServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->bind('GeneralHelper', function ($app) {
-            return new GeneralHelper();
+        $this->app->bind('ValidationHelper', function ($app) {
+            return new ValidationHelper();
         });
         $this->app->bind('PaginationHelper', function ($app) {
             return new PaginationHelper();
+        });
+        $this->app->bind('DateTimeHelper', function ($app) {
+            return new DateTimeHelper();
         });
     }
 
