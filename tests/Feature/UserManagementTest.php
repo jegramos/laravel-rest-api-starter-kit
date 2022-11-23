@@ -2,7 +2,6 @@
 
 namespace Tests\Feature;
 
-use App\Models\User;
 use App\Repositories\Eloquent\UserRepository;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Arr;
@@ -19,6 +18,47 @@ class UserManagementTest extends TestCase
     {
         $response = $this->postJson('/api/v1/users', $input);
         $response->assertStatus($statusCode);
+    }
+
+    public function validCreateUserInputs(): array
+    {
+        $requiredFieldsOnly = [
+            'email' => 'sample_email@email.com',
+            'username' => 'username1',
+            'password' => 'Sample_Password_1',
+            'password_confirmation' => 'Sample_Password_1',
+            'first_name' => 'Jeg',
+            'last_name' => 'Ramos'
+        ];
+
+        $allFields = array_merge($requiredFieldsOnly, [
+            'active' => true,
+            'middle_name' => 'Bucu',
+            'mobile_number' => '+639064647295',
+            'telephone_number' => '+63279434285',
+            'sex' => 'male',
+            'birthday' => '1997-01-04',
+            'address_line_1' => 'Address Line 1',
+            'address_line_2' => 'Address Line 2',
+            'address_line_3' => 'Address Line 3',
+            'district' => 'District 1',
+            'city' => 'City 1',
+            'province' => 'Province 1',
+            'postal_code' => '211',
+            'country' => 'Philippines',
+            'profile_picture_url' => 'https://google.com'
+        ]);
+
+        $missingRequiredFields = Arr::except(
+            $allFields,
+            ['username', 'email', 'password', 'password_confirmation', 'first_name', 'last_name']
+        );
+
+        return [
+            [$requiredFieldsOnly, 201],
+            [$allFields, 201],
+            [$missingRequiredFields, 422]
+        ];
     }
 
     /** @throws Throwable */
@@ -66,7 +106,7 @@ class UserManagementTest extends TestCase
             'active' => false,
             'middle_name' => 'Bucu edited',
             'mobile_number' => '+639064647291',
-            'telephone_number' => '223331',
+            'telephone_number' => '+63279434285',
             'sex' => 'female',
             'birthday' => '1997-01-05',
             'address_line_1' => 'Address Line 1 edited',
@@ -150,6 +190,58 @@ class UserManagementTest extends TestCase
         $response->assertStatus(200);
     }
 
+    /** @dataProvider differentMobileNumbers */
+    public function test_it_should_validate_mobile_number_formats($input, $statusCode)
+    {
+        $result = $this->postJson('api/v1/users', $input);
+        $result->assertStatus($statusCode);
+    }
+
+    public function differentMobileNumbers(): array
+    {
+        $requiredFields = [
+            'email' => 'sample_email@email.com',
+            'username' => 'username1',
+            'password' => 'Sample_Password_1',
+            'password_confirmation' => 'Sample_Password_1',
+            'first_name' => 'Jeg',
+            'last_name' => 'Ramos'
+        ];
+
+        return [
+            [array_merge($requiredFields, ['mobile_number' => '+639064647295']), 201],
+            [array_merge($requiredFields, ['mobile_number' => '+63 9064647295']), 422],
+            [array_merge($requiredFields, ['mobile_number' => '639064647295']), 422],
+            [array_merge($requiredFields, ['mobile_number' => '09064647295']), 422],
+        ];
+    }
+
+    /** @dataProvider differentTelephoneNumbers */
+    public function test_it_should_validate_telephone_number_formats($input, $statusCode)
+    {
+        $result = $this->postJson('api/v1/users', $input);
+        $result->assertStatus($statusCode);
+    }
+
+    public function differentTelephoneNumbers(): array
+    {
+        $requiredFields = [
+            'email' => 'sample_email@email.com',
+            'username' => 'username1',
+            'password' => 'Sample_Password_1',
+            'password_confirmation' => 'Sample_Password_1',
+            'first_name' => 'Jeg',
+            'last_name' => 'Ramos'
+        ];
+
+        return [
+            [array_merge($requiredFields, ['telephone_number' => '+63279434285']), 201],
+            [array_merge($requiredFields, ['telephone_number' => '+63 279434285']), 422],
+            [array_merge($requiredFields, ['telephone_number' => '63279434285']), 422],
+            [array_merge($requiredFields, ['telephone_number' => '279434285']), 422],
+        ];
+    }
+
     /** @throws Throwable */
     public function test_it_can_delete_a_user()
     {
@@ -171,46 +263,5 @@ class UserManagementTest extends TestCase
     {
         $repository = new UserRepository();
         return $repository->create($input);
-    }
-
-    public function validCreateUserInputs(): array
-    {
-        $requiredFieldsOnly = [
-            'email' => 'sample_email@email.com',
-            'username' => 'username1',
-            'password' => 'Sample_Password_1',
-            'password_confirmation' => 'Sample_Password_1',
-            'first_name' => 'Jeg',
-            'last_name' => 'Ramos'
-        ];
-
-        $allFields = array_merge($requiredFieldsOnly, [
-            'active' => true,
-            'middle_name' => 'Bucu',
-            'mobile_number' => '+639064647295',
-            'telephone_number' => '223333',
-            'sex' => 'male',
-            'birthday' => '1997-01-04',
-            'address_line_1' => 'Address Line 1',
-            'address_line_2' => 'Address Line 2',
-            'address_line_3' => 'Address Line 3',
-            'district' => 'District 1',
-            'city' => 'City 1',
-            'province' => 'Province 1',
-            'postal_code' => '211',
-            'country' => 'Philippines',
-            'profile_picture_url' => 'https://google.com'
-        ]);
-
-        $missingRequiredFields = Arr::except(
-            $allFields,
-            ['username', 'email', 'password', 'password_confirmation', 'first_name', 'last_name']
-        );
-
-        return [
-            [$requiredFieldsOnly, 201],
-            [$allFields, 201],
-            [$missingRequiredFields, 422]
-        ];
     }
 }

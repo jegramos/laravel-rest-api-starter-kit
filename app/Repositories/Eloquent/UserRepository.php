@@ -9,9 +9,7 @@ use App\QueryFilters\Sort;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
-use PaginationHelper;
 use Throwable;
 
 class UserRepository implements UserRepositoryInterface

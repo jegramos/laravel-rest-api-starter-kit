@@ -3,6 +3,8 @@
 namespace App\Http\Requests;
 
 use App\Enums\Sex;
+use App\Rules\IsInternationalPhoneNumber;
+use Illuminate\Validation\Rule;
 use ValidationHelper;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rules\Enum;
@@ -64,9 +66,18 @@ class UserRequest extends FormRequest
             'first_name' => ['string', 'required', ValidationHelper::getMaxStringValidationValue()],
             'last_name' => ['string', 'required', ValidationHelper::getMaxStringValidationValue()],
             'middle_name' => ['string', 'nullable', ValidationHelper::getMaxStringValidationValue()],
-            /** @TODO: add international validation */
-            'mobile_number' => ['string', 'nullable', 'regex:/^(\+63)\d{10}$/'],
-            'telephone_number' => ['string', 'nullable', ValidationHelper::getMaxStringValidationValue()],
+            'mobile_number' => [
+                'string',
+                'nullable',
+                new IsInternationalPhoneNumber,
+                Rule::phone()->detect()->country('PH')->mobile()
+            ],
+            'telephone_number' => [
+                'string',
+                'nullable',
+                new IsInternationalPhoneNumber,
+                Rule::phone()->detect()->country('PH')->fixedLine()
+            ],
             'sex' => ['nullable', new Enum(Sex::class)],
             'birthday' => ['nullable', 'date_format:Y-m-d', 'before_or_equal:' . $this->dateToday],
             'address_line_1' => ['string', 'nullable', ValidationHelper::getMaxStringValidationValue()],
@@ -94,9 +105,18 @@ class UserRequest extends FormRequest
             'first_name' => ['string', 'nullable', ValidationHelper::getMaxStringValidationValue()],
             'last_name' => ['string', 'nullable', ValidationHelper::getMaxStringValidationValue()],
             'middle_name' => ['string', 'nullable', ValidationHelper::getMaxStringValidationValue()],
-            /** @TODO: add international validation */
-            'mobile_number' => ['string', 'nullable', 'regex:/^(\+63)\d{10}$/'],
-            'telephone_number' => ['string', 'nullable', ValidationHelper::getMaxStringValidationValue()],
+            'mobile_number' => [
+                'string',
+                'nullable',
+                new IsInternationalPhoneNumber,
+                Rule::phone()->detect()->country('PH')->mobile()
+            ],
+            'telephone_number' => [
+                'string',
+                'nullable',
+                new IsInternationalPhoneNumber,
+                Rule::phone()->detect()->country('PH')->fixedLine()
+            ],
             'sex' => ['nullable', new Enum(Sex::class)],
             'birthday' => ['nullable', 'date_format:Y-m-d', 'before_or_equal:' . $this->dateToday],
             'address_line_1' => ['string', 'nullable', ValidationHelper::getMaxStringValidationValue()],
@@ -133,9 +153,12 @@ class UserRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'mobile_number.regex' => 'The :attribute field should follow this format: +63XXXXXXXXXX.',
             'sort.in' => 'The :attribute parameter must be either `asc` or `desc`',
             'active.boolean' => 'The :attribute parameter must be either `1` (for true) or `0` (for false)',
+
+            /** @see https://github.com/Propaganistas/Laravel-Phone#validation */
+            'mobile_number.phone' => "The :attribute field format must be a valid mobile number",
+            'telephone_number.phone' => "The :attribute field format must be a valid line number",
 
             // As of writing, we need to add the namespace for the enum rule
             'sex.Illuminate\Validation\Rules\Enum' => 'Valid values for the :attribute field are `male` and `female`.'

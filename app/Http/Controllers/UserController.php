@@ -5,9 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\PaginationType;
 use App\Http\Requests\UserRequest;
 use App\Interfaces\Repositories\UserRepositoryInterface;
-use App\Models\User;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class UserController extends ApiController

@@ -7,9 +7,9 @@ use App\Http\Controllers\UserController;
  *  @see https://laravel.com/docs/9.x/routing#route-group-controllers
  */
 Route::controller(UserController::class)->name('users.')->group(function () {
-    Route::get('', 'index')->name('index');
     Route::post('', 'store')->name('store');
-    Route::get('{id}', 'read')->name('read');
     Route::patch('{id}', 'update')->name('update');
+    Route::get('', 'index')->name('index');
+    Route::get('{id}', 'read')->name('read');
     Route::delete('{id}', 'destroy')->name('destroy');
 });
