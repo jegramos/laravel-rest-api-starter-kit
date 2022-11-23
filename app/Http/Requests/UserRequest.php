@@ -69,13 +69,13 @@ class UserRequest extends FormRequest
             'mobile_number' => [
                 'string',
                 'nullable',
-                new IsInternationalPhoneNumber,
+                new IsInternationalPhoneNumber(),
                 Rule::phone()->detect()->country('PH')->mobile()
             ],
             'telephone_number' => [
                 'string',
                 'nullable',
-                new IsInternationalPhoneNumber,
+                new IsInternationalPhoneNumber(),
                 Rule::phone()->detect()->country('PH')->fixedLine()
             ],
             'sex' => ['nullable', new Enum(Sex::class)],
@@ -108,13 +108,13 @@ class UserRequest extends FormRequest
             'mobile_number' => [
                 'string',
                 'nullable',
-                new IsInternationalPhoneNumber,
+                new IsInternationalPhoneNumber(),
                 Rule::phone()->detect()->country('PH')->mobile()
             ],
             'telephone_number' => [
                 'string',
                 'nullable',
-                new IsInternationalPhoneNumber,
+                new IsInternationalPhoneNumber(),
                 Rule::phone()->detect()->country('PH')->fixedLine()
             ],
             'sex' => ['nullable', new Enum(Sex::class)],
