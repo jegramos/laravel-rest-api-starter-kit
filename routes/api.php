@@ -18,4 +18,4 @@ use Illuminate\Support\Facades\Route;
 //    return $request->user();
 //});
 
-Route::prefix('/v1/users')->group(base_path('routes/api/users.php'));
+Route::prefix('/v1/users')->group(base_path('routes/api/users.routes.php'));

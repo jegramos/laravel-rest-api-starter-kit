@@ -61,6 +61,8 @@ class UserManagementTest extends TestCase
             'username' => 'user_edited',
             'first_name' => 'Jeg edited',
             'last_name' => 'Ramos edited',
+            'password' => 'Sample123_123',
+            'password_confirmation' => 'Sample123_123',
             'active' => false,
             'middle_name' => 'Bucu edited',
             'mobile_number' => '+639064647291',
@@ -78,13 +80,20 @@ class UserManagementTest extends TestCase
             'profile_picture_url' => 'https://yahoo.com'
         ];
 
-        $response = $this->putJson("/api/v1/users/{$user['id']}", $edits);
+        $response = $this->patchJson("/api/v1/users/{$user['id']}", $edits);
         $response->assertStatus(200);
 
         $response = json_decode($response->decodeResponseJson()->json, true);
 
         // compare the input edits to the actual response data
         foreach ($edits as $key => $value) {
+
+            // ignore hidden fields in the response
+            if (in_array($key, ['password', 'password_confirmation'])) {
+                continue;
+            }
+
+            // profile details are wrapped with a `user_profile` field
             $actual = in_array($key, ['username', 'email', 'active'])
                 ? $response['data'][$key]
                 : $response['data']['user_profile'][$key];
@@ -121,12 +130,12 @@ class UserManagementTest extends TestCase
         ];
         $this->createUser($input2);
 
-        $response = $this->putJson("/api/v1/users/{$user1['id']}", $input2);
+        $response = $this->patchJson("/api/v1/users/{$user1['id']}", $input2);
         $response->assertStatus(422);
     }
 
     /** @throws Throwable */
-    public function test_it_should_ignore_unique_validation_when_updating_the_same_user()
+    public function test_it_should_ignore_unique_validation_when_updating_the_same_user_with_the_same_field_values()
     {
         $input = [
             'email' => 'sample_email@email.com',
@@ -138,7 +147,7 @@ class UserManagementTest extends TestCase
         ];
         $user = $this->createUser($input);
 
-        $response = $this->putJson("/api/v1/users/{$user['id']}", $input);
+        $response = $this->patchJson("/api/v1/users/{$user['id']}", $input);
         $response->assertStatus(200);
     }
 
