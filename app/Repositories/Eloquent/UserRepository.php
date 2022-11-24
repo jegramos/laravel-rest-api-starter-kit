@@ -20,9 +20,9 @@ class UserRepository implements UserRepositoryInterface
 {
     public const MAX_TRANSACTION_DEADLOCK_ATTEMPTS = 5;
 
-    private Model $model;
+    private User $model;
 
-    public function __construct(Model $model)
+    public function __construct(User $model)
     {
         $this->model = $model;
     }
