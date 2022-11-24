@@ -30,7 +30,7 @@ class UserRepository implements UserRepositoryInterface
     /**
      * @inheritDoc
      */
-    public function all(?PaginationType $paginationType = null, ): array
+    public function all(?PaginationType $paginationType = null): array
     {
         /** @var Builder $users */
         $users = app(Pipeline::class)
