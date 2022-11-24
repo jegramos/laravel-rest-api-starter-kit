@@ -3,10 +3,10 @@
 namespace App\Http\Requests;
 
 use App\Enums\Sex;
+use App\Rules\DbVarcharMaxLength;
 use App\Rules\IsInternationalPhoneNumber;
-use Illuminate\Validation\Rule;
-use ValidationHelper;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Enum;
 use Illuminate\Validation\Rules\Password;
 
@@ -63,32 +63,32 @@ class UserRequest extends FormRequest
             'email' => ['required', 'email', 'unique:users,email'],
             'username' => ['string', 'required', 'unique:users,username', 'alpha_dash', 'max:15'],
             'password' => ['string', 'required', 'confirmed', Password::min(8)->mixedCase()->numbers()],
-            'first_name' => ['string', 'required', ValidationHelper::getMaxStringValidationValue()],
-            'last_name' => ['string', 'required', ValidationHelper::getMaxStringValidationValue()],
-            'middle_name' => ['string', 'nullable', ValidationHelper::getMaxStringValidationValue()],
+            'first_name' => ['string', 'required', new DbVarcharMaxLength],
+            'last_name' => ['string', 'required', new DbVarcharMaxLength],
+            'middle_name' => ['string', 'nullable', new DbVarcharMaxLength],
             'mobile_number' => [
                 'string',
                 'nullable',
-                new IsInternationalPhoneNumber(),
+                new IsInternationalPhoneNumber,
                 Rule::phone()->detect()->country('PH')->mobile()
             ],
             'telephone_number' => [
                 'string',
                 'nullable',
-                new IsInternationalPhoneNumber(),
+                new IsInternationalPhoneNumber,
                 Rule::phone()->detect()->country('PH')->fixedLine()
             ],
             'sex' => ['nullable', new Enum(Sex::class)],
             'birthday' => ['nullable', 'date_format:Y-m-d', 'before_or_equal:' . $this->dateToday],
-            'address_line_1' => ['string', 'nullable', ValidationHelper::getMaxStringValidationValue()],
-            'address_line_2' => ['string', 'nullable', ValidationHelper::getMaxStringValidationValue()],
-            'address_line_3' => ['string', 'nullable', ValidationHelper::getMaxStringValidationValue()],
-            'district' => ['string', 'nullable', ValidationHelper::getMaxStringValidationValue()],
-            'city' => ['string', 'nullable', ValidationHelper::getMaxStringValidationValue()],
-            'province' => ['string', 'nullable', ValidationHelper::getMaxStringValidationValue()],
-            'postal_code' => ['string', 'nullable', ValidationHelper::getMaxStringValidationValue()],
-            'country' => ['string', 'nullable', ValidationHelper::getMaxStringValidationValue()],
-            'profile_picture_url' => ['nullable', 'active_url', ValidationHelper::getMaxStringValidationValue()],
+            'address_line_1' => ['string', 'nullable', new DbVarcharMaxLength],
+            'address_line_2' => ['string', 'nullable', new DbVarcharMaxLength],
+            'address_line_3' => ['string', 'nullable', new DbVarcharMaxLength],
+            'district' => ['string', 'nullable', new DbVarcharMaxLength],
+            'city' => ['string', 'nullable', new DbVarcharMaxLength],
+            'province' => ['string', 'nullable', new DbVarcharMaxLength],
+            'postal_code' => ['string', 'nullable', new DbVarcharMaxLength],
+            'country' => ['string', 'nullable', new DbVarcharMaxLength],
+            'profile_picture_url' => ['nullable', 'active_url', new DbVarcharMaxLength],
             'active' => ['nullable', 'boolean']
         ];
     }
@@ -102,13 +102,13 @@ class UserRequest extends FormRequest
             'email' => ['nullable', 'email', 'unique:users,email,' . request('id')],
             'username' => ['string', 'nullable', 'alpha_dash', 'max:15', 'unique:users,username,' . request('id')],
             'password' => ['string', 'nullable', 'confirmed', Password::min(8)->mixedCase()->numbers()],
-            'first_name' => ['string', 'nullable', ValidationHelper::getMaxStringValidationValue()],
-            'last_name' => ['string', 'nullable', ValidationHelper::getMaxStringValidationValue()],
-            'middle_name' => ['string', 'nullable', ValidationHelper::getMaxStringValidationValue()],
+            'first_name' => ['string', 'nullable', new DbVarcharMaxLength],
+            'last_name' => ['string', 'nullable', new DbVarcharMaxLength],
+            'middle_name' => ['string', 'nullable', new DbVarcharMaxLength],
             'mobile_number' => [
                 'string',
                 'nullable',
-                new IsInternationalPhoneNumber(),
+                new IsInternationalPhoneNumber,
                 Rule::phone()->detect()->country('PH')->mobile()
             ],
             'telephone_number' => [
@@ -119,15 +119,15 @@ class UserRequest extends FormRequest
             ],
             'sex' => ['nullable', new Enum(Sex::class)],
             'birthday' => ['nullable', 'date_format:Y-m-d', 'before_or_equal:' . $this->dateToday],
-            'address_line_1' => ['string', 'nullable', ValidationHelper::getMaxStringValidationValue()],
-            'address_line_2' => ['string', 'nullable', ValidationHelper::getMaxStringValidationValue()],
-            'address_line_3' => ['string', 'nullable', ValidationHelper::getMaxStringValidationValue()],
-            'district' => ['string', 'nullable', ValidationHelper::getMaxStringValidationValue()],
-            'city' => ['string', 'nullable', ValidationHelper::getMaxStringValidationValue()],
-            'province' => ['string', 'nullable', ValidationHelper::getMaxStringValidationValue()],
-            'postal_code' => ['string', 'nullable', ValidationHelper::getMaxStringValidationValue()],
-            'country' => ['string', 'nullable', ValidationHelper::getMaxStringValidationValue()],
-            'profile_picture_url' => ['nullable', 'active_url', ValidationHelper::getMaxStringValidationValue()],
+            'address_line_1' => ['string', 'nullable', new DbVarcharMaxLength],
+            'address_line_2' => ['string', 'nullable', new DbVarcharMaxLength],
+            'address_line_3' => ['string', 'nullable', new DbVarcharMaxLength],
+            'district' => ['string', 'nullable', new DbVarcharMaxLength],
+            'city' => ['string', 'nullable', new DbVarcharMaxLength],
+            'province' => ['string', 'nullable', new DbVarcharMaxLength],
+            'postal_code' => ['string', 'nullable',new DbVarcharMaxLength],
+            'country' => ['string', 'nullable', new DbVarcharMaxLength],
+            'profile_picture_url' => ['nullable', 'active_url', new DbVarcharMaxLength],
             'active' => ['nullable', 'boolean']
         ];
     }

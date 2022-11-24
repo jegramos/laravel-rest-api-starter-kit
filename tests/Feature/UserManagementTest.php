@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Repositories\Eloquent\UserRepository;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Tests\TestCase;
@@ -12,6 +13,7 @@ use Throwable;
 class UserManagementTest extends TestCase
 {
     use RefreshDatabase;
+    use WithFaker;
 
     /** @dataProvider validCreateUserInputs */
     public function test_it_can_create_a_user($input, $statusCode)
@@ -23,7 +25,7 @@ class UserManagementTest extends TestCase
     public function validCreateUserInputs(): array
     {
         $requiredFieldsOnly = [
-            'email' => 'sample_email@email.com',
+            'email' => 'sample@email.com',
             'username' => 'username1',
             'password' => 'Sample_Password_1',
             'password_confirmation' => 'Sample_Password_1',
@@ -36,7 +38,7 @@ class UserManagementTest extends TestCase
             'middle_name' => 'Bucu',
             'mobile_number' => '+639064647295',
             'telephone_number' => '+63279434285',
-            'sex' => 'male',
+            'sex' =>'male',
             'birthday' => '1997-01-04',
             'address_line_1' => 'Address Line 1',
             'address_line_2' => 'Address Line 2',
@@ -64,14 +66,7 @@ class UserManagementTest extends TestCase
     /** @throws Throwable */
     public function test_it_should_validate_unique_fields_when_creating_a_user()
     {
-        $input = [
-            'email' => 'sample_email@email.com',
-            'username' => 'username1',
-            'password' => 'Sample_Password_1',
-            'password_confirmation' => 'Sample_Password_1',
-            'first_name' => 'Jeg',
-            'last_name' => 'Ramos'
-        ];
+        $input = $this->getRequiredUserInputSample();
         $this->createUser($input);
 
         $response = $this->postJson('/api/v1/users', $input);
@@ -86,38 +81,31 @@ class UserManagementTest extends TestCase
     /** @throws Throwable */
     public function test_it_should_update_a_user()
     {
-        $input = [
-            'email' => 'sample_email@email.com',
-            'username' => 'username1',
-            'password' => 'Sample_Password_1',
-            'password_confirmation' => 'Sample_Password_1',
-            'first_name' => 'Jeg',
-            'last_name' => 'Ramos'
-        ];
+        $input = $this->getRequiredUserInputSample();
         $user = $this->createUser($input);
 
         $edits = [
-            'email' => 'sample_email_edited@email.com',
-            'username' => 'user_edited',
-            'first_name' => 'Jeg edited',
-            'last_name' => 'Ramos edited',
+            'email' => $this->faker->unique()->safeEmail,
+            'username' => 'username_edited',
+            'first_name' => $this->faker->firstName,
+            'last_name' => $this->faker->lastName,
             'password' => 'Sample123_123',
             'password_confirmation' => 'Sample123_123',
             'active' => false,
-            'middle_name' => 'Bucu edited',
+            'middle_name' => $this->faker->lastName,
             'mobile_number' => '+639064647291',
             'telephone_number' => '+63279434285',
             'sex' => 'female',
             'birthday' => '1997-01-05',
-            'address_line_1' => 'Address Line 1 edited',
-            'address_line_2' => 'Address Line 2 edited',
-            'address_line_3' => 'Address Line 3 edited',
-            'district' => 'District 1 edited',
-            'city' => 'City 1 edited',
-            'province' => 'Province 1 edited',
-            'postal_code' => '211234',
-            'country' => 'Norway',
-            'profile_picture_url' => 'https://yahoo.com'
+            'address_line_1' => $this->faker->buildingNumber,
+            'address_line_2' => $this->faker->streetName,
+            'address_line_3' => $this->faker->streetAddress,
+            'district' => 'District 1',
+            'city' => $this->faker->city,
+            'province' => 'Province 1',
+            'postal_code' => $this->faker->postcode,
+            'country' => $this->faker->country,
+            'profile_picture_url' => $this->faker->imageUrl
         ];
 
         $response = $this->patchJson("/api/v1/users/{$user['id']}", $edits);
@@ -149,23 +137,16 @@ class UserManagementTest extends TestCase
     /** @throws Throwable */
     public function test_it_should_validate_unique_fields_when_updating_a_user()
     {
-        $input = [
-            'email' => 'sample_email@email.com',
-            'username' => 'username1',
-            'password' => 'Sample_Password_1',
-            'password_confirmation' => 'Sample_Password_1',
-            'first_name' => 'Jeg',
-            'last_name' => 'Ramos'
-        ];
+        $input = $this->getRequiredUserInputSample();
         $user1 = $this->createUser($input);
 
         $input2 = [
-            'email' => 'sample_email2@email.com',
-            'username' => 'username2',
+            'email' => $this->faker->unique()->safeEmail,
+            'username' => 'second_username_2',
             'password' => 'Sample_Password_1',
             'password_confirmation' => 'Sample_Password_1',
-            'first_name' => 'Jego',
-            'last_name' => 'Ramos'
+            'first_name' => $this->faker->firstName,
+            'last_name' => $this->faker->lastName
         ];
         $this->createUser($input2);
 
@@ -176,14 +157,7 @@ class UserManagementTest extends TestCase
     /** @throws Throwable */
     public function test_it_should_ignore_unique_validation_when_updating_the_same_user_with_the_same_field_values()
     {
-        $input = [
-            'email' => 'sample_email@email.com',
-            'username' => 'username1',
-            'password' => 'Sample_Password_1',
-            'password_confirmation' => 'Sample_Password_1',
-            'first_name' => 'Jeg',
-            'last_name' => 'Ramos'
-        ];
+        $input = $this->getRequiredUserInputSample();
         $user = $this->createUser($input);
 
         $response = $this->patchJson("/api/v1/users/{$user['id']}", $input);
@@ -245,14 +219,8 @@ class UserManagementTest extends TestCase
     /** @throws Throwable */
     public function test_it_can_delete_a_user()
     {
-        $user = $this->createUser([
-            'email' => 'sample_email@email.com',
-            'username' => 'username1',
-            'password' => 'Sample_Password_1',
-            'password_confirmation' => 'Sample_Password_1',
-            'first_name' => 'Jeg',
-            'last_name' => 'Ramos'
-        ]);
+        $input = $this->getRequiredUserInputSample();
+        $user = $this->createUser($input);
 
         $response = $this->delete("api/v1/users/{$user['id']}");
         $response->assertStatus(200);
@@ -263,5 +231,22 @@ class UserManagementTest extends TestCase
     {
         $repository = new UserRepository();
         return $repository->create($input);
+    }
+
+    /**
+     * Generate required user info input
+     *
+     * @return array
+     */
+    private function getRequiredUserInputSample(): array
+    {
+        return [
+            'email' => $this->faker->unique()->safeEmail,
+            'username' => 'username_1',
+            'password' => 'Sample_Password_1',
+            'password_confirmation' => 'Sample_Password_1',
+            'first_name' => $this->faker->firstName,
+            'last_name' => $this->faker->lastName
+        ];
     }
 }
