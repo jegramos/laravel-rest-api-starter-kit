@@ -8,76 +8,46 @@ use App\Models\User;
 use App\QueryFilters\Active;
 use App\QueryFilters\Sort;
 use Carbon\Carbon;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\Builder;
+use Illuminate\Http\Request;
 use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
-use InvalidArgumentException;
 use Throwable;
 
 class UserRepository implements UserRepositoryInterface
 {
     public const MAX_TRANSACTION_DEADLOCK_ATTEMPTS = 5;
 
+    private Model $model;
+
+    public function __construct(Model $model)
+    {
+        $this->model = $model;
+    }
+
     /**
      * @inheritDoc
      */
-    public function all(?PaginationType $paginationType = null): array
+    public function all(?PaginationType $paginationType = null, ): array
     {
         /** @var Builder $users */
         $users = app(Pipeline::class)
-            ->send(User::query()->with('userProfile'))
+            ->send($this->model::query()->with('userProfile'))
             ->through([
                 Sort::class,
                 Active::class
             ])
             ->thenReturn();
 
-        $limit = request('limit');
+        $limit = request('limit') ?? 25;
         return match ($paginationType) {
             PaginationType::LENGTH_AWARE => $users->paginate($limit)->toArray(),
             PaginationType::SIMPLE => $users->simplePaginate($limit)->toArray(),
             PaginationType::CURSOR => $users->cursorPaginate($limit)->toArray(),
             default => $users->get()->toArray(),
         };
-    }
-
-    /**
-     * Return all users with pagination
-     *
-     * @param array|null $filters
-     * @param PaginationType $paginationType
-     * @return void
-     */
-    public function allPaginated(array $filters = null, PaginationType $paginationType = PaginationType::LENGTH_AWARE)
-    {
-        $limit = request('limit');
-
-        /** @var Builder $users */
-        $users = app(Pipeline::class)
-            ->send(User::query()->with('userProfile'))
-            ->through([
-                Sort::class,
-                Active::class
-            ])
-            ->thenReturn();
-
-        $results = [];
-        /** @var LengthAwarePaginator $users */
-        switch ($paginationType) {
-            case PaginationType::LENGTH_AWARE:
-                $results = $users->paginate($limit)->toArray();
-                break;
-            case PaginationType::SIMPLE:
-                $results = $users->simplePaginate($limit)->toArray();
-                break;
-            case PaginationType::CURSOR:
-                $results = $users->cursorPaginate($limit)->toArray();
-                break;
-        }
-
-        return $results;
     }
 
     /**
@@ -115,7 +85,7 @@ class UserRepository implements UserRepositoryInterface
      */
     public function read($id, bool $includeProfile = true): array
     {
-        $query = User::query();
+        $query = $this->model::query();
 
         if ($includeProfile) {
             $query->with('userProfile');
@@ -132,7 +102,7 @@ class UserRepository implements UserRepositoryInterface
     {
         return DB::transaction(function () use ($id, $newUserInfo) {
             /** @var User $user */
-            $user = User::with('userProfile')->findOrFail($id);
+            $user = $this->model::with('userProfile')->findOrFail($id);
 
             unset($newUserInfo['password_confirmation']);
 
@@ -159,7 +129,7 @@ class UserRepository implements UserRepositoryInterface
      */
     public function destroy($id): array
     {
-        $user = User::with('userProfile')->findOrFail($id);
+        $user = $this->model::with('userProfile')->findOrFail($id);
         $user->delete();
 
         return $user->toArray();

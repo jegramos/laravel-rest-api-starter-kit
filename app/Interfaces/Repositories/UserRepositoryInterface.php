@@ -3,6 +3,7 @@
 namespace App\Interfaces\Repositories;
 
 use App\Enums\PaginationType;
+use Illuminate\Http\Request;
 
 interface UserRepositoryInterface
 {
@@ -10,6 +11,7 @@ interface UserRepositoryInterface
      * Fetch a list of users
      *
      * @param PaginationType|null $paginationType
+     * @param Request $request
      * @return array
      */
     public function all(?PaginationType $paginationType = PaginationType::LENGTH_AWARE): array;

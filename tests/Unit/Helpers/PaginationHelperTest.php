@@ -26,7 +26,7 @@ class PaginationHelperTest extends TestCase
     {
         parent::setUp();
         $this->paginationHelper = new PaginationHelper();
-        $this->userRepository = new UserRepository();
+        $this->userRepository = new UserRepository(new User());
         $this->usersCount = 10;
         User::factory()->has(UserProfile::factory())->count($this->usersCount)->create();
     }
