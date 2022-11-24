@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\User;
 use App\Repositories\Eloquent\UserRepository;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -35,6 +36,7 @@ class UserManagementTest extends TestCase
 
         $allFields = array_merge($requiredFieldsOnly, [
             'active' => true,
+            'email_verified' => false,
             'middle_name' => 'Bucu',
             'mobile_number' => '+639064647295',
             'telephone_number' => '+63279434285',
@@ -92,6 +94,7 @@ class UserManagementTest extends TestCase
             'password' => 'Sample123_123',
             'password_confirmation' => 'Sample123_123',
             'active' => false,
+            'email_verified' => true,
             'middle_name' => $this->faker->lastName,
             'mobile_number' => '+639064647291',
             'telephone_number' => '+63279434285',
@@ -120,6 +123,16 @@ class UserManagementTest extends TestCase
                 continue;
             }
 
+            // when email_verified is set to `true`, response will have
+            // an email_verified_at key with a timestamp value
+            if ($key === 'email_verified') {
+                $value ?
+                    $this->assertTrue(!!strtotime($response['data']['email_verified_at'])) :
+                    $this->assertFalse(!!strtotime($response['data']['email_verified_at']));
+
+                continue;
+            }
+
             // profile details are wrapped with a `user_profile` field
             $actual = in_array($key, ['username', 'email', 'active'])
                 ? $response['data'][$key]
@@ -140,14 +153,7 @@ class UserManagementTest extends TestCase
         $input = $this->getRequiredUserInputSample();
         $user1 = $this->createUser($input);
 
-        $input2 = [
-            'email' => $this->faker->unique()->safeEmail,
-            'username' => 'second_username_2',
-            'password' => 'Sample_Password_1',
-            'password_confirmation' => 'Sample_Password_1',
-            'first_name' => $this->faker->firstName,
-            'last_name' => $this->faker->lastName
-        ];
+        $input2 = $this->getRequiredUserInputSample();
         $this->createUser($input2);
 
         $response = $this->patchJson("/api/v1/users/{$user1['id']}", $input2);
@@ -162,6 +168,37 @@ class UserManagementTest extends TestCase
 
         $response = $this->patchJson("/api/v1/users/{$user['id']}", $input);
         $response->assertStatus(200);
+    }
+
+    /** @dataProvider differentUsernames */
+    public function test_it_should_only_accept_alphanumeric_and_dot_for_username($input, $expected)
+    {
+        $response = $this->postJson('api/v1/users', $input);
+        $response->assertStatus($expected);
+    }
+
+    public function differentUsernames(): array
+    {
+        $requiredFields = [
+            'email' => 'sample_email@email.com',
+            'password' => 'Sample_Password_1',
+            'password_confirmation' => 'Sample_Password_1',
+            'first_name' => 'Jeg',
+            'last_name' => 'Ramos'
+        ];
+
+        return [
+            [array_merge($requiredFields, ['username' => 'jegramos']), 201],
+            [array_merge($requiredFields, ['username' => 'jeg.ramos']), 201],
+            [array_merge($requiredFields, ['username' => 'jeg-ramos.04']), 201],
+            [array_merge($requiredFields, ['username' => 'jegramos-ramos-04']), 201],
+            [array_merge($requiredFields, ['username' => 'jegramos_ramos-04']), 201],
+            [array_merge($requiredFields, ['username' => 'jegramos-ramos.04']), 201],
+            [array_merge($requiredFields, ['username' => 'jeg ramos']), 422],
+            [array_merge($requiredFields, ['username' => 'jegramos!']), 422],
+            [array_merge($requiredFields, ['username' => 'jegramos :)']), 422],
+            [array_merge($requiredFields, ['username' => 'jeg+ramos']), 422],
+        ];
     }
 
     /** @dataProvider differentMobileNumbers */
@@ -227,6 +264,51 @@ class UserManagementTest extends TestCase
     }
 
     /** @throws Throwable */
+    public function test_it_sets_up_the_active_and_email_verified_at_fields_when_not_provided()
+    {
+        $input = $this->getRequiredUserInputSample();
+        $user = $this->createUser($input);
+
+        $response = $this->get("api/v1/users/{$user['id']}");
+        $response = json_decode($response->decodeResponseJson()->json, true);
+
+        $this->assertTrue($response['data']['active']);
+        $this->assertNull($response['data']['email_verified_at']);
+    }
+
+    /** @throws Throwable */
+    public function test_if_email_verified_at_is_null_if_email_verified_field_not_in_payload()
+    {
+        $input = $this->getRequiredUserInputSample();
+        $response = $this->postJson('api/v1/users', $input);
+        $response = json_decode($response->decodeResponseJson()->json, true);
+        $user = User::find($response['data']['id']);
+        $this->assertNull($user->email_verified_at);
+    }
+
+    /** @throws Throwable */
+    public function test_if_email_verified_at_is_null_if_email_verified_field_is_false()
+    {
+        $input = $this->getRequiredUserInputSample();
+        $input['email_verified'] = false;
+        $response = $this->postJson('api/v1/users', $input);
+        $response = json_decode($response->decodeResponseJson()->json, true);
+        $user = User::find($response['data']['id']);
+        $this->assertNull($user->email_verified_at);
+    }
+
+    /** @throws Throwable */
+    public function test_if_email_verified_at_is_a_valid_date_if_email_verified_field_is_true()
+    {
+        $input = $this->getRequiredUserInputSample();
+        $input['email_verified'] = true;
+        $response = $this->postJson('api/v1/users', $input);
+        $response = json_decode($response->decodeResponseJson()->json, true);
+        $user = User::find($response['data']['id']);
+        $this->assertTrue(!!strtotime($user->email_verified_at->toDateString()));
+    }
+
+    /** @throws Throwable */
     private function createUser(array $input): array
     {
         $repository = new UserRepository();
@@ -242,7 +324,7 @@ class UserManagementTest extends TestCase
     {
         return [
             'email' => $this->faker->unique()->safeEmail,
-            'username' => 'username_1',
+            'username' => $this->faker->unique()->userName,
             'password' => 'Sample_Password_1',
             'password_confirmation' => 'Sample_Password_1',
             'first_name' => $this->faker->firstName,

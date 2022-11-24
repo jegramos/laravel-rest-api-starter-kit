@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Enums\Sex;
+use App\Rules\AlphaDashDot;
 use App\Rules\DbVarcharMaxLength;
 use App\Rules\IsInternationalPhoneNumber;
 use Illuminate\Foundation\Http\FormRequest;
@@ -61,7 +62,7 @@ class UserRequest extends FormRequest
     {
         return [
             'email' => ['required', 'email', 'unique:users,email'],
-            'username' => ['string', 'required', 'unique:users,username', 'alpha_dash', 'max:15'],
+            'username' => ['string', 'required', 'unique:users,username', new AlphaDashDot(), 'max:30'],
             'password' => ['string', 'required', 'confirmed', Password::min(8)->mixedCase()->numbers()],
             'first_name' => ['string', 'required', new DbVarcharMaxLength()],
             'last_name' => ['string', 'required', new DbVarcharMaxLength()],
@@ -89,7 +90,8 @@ class UserRequest extends FormRequest
             'postal_code' => ['string', 'nullable', new DbVarcharMaxLength()],
             'country' => ['string', 'nullable', new DbVarcharMaxLength()],
             'profile_picture_url' => ['nullable', 'active_url', new DbVarcharMaxLength()],
-            'active' => ['nullable', 'boolean']
+            'active' => ['nullable', 'boolean'],
+            'email_verified' => ['nullable', 'boolean']
         ];
     }
 
@@ -100,7 +102,13 @@ class UserRequest extends FormRequest
     {
         return [
             'email' => ['nullable', 'email', 'unique:users,email,' . request('id')],
-            'username' => ['string', 'nullable', 'alpha_dash', 'max:15', 'unique:users,username,' . request('id')],
+            'username' => [
+                'string',
+                'nullable',
+                new AlphaDashDot(),
+                'max:30',
+                'unique:users,username,' . request('id')
+            ],
             'password' => ['string', 'nullable', 'confirmed', Password::min(8)->mixedCase()->numbers()],
             'first_name' => ['string', 'nullable', new DbVarcharMaxLength()],
             'last_name' => ['string', 'nullable', new DbVarcharMaxLength()],
@@ -128,7 +136,8 @@ class UserRequest extends FormRequest
             'postal_code' => ['string', 'nullable',new DbVarcharMaxLength()],
             'country' => ['string', 'nullable', new DbVarcharMaxLength()],
             'profile_picture_url' => ['nullable', 'active_url', new DbVarcharMaxLength()],
-            'active' => ['nullable', 'boolean']
+            'active' => ['nullable', 'boolean'],
+            'email_verified' => ['nullable', 'boolean']
         ];
     }
 

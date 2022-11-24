@@ -4,7 +4,7 @@ namespace App\Rules;
 
 use Illuminate\Contracts\Validation\Rule;
 
-class IsInternationalPhoneNumber implements Rule
+class AlphaDashDot implements Rule
 {
     /**
      * Create a new rule instance.
@@ -17,8 +17,7 @@ class IsInternationalPhoneNumber implements Rule
     }
 
     /**
-     * Number must start with a [+] sign followed by numbers
-     * e.g. +639091122333
+     * The string must only contain alphanumeric, dash, and dot characters
      *
      * @param  string  $attribute
      * @param  mixed  $value
@@ -30,7 +29,7 @@ class IsInternationalPhoneNumber implements Rule
             return false;
         }
 
-        return preg_match("/^\+[0-9]+$/", $value) > 0;
+        return preg_match('/^[0-9A-Za-z_\-.]+$/u', $value) > 0;
     }
 
     /**
@@ -40,8 +39,6 @@ class IsInternationalPhoneNumber implements Rule
      */
     public function message(): string
     {
-        /** phpcs:disable **/
-        return 'The :attribute must follow the E.164 international phone number formatting: [+][country code][area code][local phone number]. E.g. +639091122333, +63279434285';
-        /** phpcs:enable */
+        return 'The :attribute must only contain letters, numbers, dashes, underscores, and dots';
     }
 }
