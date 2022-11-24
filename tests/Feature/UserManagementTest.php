@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\User;
-use App\Repositories\Eloquent\UserRepository;
+use App\Models\UserProfile;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Arr;
@@ -68,8 +68,10 @@ class UserManagementTest extends TestCase
     /** @throws Throwable */
     public function test_it_should_validate_unique_fields_when_creating_a_user()
     {
+        $user = User::factory()->has(UserProfile::factory())->create();
         $input = $this->getRequiredUserInputSample();
-        $this->createUser($input);
+        $input['email'] = $user->email;
+        $input['username'] = $user->username;
 
         $response = $this->postJson('/api/v1/users', $input);
         $response->assertStatus(422);
@@ -83,22 +85,23 @@ class UserManagementTest extends TestCase
     /** @throws Throwable */
     public function test_it_should_update_a_user()
     {
-        $input = $this->getRequiredUserInputSample();
-        $user = $this->createUser($input);
+        $user = User::factory()
+            ->has(UserProfile::factory())
+            ->create();
 
         $edits = [
-            'email' => $this->faker->unique()->safeEmail,
-            'username' => 'username_edited',
-            'first_name' => $this->faker->firstName,
-            'last_name' => $this->faker->lastName,
+            'email' => fake()->unique()->safeEmail,
+            'username' => fake()->unique()->userName,
+            'first_name' => fake()->firstName,
+            'last_name' => fake()->lastName,
             'password' => 'Sample123_123',
             'password_confirmation' => 'Sample123_123',
-            'active' => false,
-            'email_verified' => true,
+            'active' => fake()->boolean,
+            'email_verified' => fake()->boolean,
             'middle_name' => $this->faker->lastName,
             'mobile_number' => '+639064647291',
             'telephone_number' => '+63279434285',
-            'sex' => 'female',
+            'sex' => fake()->randomElement(['male', 'female']),
             'birthday' => '1997-01-05',
             'address_line_1' => $this->faker->buildingNumber,
             'address_line_2' => $this->faker->streetName,
@@ -111,7 +114,7 @@ class UserManagementTest extends TestCase
             'profile_picture_url' => $this->faker->imageUrl
         ];
 
-        $response = $this->patchJson("/api/v1/users/{$user['id']}", $edits);
+        $response = $this->patchJson("/api/v1/users/{$user->id}", $edits);
         $response->assertStatus(200);
 
         $response = json_decode($response->decodeResponseJson()->json, true);
@@ -124,12 +127,9 @@ class UserManagementTest extends TestCase
             }
 
             // when email_verified is set to `true`, response will have
-            // an email_verified_at key with a timestamp value
+            // an email_verified_at key with a timestamp value -- and it will be set to null if it's `false`
             if ($key === 'email_verified') {
-                $value ?
-                    $this->assertTrue(!!strtotime($response['data']['email_verified_at'])) :
-                    $this->assertFalse(!!strtotime($response['data']['email_verified_at']));
-
+                $this->assertEquals($value, !!strtotime($response['data']['email_verified_at']));
                 continue;
             }
 
@@ -148,25 +148,29 @@ class UserManagementTest extends TestCase
     }
 
     /** @throws Throwable */
-    public function test_it_should_validate_unique_fields_when_updating_a_user()
+    public function test_it_should_validate_unique_username_and_email_when_updating_a_user()
     {
-        $input = $this->getRequiredUserInputSample();
-        $user1 = $this->createUser($input);
+        $users = User::factory()->count(2)->has(UserProfile::factory())->create();
+        $user2Info = [
+            'email' => $users[1]->email,
+            'username' => $users[1]->username,
+        ];
 
-        $input2 = $this->getRequiredUserInputSample();
-        $this->createUser($input2);
-
-        $response = $this->patchJson("/api/v1/users/{$user1['id']}", $input2);
+        // try to update the first user's username and email with user 2's
+        $response = $this->patchJson("/api/v1/users/{$users[0]->id}", $user2Info);
         $response->assertStatus(422);
     }
 
     /** @throws Throwable */
     public function test_it_should_ignore_unique_validation_when_updating_the_same_user_with_the_same_field_values()
     {
-        $input = $this->getRequiredUserInputSample();
-        $user = $this->createUser($input);
+        $user = User::factory()->has(UserProfile::factory())->create();
+        $input = [
+            'email' => $user->email,
+            'username' => $user->username
+        ];
 
-        $response = $this->patchJson("/api/v1/users/{$user['id']}", $input);
+        $response = $this->patchJson("/api/v1/users/{$user->id}", $input);
         $response->assertStatus(200);
     }
 
@@ -256,24 +260,50 @@ class UserManagementTest extends TestCase
     /** @throws Throwable */
     public function test_it_can_delete_a_user()
     {
-        $input = $this->getRequiredUserInputSample();
-        $user = $this->createUser($input);
+        $user = User::factory()->has(UserProfile::factory())->create();
 
-        $response = $this->delete("api/v1/users/{$user['id']}");
+        $response = $this->delete("api/v1/users/{$user->id}");
         $response->assertStatus(200);
+    }
+
+    /** @throws Throwable */
+    public function test_it_can_fetch_users()
+    {
+        $usersCount = 7;
+        User::factory()->count($usersCount)->has(UserProfile::factory())->create();
+
+        $response = $this->get('api/v1/users');
+        $response = json_decode($response->decodeResponseJson()->json, true);
+
+        $this->assertIsArray($response['data']);
+        $this->assertEquals($usersCount, count($response['data']));
+    }
+
+    /** @throws Throwable */
+    public function test_it_can_return_length_aware_paginated_results()
+    {
+        $usersCount = 15;
+        User::factory()->count($usersCount)->has(UserProfile::factory())->create();
+
+        $limit = 5;
+        $response = $this->get("api/v1/users?limit=$limit");
+        $response = json_decode($response->decodeResponseJson()->json, true);
+
+        $this->assertArrayHasKey('pagination', $response);
+        $this->assertEquals($usersCount, $response['pagination']['total']);
+        $this->assertEquals($limit, count($response['data']));
     }
 
     /** @throws Throwable */
     public function test_it_sets_up_the_active_and_email_verified_at_fields_when_not_provided()
     {
-        $input = $this->getRequiredUserInputSample();
-        $user = $this->createUser($input);
-
-        $response = $this->get("api/v1/users/{$user['id']}");
+        $onlyRequiredInputs = $this->getRequiredUserInputSample();
+        $response = $this->postJson('api/v1/users', $onlyRequiredInputs);
         $response = json_decode($response->decodeResponseJson()->json, true);
+        $user = User::find($response['data']['id']);
 
-        $this->assertTrue($response['data']['active']);
-        $this->assertNull($response['data']['email_verified_at']);
+        $this->assertTrue($user->active);
+        $this->assertNull($user->email_verified_at);
     }
 
     /** @throws Throwable */
@@ -308,13 +338,6 @@ class UserManagementTest extends TestCase
         $this->assertTrue(!!strtotime($user->email_verified_at->toDateString()));
     }
 
-    /** @throws Throwable */
-    private function createUser(array $input): array
-    {
-        $repository = new UserRepository();
-        return $repository->create($input);
-    }
-
     /**
      * Generate required user info input
      *
@@ -323,12 +346,12 @@ class UserManagementTest extends TestCase
     private function getRequiredUserInputSample(): array
     {
         return [
-            'email' => $this->faker->unique()->safeEmail,
-            'username' => $this->faker->unique()->userName,
+            'email' => fake()->unique()->safeEmail,
+            'username' => fake()->unique()->userName,
             'password' => 'Sample_Password_1',
             'password_confirmation' => 'Sample_Password_1',
-            'first_name' => $this->faker->firstName,
-            'last_name' => $this->faker->lastName
+            'first_name' => fake()->firstName,
+            'last_name' => fake()->lastName
         ];
     }
 }

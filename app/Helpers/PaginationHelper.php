@@ -3,8 +3,6 @@
 namespace App\Helpers;
 
 use Arr;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Database\Query\Builder;
 
 /**
  * Please use the facade registered
@@ -22,7 +20,7 @@ class PaginationHelper
     private function appendUrlQueryInputs(?string $url, array $except = ['page']): ?string
     {
         if (is_null($url)) {
-            return $url;
+            return null;
         }
 
         return $url . '&' . http_build_query(Arr::except(request()->all(), $except));

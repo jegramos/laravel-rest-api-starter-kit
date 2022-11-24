@@ -2,16 +2,17 @@
 
 namespace App\Interfaces\Repositories;
 
+use App\Enums\PaginationType;
+
 interface UserRepositoryInterface
 {
     /**
      * Fetch a list of users
      *
-     * @param array|null $filters
-     * @param bool $paginated
+     * @param PaginationType|null $paginationType
      * @return array
      */
-    public function all(array $filters = null, bool $paginated = false): array;
+    public function all(?PaginationType $paginationType = PaginationType::LENGTH_AWARE): array;
 
     /**
      * Create a new user

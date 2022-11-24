@@ -2,15 +2,18 @@
 
 namespace App\Repositories\Eloquent;
 
+use App\Enums\PaginationType;
 use App\Interfaces\Repositories\UserRepositoryInterface;
 use App\Models\User;
 use App\QueryFilters\Active;
 use App\QueryFilters\Sort;
 use Carbon\Carbon;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
+use InvalidArgumentException;
 use Throwable;
 
 class UserRepository implements UserRepositoryInterface
@@ -20,19 +23,61 @@ class UserRepository implements UserRepositoryInterface
     /**
      * @inheritDoc
      */
-    public function all(array $filters = null, bool $paginated = false): array
+    public function all(?PaginationType $paginationType = null): array
     {
-        /** @var LengthAwarePaginator $users */
+        /** @var Builder $users */
         $users = app(Pipeline::class)
             ->send(User::query()->with('userProfile'))
             ->through([
                 Sort::class,
                 Active::class
             ])
-            ->thenReturn()
-            ->paginate(request('limit'));
+            ->thenReturn();
 
-        return $users->toArray();
+        $limit = request('limit');
+        return match ($paginationType) {
+            PaginationType::LENGTH_AWARE => $users->paginate($limit)->toArray(),
+            PaginationType::SIMPLE => $users->simplePaginate($limit)->toArray(),
+            PaginationType::CURSOR => $users->cursorPaginate($limit)->toArray(),
+            default => $users->get()->toArray(),
+        };
+    }
+
+    /**
+     * Return all users with pagination
+     *
+     * @param array|null $filters
+     * @param PaginationType $paginationType
+     * @return void
+     */
+    public function allPaginated(array $filters = null, PaginationType $paginationType = PaginationType::LENGTH_AWARE)
+    {
+        $limit = request('limit');
+
+        /** @var Builder $users */
+        $users = app(Pipeline::class)
+            ->send(User::query()->with('userProfile'))
+            ->through([
+                Sort::class,
+                Active::class
+            ])
+            ->thenReturn();
+
+        $results = [];
+        /** @var LengthAwarePaginator $users */
+        switch ($paginationType) {
+            case PaginationType::LENGTH_AWARE:
+                $results = $users->paginate($limit)->toArray();
+                break;
+            case PaginationType::SIMPLE:
+                $results = $users->simplePaginate($limit)->toArray();
+                break;
+            case PaginationType::CURSOR:
+                $results = $users->cursorPaginate($limit)->toArray();
+                break;
+        }
+
+        return $results;
     }
 
     /**

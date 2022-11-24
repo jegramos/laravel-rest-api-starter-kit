@@ -4,7 +4,6 @@ namespace Database\Factories;
 
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Str;
 
 /**
  * @extends Factory<User>
@@ -19,10 +18,11 @@ class UserFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => fake()->name(),
-            'email' => fake()->unique()->safeEmail(),
-            'email_verified_at' => now(),
+            'email' => fake()->unique()->safeEmail,
+            'username' => fake()->unique()->userName,
             'password' => 'Sample_Password_1',
+            'active' => fake()->boolean,
+            'email_verified_at' => fake()->date
         ];
     }
 
