@@ -19,9 +19,6 @@ class FacadeServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->bind('ValidationHelper', function ($app) {
-            return new ValidationHelper();
-        });
         $this->app->bind('PaginationHelper', function ($app) {
             return new PaginationHelper();
         });

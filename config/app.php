@@ -211,7 +211,6 @@ return [
     */
 
     'aliases' => Facade::defaultAliases()->merge([
-        'ValidationHelper' => \App\Facades\ValidationHelperFacade::class,
         'PaginationHelper' => \App\Facades\PaginationHelperFacade::class,
         'DateTimeHelper' => \App\Facades\DateTimeHelperFacade::class,
     ])->toArray(),
