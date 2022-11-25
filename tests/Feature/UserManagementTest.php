@@ -137,7 +137,7 @@ class UserManagementTest extends TestCase
             // country info is wrapped in `user_profile.country` field
             if ($key === 'country_id') {
                 $result = $response['data']['user_profile']['country']['id'];
-            } else if (!in_array($key, ['username', 'email', 'active'])) {
+            } elseif (!in_array($key, ['username', 'email', 'active'])) {
                 // profile details are wrapped with a `user_profile` field
                 $result = $response['data']['user_profile'][$key];
             } else {
