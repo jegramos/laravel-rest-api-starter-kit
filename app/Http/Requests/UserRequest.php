@@ -88,7 +88,7 @@ class UserRequest extends FormRequest
             'city' => ['string', 'nullable', new DbVarcharMaxLength()],
             'province' => ['string', 'nullable', new DbVarcharMaxLength()],
             'postal_code' => ['string', 'nullable', new DbVarcharMaxLength()],
-            'country' => ['string', 'nullable', new DbVarcharMaxLength()],
+            'country_id' => ['nullable', 'exists:countries,id'],
             'profile_picture_url' => ['nullable', 'active_url', new DbVarcharMaxLength()],
             'active' => ['nullable', 'boolean'],
             'email_verified' => ['nullable', 'boolean']
@@ -134,7 +134,7 @@ class UserRequest extends FormRequest
             'city' => ['string', 'nullable', new DbVarcharMaxLength()],
             'province' => ['string', 'nullable', new DbVarcharMaxLength()],
             'postal_code' => ['string', 'nullable',new DbVarcharMaxLength()],
-            'country' => ['string', 'nullable', new DbVarcharMaxLength()],
+            'country_id' => ['nullable', 'exists:countries,id'],
             'profile_picture_url' => ['nullable', 'active_url', new DbVarcharMaxLength()],
             'active' => ['nullable', 'boolean'],
             'email_verified' => ['nullable', 'boolean']
@@ -164,6 +164,7 @@ class UserRequest extends FormRequest
         return [
             'sort.in' => 'The :attribute parameter must be either `asc` or `desc`',
             'active.boolean' => 'The :attribute parameter must be either `1` (for true) or `0` (for false)',
+            'country_id.exists' => 'The :attribute does not exists',
 
             /** @see https://github.com/Propaganistas/Laravel-Phone#validation */
             'mobile_number.phone' => "The :attribute field format must be a valid mobile number",

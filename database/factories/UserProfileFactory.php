@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Country;
 use App\Models\User;
 use App\Models\UserProfile;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -34,7 +35,7 @@ class UserProfileFactory extends Factory
             'city' => fake()->city,
             'province' => 'Province ' . fake()->city,
             'postal_code' => fake()->postcode,
-            'country' => fake()->country,
+            'country_id' => Country::first()->id,
             'profile_picture_url' => fake()->imageUrl
         ];
     }

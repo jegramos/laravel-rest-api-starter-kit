@@ -34,18 +34,17 @@ class UserProfile extends Model
         'city', // Or Municipality
         'province',
         'postal_code',
-        'country',
+        'country_id',
         'profile_picture_url',
     ];
 
     /**
-     * The attributes that should be hidden for serialization.
+     * Relationships to eager-load
      *
      * @var array<int, string>
      */
-    protected $hidden = [
-        'id',
-        'user_id',
+    protected $with = [
+        'country'
     ];
 
     /**
@@ -55,6 +54,16 @@ class UserProfile extends Model
      */
     protected $appends = [
         'full_name'
+    ];
+
+    /**
+     * The attributes that should be hidden for serialization.
+     *
+     * @var array<int, string>
+     */
+    protected $hidden = [
+        'user_id',
+        'country_id'
     ];
 
     /**
@@ -75,6 +84,16 @@ class UserProfile extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * A profile belongs to exactly one country
+     *
+     * @returns BelongsTo
+     */
+    public function country(): BelongsTo
+    {
+        return $this->belongsTo(Country::class);
     }
 
     /**

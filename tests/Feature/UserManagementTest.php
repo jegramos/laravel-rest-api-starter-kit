@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Country;
 use App\Models\User;
 use App\Models\UserProfile;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -49,7 +50,7 @@ class UserManagementTest extends TestCase
             'city' => 'City 1',
             'province' => 'Province 1',
             'postal_code' => '211',
-            'country' => 'Philippines',
+            'country_id' => 1, // we can't use Eloquent in data providers
             'profile_picture_url' => 'https://google.com'
         ]);
 
@@ -110,7 +111,7 @@ class UserManagementTest extends TestCase
             'city' => $this->faker->city,
             'province' => 'Province 1',
             'postal_code' => $this->faker->postcode,
-            'country' => $this->faker->country,
+            'country_id' => Country::first()->id,
             'profile_picture_url' => $this->faker->imageUrl
         ];
 
@@ -133,17 +134,24 @@ class UserManagementTest extends TestCase
                 continue;
             }
 
-            // profile details are wrapped with a `user_profile` field
-            $actual = in_array($key, ['username', 'email', 'active'])
-                ? $response['data'][$key]
-                : $response['data']['user_profile'][$key];
+            // country info is wrapped in `user_profile.country` field
+            if ($key === 'country_id') {
+                $result = $response['data']['user_profile']['country']['id'];
+            } else if (!in_array($key, ['username', 'email', 'active'])) {
+                // profile details are wrapped with a `user_profile` field
+                $result = $response['data']['user_profile'][$key];
+            } else {
+                // creds are at the root of the `data` field
+                $result = $response['data'][$key];
+            }
 
             // format birthday as ISO for correct checking
             if ($key === 'birthday') {
                 $value = Carbon::create($value)->toISOString();
             }
 
-            $this->assertEquals($value, $actual);
+            // compare the edit value and the result
+            $this->assertEquals($value, $result);
         }
     }
 

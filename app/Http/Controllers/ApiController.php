@@ -17,48 +17,24 @@ abstract class ApiController extends Controller
      * @param array $data
      * @param int $statusCode
      * @param array $headers
-     *
+     * @param PaginationType|null $paginationType
      * @return JsonResponse
      */
-    protected function success(array $data, int $statusCode, array $headers = []): JsonResponse
-    {
-        $results = ['success' => true, 'data' => $data];
-        return response()->json($results, $statusCode, $headers);
-    }
-
-    /**
-     * Return a success JSON success response with pagination
-     *
-     * @param PaginationType $type
-     * @param array $data
-     * @param int $statusCode
-     * @param array $headers
-     *
-     * @return JsonResponse
-     */
-    protected function successWithPagination(
-        PaginationType $type,
+    protected function success(
         array $data,
         int $statusCode,
-        array $headers = []
+        array $headers = [],
+        ?PaginationType $paginationType = null
     ): JsonResponse {
-        if ($type === PaginationType::LENGTH_AWARE) {
-            $results = PaginationHelper::formatLengthAwarePagination($data);
-        }
+        $results = ['success' => true, 'data' => $data];
 
-        switch ($type) {
-            case PaginationType::LENGTH_AWARE:
-                $results = PaginationHelper::formatLengthAwarePagination($data);
-                break;
-            case PaginationType::SIMPLE:
-                $results = PaginationHelper::formatSimplePagination($data);
-                break;
-            case PaginationType::CURSOR:
-                $results = PaginationHelper::formatCursorPagination($data);
-                break;
-        }
+        $results = match ($paginationType) {
+            PaginationType::LENGTH_AWARE => PaginationHelper::formatLengthAwarePagination($data),
+            PaginationType::SIMPLE => PaginationHelper::formatSimplePagination($data),
+            PaginationType::CURSOR => PaginationHelper::formatCursorPagination($data),
+            null => $results
+        };
 
-        $results['success'] = true;
         return response()->json($results, $statusCode, $headers);
     }
 

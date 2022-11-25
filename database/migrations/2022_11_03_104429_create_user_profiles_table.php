@@ -15,6 +15,7 @@ return new class () extends Migration {
         Schema::create('user_profiles', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->unique()->constrained()->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('country_id')->nullable()->constrained()->cascadeOnUpdate()->nullOnDelete();
             $table->string('first_name');
             $table->string('last_name');
             $table->string('middle_name')->nullable();
@@ -30,7 +31,6 @@ return new class () extends Migration {
             $table->string('city')->nullable(); // or Municipality
             $table->string('province')->nullable();
             $table->string('postal_code')->nullable();
-            $table->string('country')->nullable();
             $table->string('profile_picture_url')->nullable();
             $table->timestamps();
             $table->softDeletes();
