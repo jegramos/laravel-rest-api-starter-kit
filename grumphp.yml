@@ -1,23 +1,28 @@
 grumphp:
+  process_timeout: 180
   fixer:
     enabled: true
     fix_by_default: true
+  parallel:
+    enabled: false
   tasks:
     laravel_cs_fixer:
       ide_helper: true
     securitychecker_enlightn:
       lockfile: ./composer.lock
-      run_always: true
+      run_always: false
     phpcs:
       standard: [ PSR1, PSR2, PSR12 ]
       whitelist_patterns: [ /^app\/(.*)/ ]
       report: full
+      metadata:
+        priority: 1
     phpunit:
       always_execute: true
 services:
-  App\Automation\Grump\LaravelPhpCsFixer:
+  App\Services\Grump\LaravelPhpCsFixer:
     arguments:
       - '@process_builder'
       - '@formatter.raw_process'
     tags:
-      - { name: grumphp.task, task: laravel_cs_fixer }
+      - { name: grumphp.task, task: laravel_cs_fixer, priority: 2 }

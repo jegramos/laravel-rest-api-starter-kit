@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Automation\Grump;
+namespace App\Services\Grump;
 
 use App\Console\Commands\StyleFixer;
 use GrumPHP\Runner\TaskResult;
@@ -9,6 +9,7 @@ use GrumPHP\Task\AbstractExternalTask;
 use GrumPHP\Task\Context\ContextInterface;
 use GrumPHP\Task\Context\GitPreCommitContext;
 use GrumPHP\Task\Context\RunContext;
+use Illuminate\Console\Command;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -38,18 +39,22 @@ class LaravelPhpCsFixer extends AbstractExternalTask
     {
         /** @see \App\Console\Commands\StyleFixer */
         $config = $this->getConfig()->getOptions();
-        $command = 'php artisan fixer:style -i';
+        $command = 'php artisan app:styler';
 
-        if (!$config['ide_helper']) {
-            $command = 'php artisan fixer:style';
+        if ($config['ide_helper']) {
+            $command .= ' -i';
         }
 
         exec($command, $output, $exitCode);
 
-        if ($exitCode !== 0) {
+        foreach ($output as $message) {
+            echo $message . PHP_EOL;
+        }
+
+        if ($exitCode !== Command::SUCCESS) {
             $styleFixerClass = StyleFixer::class;
             $errorMessage =
-                "A command threw an exception (code: $exitCode)  in $styleFixerClass. All I can say is good luck";
+                "A command threw an exception (code: $exitCode)  in $styleFixerClass. Please see the logs above";
 
             return TaskResult::createFailed($this, $context, $errorMessage);
         }

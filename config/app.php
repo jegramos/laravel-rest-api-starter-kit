@@ -194,6 +194,9 @@ return [
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
+        App\Providers\RepositoryServiceProvider::class,
+        App\Providers\FacadeServiceProvider::class,
+        App\Providers\CloudFileManagementServiceProvider::class
 
     ],
 
@@ -209,7 +212,8 @@ return [
     */
 
     'aliases' => Facade::defaultAliases()->merge([
-        // 'ExampleClass' => App\Example\ExampleClass::class,
+        'PaginationHelper' => \App\Facades\PaginationHelperFacade::class,
+        'DateTimeHelper' => \App\Facades\DateTimeHelperFacade::class,
     ])->toArray(),
 
 ];

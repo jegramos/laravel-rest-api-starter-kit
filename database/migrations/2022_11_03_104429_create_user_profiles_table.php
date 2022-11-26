@@ -15,12 +15,13 @@ return new class () extends Migration {
         Schema::create('user_profiles', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->unique()->constrained()->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('country_id')->nullable()->constrained()->cascadeOnUpdate()->nullOnDelete();
             $table->string('first_name');
             $table->string('last_name');
             $table->string('middle_name')->nullable();
             $table->string('mobile_number')->nullable();
             $table->string('telephone_number')->nullable();
-            $table->enum('sex', ['make', 'female'])->nullable();
+            $table->enum('sex', ['male', 'female'])->nullable();
             $table->date('birthday')->nullable();
             // Address columns are created in a way that will enable us to work with multiple countries
             $table->string('address_line_1')->nullable(); // Building number, Building name
@@ -30,9 +31,9 @@ return new class () extends Migration {
             $table->string('city')->nullable(); // or Municipality
             $table->string('province')->nullable();
             $table->string('postal_code')->nullable();
-            $table->string('profile_picture_url')->nullable();
-            $table->string('country')->nullable();
+            $table->string('profile_picture_path')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
