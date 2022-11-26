@@ -9,6 +9,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\URL;
 use Tests\TestCase;
 use Throwable;
 
@@ -50,8 +51,8 @@ class UserManagementTest extends TestCase
             'city' => 'City 1',
             'province' => 'Province 1',
             'postal_code' => '211',
-            'country_id' => 1, // we can't use Eloquent in data providers
-            'profile_picture_url' => 'https://google.com'
+            'country_id' => 1, // we can't use Eloquent nor faker in data providers
+            'profile_picture_path' => 'images/something/image.jpg'
         ]);
 
         $missingRequiredFields = Arr::except(
@@ -112,7 +113,7 @@ class UserManagementTest extends TestCase
             'province' => 'Province 1',
             'postal_code' => $this->faker->postcode,
             'country_id' => Country::first()->id,
-            'profile_picture_url' => $this->faker->imageUrl
+            'profile_picture_path' => $this->faker->filePath()
         ];
 
         $response = $this->patchJson("/api/v1/users/{$user->id}", $edits);
@@ -136,8 +137,19 @@ class UserManagementTest extends TestCase
 
             // country info is wrapped in `user_profile.country` field
             if ($key === 'country_id') {
-                $result = $response['data']['user_profile']['country']['id'];
-            } elseif (!in_array($key, ['username', 'email', 'active'])) {
+                $this->assertEquals($value, $response['data']['user_profile']['country']['id']);
+                continue;
+            }
+
+            // if the `profile_picture_path` is set, the response will have
+            // `user_profile.profile_picture_url` (a tmp url value)
+            if ($key === 'profile_picture_path') {
+                $url = $response['data']['user_profile']['profile_picture_url'];
+                $this->assertTrue(URL::isValidUrl($url));
+                continue;
+            }
+
+            if (!in_array($key, ['username', 'email', 'active'])) {
                 // profile details are wrapped with a `user_profile` field
                 $result = $response['data']['user_profile'][$key];
             } else {

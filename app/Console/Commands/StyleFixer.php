@@ -3,7 +3,6 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use Symfony\Component\Console\Command\Command as CommandBase;
 use Throwable;
 
 class StyleFixer extends Command
@@ -13,7 +12,7 @@ class StyleFixer extends Command
      *
      * @var string
      */
-    protected $signature = 'fixer:style
+    protected $signature = 'app:styler
                            {--i|ide_helper : Run style fixer with barryvdh/laravel-ide-helper}
                            {--c|check      : Run the style fixer without changing the files}';
 
@@ -46,13 +45,13 @@ class StyleFixer extends Command
 
         $this->info("\u{1F9F9} Cleaning up your dirty code...");
 
-        $exitCode = CommandBase::SUCCESS;
+        $exitCode = Command::SUCCESS;
         foreach ($commands as $command) {
             try {
                 $this->call($command['cmd'], $command['args']);
             } catch (Throwable $th) {
                 $this->error("\u{1F645}  Error: " . $th->getMessage());
-                $exitCode = CommandBase::FAILURE;
+                $exitCode = Command::FAILURE;
             }
         }
 

@@ -19,6 +19,7 @@ class IsInternationalPhoneNumber implements Rule
     /**
      * Number must start with a [+] sign followed by numbers
      * e.g. +639091122333
+     * This is additional validation on top of https://github.com/Propaganistas/Laravel-Phone#validation
      *
      * @param  string  $attribute
      * @param  mixed  $value

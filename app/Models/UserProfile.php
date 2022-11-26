@@ -3,6 +3,9 @@
 namespace App\Models;
 
 use App\Enums\Sex;
+use App\Interfaces\Services\CloudFileManager\CanGenerateTempUrl;
+use App\Services\CloudFileManager\S3FileManager;
+use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -35,7 +38,7 @@ class UserProfile extends Model
         'province',
         'postal_code',
         'country_id',
-        'profile_picture_url',
+        'profile_picture_path',
     ];
 
     /**
@@ -53,7 +56,7 @@ class UserProfile extends Model
      * @var array<int, string>
      */
     protected $appends = [
-        'full_name'
+        'full_name', 'profile_picture_url'
     ];
 
     /**
@@ -63,7 +66,8 @@ class UserProfile extends Model
      */
     protected $hidden = [
         'user_id',
-        'country_id'
+        'country_id',
+        'profile_picture_path'
     ];
 
     /**
@@ -96,11 +100,7 @@ class UserProfile extends Model
         return $this->belongsTo(Country::class);
     }
 
-    /**
-     * Create full_name attribute
-     *
-     * @return Attribute
-     */
+    /** @Attribute */
     public function fullName(): Attribute
     {
         return Attribute::get(function () {
@@ -113,6 +113,24 @@ class UserProfile extends Model
             }
 
             return "$firstName $lastName";
+        });
+    }
+
+    /**
+     * @Attribute
+     */
+    public function profilePictureUrl(): Attribute
+    {
+        return Attribute::get(function () {
+            if (!$this->profile_picture_path) {
+                return null;
+            }
+
+            // resolve a tmp url generator instance from the service container
+            $tmpUrlGenerator = resolve(CanGenerateTempUrl::class);
+
+            // generate a tmp URL available for 3-minutes
+            return $tmpUrlGenerator->getTmpUrl($this->profile_picture_path, 3 * 60);
         });
     }
 }

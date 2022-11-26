@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\PaginationType;
 use App\Http\Requests\UserRequest;
 use App\Interfaces\Repositories\UserRepositoryInterface;
-use App\Services\FileUpload\S3UploadService;
+use App\Services\CloudFileManager\S3FileManager;
 use Illuminate\Http\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -84,13 +84,21 @@ class UserController extends ApiController
      *
      * @param $id
      * @param UserRequest $request
-     * @param S3UploadService $uploadService
+     * @param S3FileManager $uploadService
      *
      * @return JsonResponse
      */
-    public function uploadProfilePicture($id, UserRequest $request, S3UploadService $uploadService): JsonResponse
+    public function uploadProfilePicture($id, UserRequest $request, S3FileManager $uploadService): JsonResponse
     {
-        $results = $uploadService->upload($id, $request);
+        $file = $request->file('photo');
+        $results = $uploadService->upload($id, $file, 'images', 'profile-pictures');
+        $results = [
+            'user_id' => $results['owner_id'],
+            'path' => $results['path'],
+            'url' => $results['url']
+        ];
+
+        $this->userRepository->update($id, ['profile_picture_path' => $results['path']]);
         return $this->success($results, Response::HTTP_OK);
     }
 }

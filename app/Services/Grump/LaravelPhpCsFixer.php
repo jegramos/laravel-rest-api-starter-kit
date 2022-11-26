@@ -9,7 +9,7 @@ use GrumPHP\Task\AbstractExternalTask;
 use GrumPHP\Task\Context\ContextInterface;
 use GrumPHP\Task\Context\GitPreCommitContext;
 use GrumPHP\Task\Context\RunContext;
-use Symfony\Component\Console\Command\Command;
+use Illuminate\Console\Command;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -39,10 +39,10 @@ class LaravelPhpCsFixer extends AbstractExternalTask
     {
         /** @see \App\Console\Commands\StyleFixer */
         $config = $this->getConfig()->getOptions();
-        $command = 'php artisan fixer:style -i';
+        $command = 'php artisan app:styler';
 
-        if (!$config['ide_helper']) {
-            $command = 'php artisan fixer:style';
+        if ($config['ide_helper']) {
+            $command .= ' -i';
         }
 
         exec($command, $output, $exitCode);

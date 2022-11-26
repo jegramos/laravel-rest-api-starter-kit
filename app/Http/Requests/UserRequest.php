@@ -88,7 +88,7 @@ class UserRequest extends FormRequest
             'province' => ['string', 'nullable', new DbVarcharMaxLength()],
             'postal_code' => ['nullable', new DbVarcharMaxLength()],
             'country_id' => ['nullable', 'exists:countries,id'],
-            'profile_picture_url' => ['nullable', 'active_url', new DbVarcharMaxLength()],
+            'profile_picture_path' => ['string', 'nullable', new DbVarcharMaxLength()],
             'active' => ['nullable', 'boolean'],
             'email_verified' => ['nullable', 'boolean']
         ];
@@ -126,7 +126,7 @@ class UserRequest extends FormRequest
             'province' => ['string', 'nullable', new DbVarcharMaxLength()],
             'postal_code' => ['nullable',new DbVarcharMaxLength()],
             'country_id' => ['nullable', 'exists:countries,id'],
-            'profile_picture_url' => ['nullable', 'active_url', new DbVarcharMaxLength()],
+            'profile_picture_path' => ['string', 'nullable', new DbVarcharMaxLength()],
             'active' => ['nullable', 'boolean'],
             'email_verified' => ['nullable', 'boolean']
         ];

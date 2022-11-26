@@ -1,23 +1,28 @@
 <?php
 
-namespace App\Services\FileUpload;
+namespace App\Services\CloudFileManager;
 
-use Illuminate\Http\Request;
+use App\Interfaces\Services\CloudFileManager\CanGenerateTempUrl;
+use App\Interfaces\Services\CloudFileManager\CloudFileManagerInterface;
+use Illuminate\Http\UploadedFile;
 use Storage;
 
-class S3UploadService
+class S3FileManager implements CloudFileManagerInterface, CanGenerateTempUrl
 {
     /**
      * Upload file to S3
      *
      * @param $ownerId
-     * @param Request $request
+     * @param UploadedFile $file
+     * @param string|null $parentPath
+     * @param string|null $childPath
      * @return array
      */
-    public function upload($ownerId, Request $request): array
+    public function upload($ownerId, UploadedFile $file, ?string $parentPath = null, ?string $childPath = null): array
     {
-        $file = $request->file('photo');
-        $filePath = "images/$ownerId/profile-pictures";
+        $parentPath = !$parentPath ? '' : "$parentPath/";
+        $childPath = !$childPath ? '' : "/$childPath";
+        $filePath = $parentPath . $ownerId . $childPath;
 
         $path = Storage::disk('s3')->put($filePath, $file);
         $url = $this->getTmpUrl($path, 3 * 60);
@@ -48,7 +53,8 @@ class S3UploadService
      * @param int $seconds
      * @return string
      */
-    public function getTmpUrl(string $path, int $seconds): string {
+    public function getTmpUrl(string $path, int $seconds): string
+    {
         return Storage::disk('s3')->temporaryUrl($path, now()->addSeconds($seconds));
     }
 }

@@ -2,7 +2,7 @@
 
 namespace App\Providers;
 
-use App\Services\FileUpload\S3UploadService;
+use App\Services\CloudFileManager\S3FileManager;
 use Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Events\QueryExecuted;
@@ -38,11 +38,6 @@ class AppServiceProvider extends ServiceProvider
             ]);
             /** @TODO: Notify development team...*/
         });
-
-        /**
-         * Custom services
-         */
-        $this->app->bind(S3UploadService::class, fn ($app) => new S3UploadService());
     }
 
     /**
