@@ -20,7 +20,6 @@ class Country extends Model
         'name',
         'iso3',
         'num_code',
-        'phone_code',
     ];
 
     /**

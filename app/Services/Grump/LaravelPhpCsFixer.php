@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Automation\Grump;
+namespace App\Services\Grump;
 
 use App\Console\Commands\StyleFixer;
 use GrumPHP\Runner\TaskResult;

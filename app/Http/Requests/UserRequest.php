@@ -51,6 +51,7 @@ class UserRequest extends FormRequest
             'users.store' => $this->getStoreUserRules(),
             'users.update' => $this->getUpdateUserRules(),
             'users.index' => $this->getFetchUsersRules(),
+            'users.upload.profile_picture' => $this->getUploadProfilePictureRules(),
             default => [],
         };
     }
@@ -62,19 +63,17 @@ class UserRequest extends FormRequest
     {
         return [
             'email' => ['required', 'email', 'unique:users,email'],
-            'username' => ['string', 'required', 'unique:users,username', new AlphaDashDot(), 'max:30'],
-            'password' => ['string', 'required', 'confirmed', Password::min(8)->mixedCase()->numbers()],
+            'username' => ['required', 'unique:users,username', new AlphaDashDot(), 'max:30'],
+            'password' => ['required', 'confirmed', Password::min(8)->mixedCase()->numbers()],
             'first_name' => ['string', 'required', new DbVarcharMaxLength()],
             'last_name' => ['string', 'required', new DbVarcharMaxLength()],
             'middle_name' => ['string', 'nullable', new DbVarcharMaxLength()],
             'mobile_number' => [
-                'string',
                 'nullable',
                 new IsInternationalPhoneNumber(),
                 Rule::phone()->detect()->country('PH')->mobile()
             ],
             'telephone_number' => [
-                'string',
                 'nullable',
                 new IsInternationalPhoneNumber(),
                 Rule::phone()->detect()->country('PH')->fixedLine()
@@ -87,7 +86,7 @@ class UserRequest extends FormRequest
             'district' => ['string', 'nullable', new DbVarcharMaxLength()],
             'city' => ['string', 'nullable', new DbVarcharMaxLength()],
             'province' => ['string', 'nullable', new DbVarcharMaxLength()],
-            'postal_code' => ['string', 'nullable', new DbVarcharMaxLength()],
+            'postal_code' => ['nullable', new DbVarcharMaxLength()],
             'country_id' => ['nullable', 'exists:countries,id'],
             'profile_picture_url' => ['nullable', 'active_url', new DbVarcharMaxLength()],
             'active' => ['nullable', 'boolean'],
@@ -102,25 +101,17 @@ class UserRequest extends FormRequest
     {
         return [
             'email' => ['nullable', 'email', 'unique:users,email,' . request('id')],
-            'username' => [
-                'string',
-                'nullable',
-                new AlphaDashDot(),
-                'max:30',
-                'unique:users,username,' . request('id')
-            ],
-            'password' => ['string', 'nullable', 'confirmed', Password::min(8)->mixedCase()->numbers()],
+            'username' => ['nullable', new AlphaDashDot(), 'max:30', 'unique:users,username,' . request('id')],
+            'password' => ['nullable', 'confirmed', Password::min(8)->mixedCase()->numbers()],
             'first_name' => ['string', 'nullable', new DbVarcharMaxLength()],
             'last_name' => ['string', 'nullable', new DbVarcharMaxLength()],
             'middle_name' => ['string', 'nullable', new DbVarcharMaxLength()],
             'mobile_number' => [
-                'string',
                 'nullable',
                 new IsInternationalPhoneNumber(),
                 Rule::phone()->detect()->country('PH')->mobile()
             ],
             'telephone_number' => [
-                'string',
                 'nullable',
                 new IsInternationalPhoneNumber(),
                 Rule::phone()->detect()->country('PH')->fixedLine()
@@ -133,7 +124,7 @@ class UserRequest extends FormRequest
             'district' => ['string', 'nullable', new DbVarcharMaxLength()],
             'city' => ['string', 'nullable', new DbVarcharMaxLength()],
             'province' => ['string', 'nullable', new DbVarcharMaxLength()],
-            'postal_code' => ['string', 'nullable',new DbVarcharMaxLength()],
+            'postal_code' => ['nullable',new DbVarcharMaxLength()],
             'country_id' => ['nullable', 'exists:countries,id'],
             'profile_picture_url' => ['nullable', 'active_url', new DbVarcharMaxLength()],
             'active' => ['nullable', 'boolean'],
@@ -155,6 +146,18 @@ class UserRequest extends FormRequest
     }
 
     /**
+     * User profile picture upload rules
+     *
+     * @return array
+     */
+    private function getUploadProfilePictureRules(): array
+    {
+        return [
+            'photo' => ['required', 'image', 'mimes:jpeg,png,jpg,gif,svg', 'max:2048'],
+        ];
+    }
+
+    /**
      * Custom message for validation
      *
      * @return array
@@ -171,7 +174,10 @@ class UserRequest extends FormRequest
             'telephone_number.phone' => "The :attribute field format must be a valid line number",
 
             // As of writing, we need to add the namespace for the enum rule
-            'sex.Illuminate\Validation\Rules\Enum' => 'Valid values for the :attribute field are `male` and `female`.'
+            'sex.Illuminate\Validation\Rules\Enum' => 'Valid values for the :attribute field are `male` and `female`.',
+
+            'photo.mimes' => 'The :attribute must be jpeg, png, jpg, gif, or svg',
+            'photo.max' => 'The file size must not exists 2MB'
         ];
     }
 }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\PaginationType;
 use App\Http\Requests\UserRequest;
 use App\Interfaces\Repositories\UserRepositoryInterface;
+use App\Services\FileUpload\S3UploadService;
 use Illuminate\Http\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -76,5 +77,20 @@ class UserController extends ApiController
     {
         $user = $this->userRepository->destroy($id);
         return $this->success($user, Response::HTTP_OK);
+    }
+
+    /**
+     * Upload a profile picture for a user
+     *
+     * @param $id
+     * @param UserRequest $request
+     * @param S3UploadService $uploadService
+     *
+     * @return JsonResponse
+     */
+    public function uploadProfilePicture($id, UserRequest $request, S3UploadService $uploadService): JsonResponse
+    {
+        $results = $uploadService->upload($id, $request);
+        return $this->success($results, Response::HTTP_OK);
     }
 }

@@ -20,7 +20,7 @@ grumphp:
     phpunit:
       always_execute: true
 services:
-  App\Automation\Grump\LaravelPhpCsFixer:
+  App\Services\Grump\LaravelPhpCsFixer:
     arguments:
       - '@process_builder'
       - '@formatter.raw_process'
