@@ -18,7 +18,6 @@ return new class () extends Migration {
             $table->string('name');
             $table->char('iso3', 3);
             $table->integer('num_code')->unsigned();
-            $table->integer('phone_code')->unsigned();
         });
     }
 

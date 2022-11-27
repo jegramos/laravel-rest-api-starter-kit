@@ -51,6 +51,7 @@ class UserRequest extends FormRequest
             'users.store' => $this->getStoreUserRules(),
             'users.update' => $this->getUpdateUserRules(),
             'users.index' => $this->getFetchUsersRules(),
+            'users.upload.profile-picture' => $this->getUploadProfilePictureRules(),
             default => [],
         };
     }
@@ -68,13 +69,11 @@ class UserRequest extends FormRequest
             'last_name' => ['string', 'required', new DbVarcharMaxLength()],
             'middle_name' => ['string', 'nullable', new DbVarcharMaxLength()],
             'mobile_number' => [
-                'string',
                 'nullable',
                 new IsInternationalPhoneNumber(),
                 Rule::phone()->detect()->country('PH')->mobile()
             ],
             'telephone_number' => [
-                'string',
                 'nullable',
                 new IsInternationalPhoneNumber(),
                 Rule::phone()->detect()->country('PH')->fixedLine()
@@ -87,9 +86,9 @@ class UserRequest extends FormRequest
             'district' => ['string', 'nullable', new DbVarcharMaxLength()],
             'city' => ['string', 'nullable', new DbVarcharMaxLength()],
             'province' => ['string', 'nullable', new DbVarcharMaxLength()],
-            'postal_code' => ['string', 'nullable', new DbVarcharMaxLength()],
+            'postal_code' => ['nullable', new DbVarcharMaxLength()],
             'country_id' => ['nullable', 'exists:countries,id'],
-            'profile_picture_url' => ['nullable', 'active_url', new DbVarcharMaxLength()],
+            'profile_picture_path' => ['string', 'nullable', new DbVarcharMaxLength()],
             'active' => ['nullable', 'boolean'],
             'email_verified' => ['nullable', 'boolean']
         ];
@@ -114,13 +113,11 @@ class UserRequest extends FormRequest
             'last_name' => ['string', 'nullable', new DbVarcharMaxLength()],
             'middle_name' => ['string', 'nullable', new DbVarcharMaxLength()],
             'mobile_number' => [
-                'string',
                 'nullable',
                 new IsInternationalPhoneNumber(),
                 Rule::phone()->detect()->country('PH')->mobile()
             ],
             'telephone_number' => [
-                'string',
                 'nullable',
                 new IsInternationalPhoneNumber(),
                 Rule::phone()->detect()->country('PH')->fixedLine()
@@ -133,9 +130,9 @@ class UserRequest extends FormRequest
             'district' => ['string', 'nullable', new DbVarcharMaxLength()],
             'city' => ['string', 'nullable', new DbVarcharMaxLength()],
             'province' => ['string', 'nullable', new DbVarcharMaxLength()],
-            'postal_code' => ['string', 'nullable',new DbVarcharMaxLength()],
+            'postal_code' => ['nullable',new DbVarcharMaxLength()],
             'country_id' => ['nullable', 'exists:countries,id'],
-            'profile_picture_url' => ['nullable', 'active_url', new DbVarcharMaxLength()],
+            'profile_picture_path' => ['string', 'nullable', new DbVarcharMaxLength()],
             'active' => ['nullable', 'boolean'],
             'email_verified' => ['nullable', 'boolean']
         ];
@@ -155,6 +152,16 @@ class UserRequest extends FormRequest
     }
 
     /**
+     * Profile photo upload rules
+     */
+    private function getUploadProfilePictureRules(): array
+    {
+        return [
+            'photo' => ['max:2048', 'required'] // 2Mb max
+        ];
+    }
+
+    /**
      * Custom message for validation
      *
      * @return array
@@ -165,6 +172,9 @@ class UserRequest extends FormRequest
             'sort.in' => 'The :attribute parameter must be either `asc` or `desc`',
             'active.boolean' => 'The :attribute parameter must be either `1` (for true) or `0` (for false)',
             'country_id.exists' => 'The :attribute does not exists',
+            'photo.max' => 'The :attribute must not exceed 2MB',
+            'photo.file' => 'File triggered',
+            'photo.mimes' => 'Mimes triggered',
 
             /** @see https://github.com/Propaganistas/Laravel-Phone#validation */
             'mobile_number.phone' => "The :attribute field format must be a valid mobile number",

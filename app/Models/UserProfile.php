@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\Sex;
+use App\Interfaces\CloudFileServices\CanCreateUrlTmpInterface;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -35,7 +36,7 @@ class UserProfile extends Model
         'province',
         'postal_code',
         'country_id',
-        'profile_picture_url',
+        'profile_picture_path',
     ];
 
     /**
@@ -53,7 +54,8 @@ class UserProfile extends Model
      * @var array<int, string>
      */
     protected $appends = [
-        'full_name'
+        'full_name',
+        'profile_picture_url'
     ];
 
     /**
@@ -63,7 +65,8 @@ class UserProfile extends Model
      */
     protected $hidden = [
         'user_id',
-        'country_id'
+        'country_id',
+        'profile_picture_path'
     ];
 
     /**
@@ -97,6 +100,7 @@ class UserProfile extends Model
     }
 
     /**
+     * @Attribute
      * Create full_name attribute
      *
      * @return Attribute
@@ -113,6 +117,24 @@ class UserProfile extends Model
             }
 
             return "$firstName $lastName";
+        });
+    }
+
+    /**
+     * @Attribute
+     * Create a profile_picture_url attribute
+     *
+     * @return Attribute
+     */
+    public function profilePictureUrl(): Attribute
+    {
+        return Attribute::get(function () {
+            if (!$this->profile_picture_path) {
+                return null;
+            }
+
+            $cloudFileManager = resolve(CanCreateUrlTmpInterface::class);
+            return $cloudFileManager->generateTmpUrl($this->profile_picture_path, 60 * 3);
         });
     }
 }
