@@ -4,9 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Enums\ApiErrorCode;
 use App\Enums\PaginationType;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\JsonResponse;
-use InvalidArgumentException;
 use PaginationHelper;
 
 abstract class ApiController extends Controller
@@ -26,14 +24,20 @@ abstract class ApiController extends Controller
         array $headers = [],
         ?PaginationType $paginationType = null
     ): JsonResponse {
-        $results = ['success' => true, 'data' => $data];
-
-        $results = match ($paginationType) {
-            PaginationType::LENGTH_AWARE => PaginationHelper::formatLengthAwarePagination($data),
-            PaginationType::SIMPLE => PaginationHelper::formatSimplePagination($data),
-            PaginationType::CURSOR => PaginationHelper::formatCursorPagination($data),
-            null => $results
-        };
+        switch ($paginationType) {
+            case PaginationType::LENGTH_AWARE:
+                $results = array_merge(['success' => true], PaginationHelper::formatLengthAwarePagination($data));
+                break;
+            case PaginationType::SIMPLE:
+                $results = array_merge(['success' => true], PaginationHelper::formatSimplePagination($data));
+                break;
+            case PaginationType::CURSOR:
+                $results = array_merge(['success' => true], PaginationHelper::formatCursorPagination($data));
+                break;
+            default:
+                $results = ['success' => true, 'data' => $data];
+                break;
+        }
 
         return response()->json($results, $statusCode, $headers);
     }

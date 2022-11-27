@@ -3,6 +3,9 @@
 namespace App\Helpers;
 
 use Arr;
+use Illuminate\Contracts\Pagination\CursorPaginator;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Contracts\Pagination\Paginator;
 
 /**
  * Please use the facade registered
@@ -27,9 +30,9 @@ class PaginationHelper
     }
 
     /**
-     * Re-arrange Laravel's paginate() method results
-     * Re-arrange Laravel's paginate() method results
-     * for a cleaner API response
+     * Re-arrange Laravel's paginate() method results for a cleaner API response
+     * Convert an Illuminate\Contracts\Pagination\LengthAwarePaginator instance to an array and pass as the argument
+     * ex. Model::select('name')->paginate()->toArray()
      *
      * @param array $results
      * @return array
@@ -59,8 +62,9 @@ class PaginationHelper
     }
 
     /**
-     * Re-arrange Laravel's simplePaginate() method results
-     * for a cleaner API response
+     * Re-arrange Laravel's simplePaginate() method results for a cleaner API response
+     * Convert an Illuminate\Contracts\Pagination\Paginator instance to an array and pass as the argument
+     * ex. Model::select('name')->simplePaginate()->toArray()
      *
      * @param array $results
      * @return array
@@ -86,8 +90,9 @@ class PaginationHelper
     }
 
     /**
-     * Re-arrange Laravel's simplePaginate() method results
-     * for a cleaner API response
+     * Re-arrange Laravel's simplePaginate() method results for a cleaner API response.
+     * Convert an Illuminate\Contracts\Pagination\CursorPaginator instance to an array and pass as the argument
+     * ex. Model::select('name')->cursorPaginate()->toArray()
      *
      * @param array $results
      * @return array

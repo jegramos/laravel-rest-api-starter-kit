@@ -36,7 +36,7 @@ class UserProfileFactory extends Factory
             'province' => 'Province ' . fake()->city,
             'postal_code' => fake()->postcode,
             'country_id' => Country::first()->id,
-            'profile_picture_url' => fake()->imageUrl
+            'profile_picture_path' => fake()->filePath
         ];
     }
 }

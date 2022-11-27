@@ -1,20 +1,20 @@
 <?php
 
-namespace App\Interfaces\Repositories;
+namespace App\Interfaces\Resources;
 
 use App\Enums\PaginationType;
 use Illuminate\Http\Request;
 
-interface UserRepositoryInterface
+interface UserServiceInterface
 {
     /**
      * Fetch a list of users
      *
-     * @param PaginationType|null $paginationType
      * @param Request $request
+     * @param PaginationType|null $paginationType
      * @return array
      */
-    public function all(?PaginationType $paginationType = PaginationType::LENGTH_AWARE): array;
+    public function all(Request $request, ?PaginationType $paginationType = null): array;
 
     /**
      * Create a new user
@@ -37,6 +37,7 @@ interface UserRepositoryInterface
      *
      * @param $id
      * @param array $newUserInfo
+     * @return array
      */
     public function update($id, array $newUserInfo): array;
 
@@ -44,6 +45,7 @@ interface UserRepositoryInterface
      * Delete a user
      *
      * @param $id
+     * @return array
      */
     public function destroy($id): array;
 }

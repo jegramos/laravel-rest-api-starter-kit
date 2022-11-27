@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Automation\Grump;
+namespace App\Services\Grump;
 
-use App\Console\Commands\StyleFixer;
+use App\Console\Commands\CodeFormatter;
 use GrumPHP\Runner\TaskResult;
 use GrumPHP\Runner\TaskResultInterface;
 use GrumPHP\Task\AbstractExternalTask;
@@ -37,12 +37,12 @@ class LaravelPhpCsFixer extends AbstractExternalTask
 
     public function run(ContextInterface $context): TaskResultInterface
     {
-        /** @see \App\Console\Commands\StyleFixer */
+        /** @see \App\Console\Commands\CodeFormatter */
         $config = $this->getConfig()->getOptions();
-        $command = 'php artisan fixer:style -i';
+        $command = 'php artisan app:styler -i';
 
         if (!$config['ide_helper']) {
-            $command = 'php artisan fixer:style';
+            $command = 'php artisan app:styler';
         }
 
         exec($command, $output, $exitCode);
@@ -52,7 +52,7 @@ class LaravelPhpCsFixer extends AbstractExternalTask
         }
 
         if ($exitCode !== Command::SUCCESS) {
-            $styleFixerClass = StyleFixer::class;
+            $styleFixerClass = CodeFormatter::class;
             $errorMessage =
                 "A command threw an exception (code: $exitCode)  in $styleFixerClass. Please see the logs above";
 
