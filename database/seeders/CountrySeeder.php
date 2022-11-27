@@ -27,8 +27,7 @@ class CountrySeeder extends Seeder
                     'iso' => $data['1'],
                     'name' => $data['2'],
                     'iso3' => $data['3'],
-                    'num_code' => $data['4'],
-                    'phone_code' => $data['5']
+                    'num_code' => $data['4']
                 ];
             }
             $transRow = false;
