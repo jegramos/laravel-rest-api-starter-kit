@@ -1,14 +1,13 @@
 <?php
 
-namespace App\Repositories\Eloquent;
+namespace App\Services\Resources;
 
 use App\Enums\PaginationType;
-use App\Interfaces\Repositories\UserRepositoryInterface;
+use App\Interfaces\Resources\UserServiceInterface;
 use App\Models\User;
 use App\QueryFilters\Active;
 use App\QueryFilters\Sort;
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Pipeline\Pipeline;
@@ -16,7 +15,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Throwable;
 
-class UserRepository implements UserRepositoryInterface
+class UserService implements UserServiceInterface
 {
     public const MAX_TRANSACTION_DEADLOCK_ATTEMPTS = 5;
 
@@ -30,7 +29,7 @@ class UserRepository implements UserRepositoryInterface
     /**
      * @inheritDoc
      */
-    public function all(?PaginationType $paginationType = null): array
+    public function all(Request $request, ?PaginationType $paginationType = null): array
     {
         /** @var Builder $users */
         $users = app(Pipeline::class)
@@ -41,7 +40,7 @@ class UserRepository implements UserRepositoryInterface
             ])
             ->thenReturn();
 
-        $limit = request('limit') ?? 25;
+        $limit = $request->get('limit') ?? 25;
         return match ($paginationType) {
             PaginationType::LENGTH_AWARE => $users->paginate($limit)->toArray(),
             PaginationType::SIMPLE => $users->simplePaginate($limit)->toArray(),
@@ -129,7 +128,7 @@ class UserRepository implements UserRepositoryInterface
      */
     public function destroy($id): array
     {
-        $user = $this->model::with('userProfile')->findOrFail($id);
+        $user = $this->model->findOrFail($id);
         $user->delete();
 
         return $user->toArray();

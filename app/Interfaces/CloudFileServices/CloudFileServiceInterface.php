@@ -8,13 +8,13 @@ interface CloudFileServiceInterface
 {
     /**
      * Upload a file
-     * @param
+     * @param $ownerId
      * @param UploadedFile $file
      * @param string|null $parentDir
      * @param string|null $childDir
      * @return array
      */
-    public function upload($owner_id, UploadedFile $file, ?string $parentDir = null, ?string $childDir = null): array;
+    public function upload($ownerId, UploadedFile $file, ?string $parentDir = null, ?string $childDir = null): array;
 
     /**
      * Delete a file

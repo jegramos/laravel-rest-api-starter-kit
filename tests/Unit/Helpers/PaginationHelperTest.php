@@ -2,12 +2,10 @@
 
 namespace Tests\Unit\Helpers;
 
-use App\Enums\PaginationType;
 use App\Helpers\PaginationHelper;
-use App\Interfaces\Repositories\UserRepositoryInterface;
+use App\Interfaces\Resources\UserServiceInterface;
 use App\Models\User;
-use App\Models\UserProfile;
-use App\Repositories\Eloquent\UserRepository;
+use App\Services\Resources\UserService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Arr;
@@ -19,43 +17,40 @@ class PaginationHelperTest extends TestCase
     use WithFaker;
 
     private PaginationHelper $paginationHelper;
-    private UserRepositoryInterface $userRepository;
+    private UserServiceInterface $userRepository;
     private int $usersCount;
 
     protected function setUp(): void
     {
         parent::setUp();
         $this->paginationHelper = new PaginationHelper();
-        $this->userRepository = new UserRepository(new User());
-        $this->usersCount = 10;
-        User::factory()->has(UserProfile::factory())->count($this->usersCount)->create();
+        $this->userService = new UserService(new User());
     }
 
     public function test_can_format_length_aware_pagination()
     {
-        $users = $this->userRepository->all(PaginationType::LENGTH_AWARE);
-        $results = $this->paginationHelper->formatLengthAwarePagination($users);
+        $dummyCollection = User::query()->paginate()->toArray();
+        $results = $this->paginationHelper->formatLengthAwarePagination($dummyCollection);
         $expectedFields = [
             'total', 'current_page', 'last_page',
             'first_page_url', 'next_page_url', 'prev_page_url',
             'last_page_url', 'from', 'to', 'per_page', 'path'
         ];
         $this->assertTrue(Arr::has($results['pagination'], $expectedFields));
-        $this->assertEquals($this->usersCount, $results['pagination']['total']);
     }
 
     public function test_can_format_simple_pagination()
     {
-        $users = $this->userRepository->all(PaginationType::SIMPLE);
-        $results = $this->paginationHelper->formatSimplePagination($users);
+        $dummyCollection = User::query()->simplePaginate()->toArray();
+        $results = $this->paginationHelper->formatSimplePagination($dummyCollection);
         $expectedFields = ['first_page_url', 'next_page_url', 'prev_page_url', 'from', 'to', 'per_page', 'path'];
         $this->assertTrue(Arr::has($results['pagination'], $expectedFields));
     }
 
     public function test_can_format_cursor_pagination()
     {
-        $users = $this->userRepository->all(PaginationType::CURSOR);
-        $results = $this->paginationHelper->formatCursorPagination($users);
+        $dummyCollection = User::query()->cursorPaginate()->toArray();
+        $results = $this->paginationHelper->formatCursorPagination($dummyCollection);
         $expectedFields = ['next_cursor', 'prev_cursor', 'prev_page_url', 'next_page_url', 'per_page', 'path'];
         $this->assertTrue(Arr::has($results['pagination'], $expectedFields));
     }

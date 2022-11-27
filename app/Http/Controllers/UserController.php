@@ -5,15 +5,15 @@ namespace App\Http\Controllers;
 use App\Enums\PaginationType;
 use App\Http\Requests\UserRequest;
 use App\Interfaces\CloudFileServices\CloudFileServiceInterface;
-use App\Interfaces\Repositories\UserRepositoryInterface;
+use App\Interfaces\Resources\UserServiceInterface;
 use Illuminate\Http\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 class UserController extends ApiController
 {
-    private UserRepositoryInterface $userRepository;
+    private UserServiceInterface $userRepository;
 
-    public function __construct(UserRepositoryInterface $userRepository)
+    public function __construct(UserServiceInterface $userRepository)
     {
         $this->userRepository = $userRepository;
     }
@@ -26,7 +26,7 @@ class UserController extends ApiController
      */
     public function index(UserRequest $request): JsonResponse
     {
-        $users = $this->userRepository->all(PaginationType::LENGTH_AWARE);
+        $users = $this->userRepository->all($request, PaginationType::LENGTH_AWARE);
         return $this->success($users, Response::HTTP_OK, [], PaginationType::LENGTH_AWARE);
     }
 
@@ -91,6 +91,7 @@ class UserController extends ApiController
     {
         $file = $request->file('photo');
         $result = $uploader->upload($id, $file, 'images', 'profile-pictures');
+        $this->userRepository->update($id, ['profile_picture_path' => $result['path']]);
 
         return $this->success($result, Response::HTTP_OK);
     }

@@ -4,6 +4,7 @@ namespace App\Services\CloudFileServices;
 
 use App\Interfaces\CloudFileServices\CanCreateUrlTmpInterface;
 use App\Interfaces\CloudFileServices\CloudFileServiceInterface;
+use Illuminate\Contracts\Filesystem\Filesystem;
 use Storage;
 use Symfony\Component\HttpFoundation\File\Exception\UploadException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -11,13 +12,13 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 class S3FileService implements CloudFileServiceInterface, CanCreateUrlTmpInterface
 {
     /** @inheritDoc */
-    public function upload($owner_id, UploadedFile $file, ?string $parentDir = null, ?string $childDir = null): array
+    public function upload($ownerId, UploadedFile $file, ?string $parentDir = null, ?string $childDir = null): array
     {
         $topPath = $parentDir ? "$parentDir/" : '';
         $childPath = $childDir ? "/$childDir" : '';
-        $fullPath = $topPath . $owner_id . $childPath;
+        $fullPath = $topPath . $ownerId . $childPath;
 
-        $s3Path = Storage::put($fullPath, $file);
+        $s3Path = Storage::disk('s3')->put($fullPath, $file);
 
         // Storage::put() returns false if un-successful
         if ($s3Path === false) {
@@ -25,16 +26,16 @@ class S3FileService implements CloudFileServiceInterface, CanCreateUrlTmpInterfa
         }
 
         return [
-            'owner_id' => $owner_id,
+            'owner_id' => $ownerId,
             'path' => $s3Path,
-            'tmp_url' => $this->generateTmpUrl($s3Path, 60)
+            'url' => $this->generateTmpUrl($s3Path, 60)
         ];
     }
 
     /** @inheritDoc */
     public function delete(string $path): bool
     {
-        // TODO: Implement delete() method.
+        return Storage::disk('s3')->deleteDirectory($path);
     }
 
     /**
@@ -47,6 +48,6 @@ class S3FileService implements CloudFileServiceInterface, CanCreateUrlTmpInterfa
      */
     public function generateTmpUrl($path, int $timeLimit): string
     {
-        return Storage::temporaryUrl($path, now()->addSeconds($timeLimit));
+        return Storage::disk('s3')->temporaryUrl($path, now()->addSeconds($timeLimit));
     }
 }
