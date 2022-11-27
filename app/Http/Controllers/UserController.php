@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Enums\PaginationType;
 use App\Http\Requests\UserRequest;
+use App\Interfaces\CloudFileServices\CloudFileServiceInterface;
 use App\Interfaces\Repositories\UserRepositoryInterface;
 use Illuminate\Http\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -76,5 +77,21 @@ class UserController extends ApiController
     {
         $user = $this->userRepository->destroy($id);
         return $this->success($user, Response::HTTP_OK);
+    }
+
+    /**
+     * Upload profile picture
+     *
+     * @param $id
+     * @param UserRequest $request
+     * @param CloudFileServiceInterface $uploader
+     * @return JsonResponse
+     */
+    public function uploadProfilePicture($id, UserRequest $request, CloudFileServiceInterface $uploader): JsonResponse
+    {
+        $file = $request->file('photo');
+        $result = $uploader->upload($id, $file, 'images', 'profile-pictures');
+
+        return $this->success($result, Response::HTTP_OK);
     }
 }
