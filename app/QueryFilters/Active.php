@@ -3,8 +3,7 @@
 namespace App\QueryFilters;
 
 use Illuminate\Contracts\Database\Query\Builder;
-use Illuminate\Http\Request;
-use Closure;
+use Illuminate\Database\Eloquent\Model;
 
 class Active extends Filter
 {

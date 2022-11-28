@@ -4,7 +4,7 @@ namespace App\Rules;
 
 use Illuminate\Contracts\Validation\Rule;
 
-class IsInternationalPhoneNumber implements Rule
+class InternationalPhoneNumberFormat implements Rule
 {
     /**
      * Create a new rule instance.

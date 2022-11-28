@@ -3,10 +3,10 @@
 namespace Tests\Unit;
 
 use App\Enums\PaginationType;
-use App\Interfaces\Resources\UserServiceInterface;
+use App\Interfaces\HttpResources\UserServiceInterface;
 use App\Models\User;
 use App\Models\UserProfile;
-use App\Services\Resources\UserService;
+use App\Services\HttpResources\UserService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Http\Request;

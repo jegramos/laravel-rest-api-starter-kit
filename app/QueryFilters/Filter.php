@@ -9,7 +9,7 @@ use Illuminate\Contracts\Database\Query\Builder;
 abstract class Filter
 {
     /**
-     * The main function of a Laravel-implemented Pipeline stage
+     * The main function of a Laravel-implemented Pipe
      *
      * @throws Exception
      */
@@ -19,7 +19,6 @@ abstract class Filter
             return $next($request);
         }
 
-        /** @var Builder $builder */
         $builder = $next($request);
 
         return $this->applyFilter($builder);
