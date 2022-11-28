@@ -8,6 +8,7 @@ Sunrise API is a Laravel 9 RESTFul starter kit for SPA and mobile clients. This 
 - Implementation of S3 upload with pre-signed URL
 - Pipeline implementation of HTTP query filters
 - Composer and Git hook automation with GrumpPhp
+- Github PR document template in `docs/pull_request_template.md`
 - Feature and Unit tests coverage
 
 ## Set up your local development environment
