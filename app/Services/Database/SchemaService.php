@@ -3,7 +3,6 @@
 namespace App\Services\Database;
 
 use App\Interfaces\Database\SchemaServiceInterface;
-use Illuminate\Contracts\Database\Query\Builder;
 use Schema;
 
 class SchemaService implements SchemaServiceInterface
