@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Services\Resources;
+namespace App\Services\HttpResources;
 
 use App\Enums\PaginationType;
-use App\Interfaces\Resources\UserServiceInterface;
+use App\Interfaces\HttpResources\UserServiceInterface;
 use App\Models\User;
 use App\QueryFilters\Active;
 use App\QueryFilters\Sort;
@@ -36,7 +36,7 @@ class UserService implements UserServiceInterface
             ->send($this->model::query()->with('userProfile'))
             ->through([
                 Sort::class,
-                Active::class
+                Active::class,
             ])
             ->thenReturn();
 

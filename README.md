@@ -6,6 +6,8 @@ Sunrise API is a Laravel 9 RESTFul starter kit for SPA and mobile clients. This 
 - Implementation of CRUD for user profile with profile picture upload
 - Implementation Forgot and Reset Password with Email Notification
 - Implementation of S3 upload with pre-signed URL
+- Pipeline implementation of HTTP query filters
+- Composer and Git hook automation with GrumpPhp
 - Feature and Unit tests coverage
 
 ## Set up your local development environment
@@ -22,10 +24,14 @@ Sunrise API is a Laravel 9 RESTFul starter kit for SPA and mobile clients. This 
 - `php artisan app:styler` Runs a [code styler](https://github.com/stechstudio/Laravel-PHP-CS-Fixer) for consistency and generate [IDE helper PHP Docs](https://github.com/barryvdh/laravel-ide-helper). See the command at `app/Console/Commands/StyleFixer.php`
 - `php artisan user:create` Create a user with role. See the command at `app/Console/Commands/CreateUser.php`
 - Running `composer install`, `composer update`, `git commit` will trigger automated tasks specified in `grumphp.yml`
+   - PSR-compliant code formatting
+   - Package security checks
+   - Unit and feature tests
 
 ## Style Guide Ver. 0.1
 - Use **FormRequest** validators when available
 - Favor single quotes over double quotes
+- Make use of type-hinting
 - Extend the **ApiController** for all your API controllers
 - Use `snake_case` for DB table columns, request inputs, and resource views
 - Use `PascalCase` for class names

@@ -3,9 +3,9 @@
 namespace Tests\Unit\Helpers;
 
 use App\Helpers\PaginationHelper;
-use App\Interfaces\Resources\UserServiceInterface;
+use App\Interfaces\HttpResources\UserServiceInterface;
 use App\Models\User;
-use App\Services\Resources\UserService;
+use App\Services\HttpResources\UserService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Arr;

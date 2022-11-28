@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use App\Enums\Sex;
 use App\Rules\AlphaDashDot;
 use App\Rules\DbVarcharMaxLength;
-use App\Rules\IsInternationalPhoneNumber;
+use App\Rules\InternationalPhoneNumberFormat;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Enum;
@@ -70,12 +70,12 @@ class UserRequest extends FormRequest
             'middle_name' => ['string', 'nullable', new DbVarcharMaxLength()],
             'mobile_number' => [
                 'nullable',
-                new IsInternationalPhoneNumber(),
+                new InternationalPhoneNumberFormat(),
                 Rule::phone()->detect()->country('PH')->mobile()
             ],
             'telephone_number' => [
                 'nullable',
-                new IsInternationalPhoneNumber(),
+                new InternationalPhoneNumberFormat(),
                 Rule::phone()->detect()->country('PH')->fixedLine()
             ],
             'sex' => ['nullable', new Enum(Sex::class)],
@@ -114,12 +114,12 @@ class UserRequest extends FormRequest
             'middle_name' => ['string', 'nullable', new DbVarcharMaxLength()],
             'mobile_number' => [
                 'nullable',
-                new IsInternationalPhoneNumber(),
+                new InternationalPhoneNumberFormat(),
                 Rule::phone()->detect()->country('PH')->mobile()
             ],
             'telephone_number' => [
                 'nullable',
-                new IsInternationalPhoneNumber(),
+                new InternationalPhoneNumberFormat(),
                 Rule::phone()->detect()->country('PH')->fixedLine()
             ],
             'sex' => ['nullable', new Enum(Sex::class)],
@@ -146,6 +146,7 @@ class UserRequest extends FormRequest
         return [
             'active' => ['nullable', 'boolean'],
             'sort' => ['nullable', 'in:asc,desc'],
+            'sort_by' => ['nullable', 'string'],
             'limit' => ['nullable', 'int'],
             'page' => ['nullable', 'int'],
         ];

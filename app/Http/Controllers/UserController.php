@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\PaginationType;
 use App\Http\Requests\UserRequest;
 use App\Interfaces\CloudFileServices\CloudFileServiceInterface;
-use App\Interfaces\Resources\UserServiceInterface;
+use App\Interfaces\HttpResources\UserServiceInterface;
 use Illuminate\Http\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
