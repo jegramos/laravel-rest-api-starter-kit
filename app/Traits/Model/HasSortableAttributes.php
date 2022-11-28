@@ -14,9 +14,9 @@ trait HasSortableAttributes
      *
      * @return void
      */
-    public function initializeHasSortableAttributes() : void
+    public function initializeHasSortableAttributes(): void
     {
-        static::retrieved(function($model) {
+        static::retrieved(function ($model) {
             if ($this->appendSortableFields) {
                 $model->appends = array_merge($model->fillable, ['sortable_fields']);
             }

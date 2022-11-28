@@ -8,7 +8,6 @@ use Schema;
 
 class SchemaService implements SchemaServiceInterface
 {
-
     public function getAllColumns(string $tableName): array
     {
         return Schema::getColumnListing($tableName);
