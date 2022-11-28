@@ -3,13 +3,13 @@
 namespace App\Providers;
 
 use App\Interfaces\Repositories\UserRepositoryInterface;
-use App\Interfaces\Resources\UserServiceInterface;
+use App\Interfaces\HttpResources\UserServiceInterface;
 use App\Models\User;
 use App\Repositories\Eloquent\UserRepository;
-use App\Services\Resources\UserService;
+use App\Services\HttpResources\UserService;
 use Illuminate\Support\ServiceProvider;
 
-class ResourceManagementServiceProvider extends ServiceProvider
+class HttpResourceServiceProvider extends ServiceProvider
 {
     /**
      * Register services.

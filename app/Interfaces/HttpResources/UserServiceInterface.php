@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Interfaces\Resources;
+namespace App\Interfaces\HttpResources;
 
 use App\Enums\PaginationType;
 use Illuminate\Http\Request;

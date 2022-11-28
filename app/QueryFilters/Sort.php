@@ -2,6 +2,7 @@
 
 namespace App\QueryFilters;
 
+use App\Interfaces\Database\SchemaServiceInterface;
 use Illuminate\Contracts\Database\Query\Builder;
 
 class Sort extends Filter
@@ -14,7 +15,15 @@ class Sort extends Filter
             return $builder;
         }
 
-        return $builder->orderBy('created_at', request($filterName));
+        $sortBy = request('sort_by');
+        if (!$sortBy) {
+            return $builder->orderBy('id', request($filterName));
+        }
+
+        $schemaService = resolve(SchemaServiceInterface::class);
+        $columnExists = $schemaService->checkIfColumnExists((clone $builder), $sortBy);
+        $sortBy = $columnExists ? $sortBy : 'id';
+        return $builder->orderBy($sortBy, request($filterName));
     }
 
     protected function getFilterName(): string
