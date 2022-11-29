@@ -2,7 +2,6 @@
 
 namespace App\Providers;
 
-use App\Interfaces\CloudFileServices\CanCreateUrlTmpInterface;
 use App\Interfaces\CloudFileServices\CloudFileServiceInterface;
 use App\Services\CloudFileServices\S3FileService;
 use Illuminate\Support\ServiceProvider;
@@ -17,9 +16,6 @@ class CloudFileServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->bind(CloudFileServiceInterface::class, function () {
-            return new S3FileService();
-        });
-        $this->app->bind(CanCreateUrlTmpInterface::class, function () {
             return new S3FileService();
         });
     }

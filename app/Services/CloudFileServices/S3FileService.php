@@ -2,14 +2,12 @@
 
 namespace App\Services\CloudFileServices;
 
-use App\Interfaces\CloudFileServices\CanCreateUrlTmpInterface;
 use App\Interfaces\CloudFileServices\CloudFileServiceInterface;
-use Illuminate\Contracts\Filesystem\Filesystem;
 use Storage;
 use Symfony\Component\HttpFoundation\File\Exception\UploadException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-class S3FileService implements CloudFileServiceInterface, CanCreateUrlTmpInterface
+class S3FileService implements CloudFileServiceInterface
 {
     /** @inheritDoc */
     public function upload($ownerId, UploadedFile $file, ?string $parentDir = null, ?string $childDir = null): array

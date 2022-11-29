@@ -2,12 +2,10 @@
 
 namespace App\Interfaces\Database;
 
-use Illuminate\Contracts\Database\Query\Builder;
-
 interface SchemaServiceInterface
 {
     /**
-     * Get all columns of a table
+     * Get all the columns in a database table
      *
      * @param string $tableName
      * @return array
@@ -15,11 +13,11 @@ interface SchemaServiceInterface
     public function getAllColumns(string $tableName): array;
 
     /**
-     * Check a column exists
+     * Check if a column exists in a database table
      *
-     * @param Builder $builder
+     * @param string $tableName
      * @param string $columnName
      * @return bool
      */
-    public function checkIfColumnExists(Builder $builder, string $columnName): bool;
+    public function checkIfColumnExists(string $tableName, string $columnName): bool;
 }

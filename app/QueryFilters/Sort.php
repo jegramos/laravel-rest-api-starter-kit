@@ -21,7 +21,8 @@ class Sort extends Filter
         }
 
         $schemaService = resolve(SchemaServiceInterface::class);
-        $columnExists = $schemaService->checkIfColumnExists((clone $builder), $sortBy);
+        $tableName = (clone $builder)->getModel()->getTable();
+        $columnExists = $schemaService->checkIfColumnExists($tableName, $sortBy);
         $sortBy = $columnExists ? $sortBy : 'id';
         return $builder->orderBy($sortBy, request($filterName));
     }
