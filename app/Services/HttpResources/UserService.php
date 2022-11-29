@@ -35,8 +35,8 @@ class UserService implements UserServiceInterface
         $users = app(Pipeline::class)
             ->send($this->model::query()->with('userProfile'))
             ->through([
-                Sort::class,
                 Active::class,
+                Sort::class,
             ])
             ->thenReturn();
 
