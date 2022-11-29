@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use App\Enums\Sex;
-use App\Interfaces\CloudFileServices\CanCreateUrlTmpInterface;
+use App\Interfaces\CloudFileServices\CloudFileServiceInterface;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -133,7 +133,7 @@ class UserProfile extends Model
                 return null;
             }
 
-            $cloudFileManager = resolve(CanCreateUrlTmpInterface::class);
+            $cloudFileManager = resolve(CloudFileServiceInterface::class);
             return $cloudFileManager->generateTmpUrl($this->profile_picture_path, 60 * 3);
         });
     }

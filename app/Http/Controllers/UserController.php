@@ -11,11 +11,11 @@ use Symfony\Component\HttpFoundation\Response;
 
 class UserController extends ApiController
 {
-    private UserServiceInterface $userRepository;
+    private UserServiceInterface $userService;
 
-    public function __construct(UserServiceInterface $userRepository)
+    public function __construct(UserServiceInterface $userService)
     {
-        $this->userRepository = $userRepository;
+        $this->userService = $userService;
     }
 
     /**
@@ -26,7 +26,7 @@ class UserController extends ApiController
      */
     public function index(UserRequest $request): JsonResponse
     {
-        $users = $this->userRepository->all($request, PaginationType::LENGTH_AWARE);
+        $users = $this->userService->all($request, PaginationType::LENGTH_AWARE);
         return $this->success($users, Response::HTTP_OK, [], PaginationType::LENGTH_AWARE);
     }
 
@@ -38,7 +38,7 @@ class UserController extends ApiController
      */
     public function store(UserRequest $request): JsonResponse
     {
-        $user = $this->userRepository->create($request->validated());
+        $user = $this->userService->create($request->validated());
         return $this->success($user, Response::HTTP_CREATED);
     }
 
@@ -50,7 +50,7 @@ class UserController extends ApiController
      */
     public function read($id): JsonResponse
     {
-        $user = $this->userRepository->read($id);
+        $user = $this->userService->read($id);
         return $this->success($user, Response::HTTP_OK);
     }
 
@@ -63,7 +63,7 @@ class UserController extends ApiController
      */
     public function update($id, UserRequest $request): JsonResponse
     {
-        $user = $this->userRepository->update($id, $request->all());
+        $user = $this->userService->update($id, $request->all());
         return $this->success($user, Response::HTTP_OK);
     }
 
@@ -75,7 +75,7 @@ class UserController extends ApiController
      */
     public function destroy($id): JsonResponse
     {
-        $user = $this->userRepository->destroy($id);
+        $user = $this->userService->destroy($id);
         return $this->success($user, Response::HTTP_OK);
     }
 
@@ -91,7 +91,7 @@ class UserController extends ApiController
     {
         $file = $request->file('photo');
         $result = $uploader->upload($id, $file, 'images', 'profile-pictures');
-        $this->userRepository->update($id, ['profile_picture_path' => $result['path']]);
+        $this->userService->update($id, ['profile_picture_path' => $result['path']]);
 
         return $this->success($result, Response::HTTP_OK);
     }

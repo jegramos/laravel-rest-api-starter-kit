@@ -24,12 +24,11 @@ class S3FileServiceTest extends TestCase
         $result = $service->upload($ownerId, $file, 'images', 'profile-pictures');
 
         $expectedResult = [
-            'owner_id' => $ownerId,
-            'path' => $fakePath,
             'url' => $fakeTmpUrl,
+            'path' => $fakePath,
+            'owner_id' => $ownerId,
         ];
 
-        /** @note we're using == instead of === to ignore the ordering of elements */
-        $this->assertTrue($expectedResult == $result);
+        $this->assertTrue($this->arraysHaveSameValue($expectedResult, $result));
     }
 }

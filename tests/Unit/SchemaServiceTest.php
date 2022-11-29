@@ -34,8 +34,7 @@ class SchemaServiceTest extends TestCase
         $expectedColumns = ['id', 'col_2', 'col_3', 'col_4'];
         $result = $this->service->getAllColumns('stubs');
 
-        /** @note we're using == instead of === to ignore the ordering of elements */
-        $this->assertTrue($expectedColumns == $result);
+        $this->assertTrue($this->arraysHaveSameValue($expectedColumns, $result));
     }
 
     public function test_it_can_check_if_column_exists()
