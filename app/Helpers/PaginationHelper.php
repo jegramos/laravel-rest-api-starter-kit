@@ -3,9 +3,6 @@
 namespace App\Helpers;
 
 use Arr;
-use Illuminate\Contracts\Pagination\CursorPaginator;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Contracts\Pagination\Paginator;
 
 /**
  * Please use the facade registered
