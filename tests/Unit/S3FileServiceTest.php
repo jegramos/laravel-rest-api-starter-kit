@@ -29,7 +29,7 @@ class S3FileServiceTest extends TestCase
             'url' => $fakeTmpUrl,
         ];
 
-        // we're using == instead of === to ignore the ordering of elements
+        /** @note we're using == instead of === to ignore the ordering of elements */
         $this->assertTrue($expectedResult == $result);
     }
 }
