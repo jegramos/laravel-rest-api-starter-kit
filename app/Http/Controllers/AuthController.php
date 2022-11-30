@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Enums\ApiErrorCode;
 use App\Http\Requests\AuthRequest;
-use App\Interfaces\HttpResources\UserServiceInterface;
 use App\Models\User;
 use Hash;
 use Illuminate\Http\JsonResponse;
@@ -64,13 +63,9 @@ class AuthController extends ApiController
     {
         /** @var User $user */
         $user = auth()->user();
+        $user->currentAccessToken()->delete();
 
-        $tokens = $user->tokens;
-
-        return $this->success([
-            'user_id' => $user->id,
-            'tokens' => $tokens
-        ], 200);
+        return $this->success(null, Response::HTTP_OK);
     }
 
     /**
