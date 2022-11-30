@@ -12,32 +12,26 @@ abstract class ApiController extends Controller
     /**
      * Return a success JSON success response.
      *
-     * @param array $data
+     * @param array|null $data
      * @param int $statusCode
      * @param array $headers
      * @param PaginationType|null $paginationType
      * @return JsonResponse
      */
     protected function success(
-        array $data,
+        ?array $data,
         int $statusCode,
         array $headers = [],
         ?PaginationType $paginationType = null
     ): JsonResponse {
-        switch ($paginationType) {
-            case PaginationType::LENGTH_AWARE:
-                $results = array_merge(['success' => true], PaginationHelper::formatLengthAwarePagination($data));
-                break;
-            case PaginationType::SIMPLE:
-                $results = array_merge(['success' => true], PaginationHelper::formatSimplePagination($data));
-                break;
-            case PaginationType::CURSOR:
-                $results = array_merge(['success' => true], PaginationHelper::formatCursorPagination($data));
-                break;
-            default:
-                $results = ['success' => true, 'data' => $data];
-                break;
-        }
+        $results = ['success' => true];
+
+        $results = match ($paginationType) {
+            PaginationType::LENGTH_AWARE => array_merge($results, PaginationHelper::formatLengthAwarePagination($data)),
+            PaginationType::SIMPLE => array_merge($results, PaginationHelper::formatSimplePagination($data)),
+            PaginationType::CURSOR => array_merge($results, PaginationHelper::formatCursorPagination($data)),
+            default => array_merge($results, ['data' => $data]),
+        };
 
         return response()->json($results, $statusCode, $headers);
     }
