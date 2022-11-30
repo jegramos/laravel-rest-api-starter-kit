@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Enums\Sex;
+use App\Enums\SexualCategory;
 use App\Interfaces\CloudFileServices\CloudFileServiceInterface;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -76,7 +76,7 @@ class UserProfile extends Model
      */
     protected $casts = [
         'birthday' => 'date',
-        'sex' => Sex::class, // Laravel 9 enum casting. @see https://laravel.com/docs/9.x/releases
+        'sex' => SexualCategory::class, // Laravel 9 enum casting. @see https://laravel.com/docs/9.x/releases
     ];
 
     /**
