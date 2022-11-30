@@ -6,7 +6,9 @@ use App\Enums\PaginationType;
 use App\Http\Requests\UserRequest;
 use App\Interfaces\CloudFileServices\CloudFileServiceInterface;
 use App\Interfaces\HttpResources\UserServiceInterface;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
+use PaginationHelper;
 use Symfony\Component\HttpFoundation\Response;
 
 class UserController extends ApiController
@@ -21,13 +23,13 @@ class UserController extends ApiController
     /**
      * Display a listing of users
      *
-     * @param UserRequest $request
      * @return JsonResponse
      */
-    public function index(UserRequest $request): JsonResponse
+    public function index(): JsonResponse
     {
-        $users = $this->userService->all($request, PaginationType::LENGTH_AWARE);
-        return $this->success($users, Response::HTTP_OK, [], PaginationType::LENGTH_AWARE);
+        $users = $this->userService->all(PaginationType::LENGTH_AWARE);
+        $formatted = PaginationHelper::formatPagination($users);
+        return $this->success($formatted, Response::HTTP_OK);
     }
 
     /**
@@ -39,7 +41,7 @@ class UserController extends ApiController
     public function store(UserRequest $request): JsonResponse
     {
         $user = $this->userService->create($request->validated());
-        return $this->success($user, Response::HTTP_CREATED);
+        return $this->success(['data' => $user], Response::HTTP_CREATED);
     }
 
     /**
@@ -50,8 +52,8 @@ class UserController extends ApiController
      */
     public function read($id): JsonResponse
     {
-        $user = $this->userService->read($id);
-        return $this->success($user, Response::HTTP_OK);
+        $user = User::with('userProfile')->findOrFail($id);
+        return $this->success(['data' => $user], Response::HTTP_OK);
     }
 
     /**
@@ -64,7 +66,7 @@ class UserController extends ApiController
     public function update($id, UserRequest $request): JsonResponse
     {
         $user = $this->userService->update($id, $request->validated());
-        return $this->success($user, Response::HTTP_OK);
+        return $this->success(['data' => $user], Response::HTTP_OK);
     }
 
     /**
@@ -75,8 +77,8 @@ class UserController extends ApiController
      */
     public function destroy($id): JsonResponse
     {
-        $user = $this->userService->destroy($id);
-        return $this->success($user, Response::HTTP_OK);
+        User::findOrFail($id)->delete();
+        return $this->success(null, Response::HTTP_NO_CONTENT);
     }
 
     /**
@@ -93,6 +95,6 @@ class UserController extends ApiController
         $result = $uploader->upload($id, $file, 'images', 'profile-pictures');
         $this->userService->update($id, ['profile_picture_path' => $result['path']]);
 
-        return $this->success($result, Response::HTTP_OK);
+        return $this->success(['data' => $result], Response::HTTP_OK);
     }
 }

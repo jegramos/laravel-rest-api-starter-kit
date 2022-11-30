@@ -20,4 +20,14 @@ interface SchemaServiceInterface
      * @return bool
      */
     public function checkIfColumnExists(string $tableName, string $columnName): bool;
+
+
+    /**
+     * Get all column names of a table except
+     *
+     * @param string $tableName
+     * @param array $excludedColumns
+     * @return array
+     */
+    public function getAllColumnNamesExcept(string $tableName, array $excludedColumns): array;
 }

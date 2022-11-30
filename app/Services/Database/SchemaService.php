@@ -8,13 +8,7 @@ use Schema;
 
 class SchemaService implements SchemaServiceInterface
 {
-    /**
-     * Get all the columns in a database table
-     * @note The cache will be removed when a migration file is created
-     *
-     * @param   string $tableName
-     * @return  array
-     */
+    /** @inheritDoc */
     public function getAllColumns(string $tableName): array
     {
         return Cache::rememberForever($this->getAllColumnsCacheKey($tableName), function () use ($tableName) {
@@ -22,17 +16,18 @@ class SchemaService implements SchemaServiceInterface
         });
     }
 
-    /**
-     * Check if a column exists in a database table
-     *
-     * @param string $tableName
-     * @param string $columnName
-     * @return bool
-     */
+    /** @inheritDoc */
     public function checkIfColumnExists(string $tableName, string $columnName): bool
     {
         $tableNames = $this->getAllColumns($tableName);
         return in_array($columnName, $tableNames);
+    }
+
+    /** @inheritDoc */
+    public function getAllColumnNamesExcept(string $tableName, array $excludedColumns): array
+    {
+        $allColumns = $this->getAllColumns($tableName);
+        return array_diff($allColumns, $excludedColumns);
     }
 
     /**

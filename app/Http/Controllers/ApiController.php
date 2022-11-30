@@ -12,33 +12,16 @@ abstract class ApiController extends Controller
     /**
      * Return a success JSON success response.
      *
-     * @param array $data
+     * @param array|null $data
      * @param int $statusCode
      * @param array $headers
-     * @param PaginationType|null $paginationType
      * @return JsonResponse
      */
-    protected function success(
-        array $data,
-        int $statusCode,
-        array $headers = [],
-        ?PaginationType $paginationType = null
-    ): JsonResponse {
-        switch ($paginationType) {
-            case PaginationType::LENGTH_AWARE:
-                $results = array_merge(['success' => true], PaginationHelper::formatLengthAwarePagination($data));
-                break;
-            case PaginationType::SIMPLE:
-                $results = array_merge(['success' => true], PaginationHelper::formatSimplePagination($data));
-                break;
-            case PaginationType::CURSOR:
-                $results = array_merge(['success' => true], PaginationHelper::formatCursorPagination($data));
-                break;
-            default:
-                $results = ['success' => true, 'data' => $data];
-                break;
-        }
+    protected function success(?array $data, int $statusCode, array $headers = []): JsonResponse
+    {
+        $data = $data ?? [];
 
+        $results = array_merge(['success' => true], $data);
         return response()->json($results, $statusCode, $headers);
     }
 
