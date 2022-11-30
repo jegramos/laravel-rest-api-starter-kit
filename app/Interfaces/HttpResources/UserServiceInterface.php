@@ -15,14 +15,10 @@ interface UserServiceInterface
     /**
      * Fetch a list of users
      *
-     * @param Request $request
-     * @param PaginationType|null $paginationType
+     * @param PaginationType|null $pagination
      * @return Collection|Paginator|LengthAwarePaginator|CursorPaginator
      */
-    public function all(
-        Request $request,
-        ?PaginationType $paginationType = null
-    ): Collection|Paginator|LengthAwarePaginator|CursorPaginator;
+    public function all(?PaginationType $pagination = null): Collection|Paginator|LengthAwarePaginator|CursorPaginator;
 
     /**
      * Create a new user

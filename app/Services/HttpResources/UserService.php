@@ -31,10 +31,7 @@ class UserService implements UserServiceInterface
     }
 
     /** @inheritDoc */
-    public function all(
-        Request $request, ?PaginationType $paginationType = null
-    ): Collection|Paginator|LengthAwarePaginator|CursorPaginator
-    {
+    public function all(?PaginationType $pagination = null): Collection|Paginator|LengthAwarePaginator|CursorPaginator {
         /** @var Builder $users */
         $users = app(Pipeline::class)
             ->send($this->model::query()->with('userProfile'))
@@ -44,8 +41,8 @@ class UserService implements UserServiceInterface
             ])
             ->thenReturn();
 
-        $limit = $request->get('limit') ?? 25;
-        return match ($paginationType) {
+        $limit = request('limit') ?? 25;
+        return match ($pagination) {
             PaginationType::LENGTH_AWARE => $users->paginate($limit),
             PaginationType::SIMPLE => $users->simplePaginate($limit),
             PaginationType::CURSOR => $users->cursorPaginate($limit),

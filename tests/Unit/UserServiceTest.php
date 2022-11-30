@@ -50,8 +50,7 @@ class UserServiceTest extends TestCase
         $count = 25;
         User::factory()->has(UserProfile::factory())->count($count)->create();
 
-        $request = new Request();
-        $users = $this->userService->all($request);
+        $users = $this->userService->all();
         $this->assertEquals($count, count($users));
     }
 
@@ -63,8 +62,9 @@ class UserServiceTest extends TestCase
         $request = new Request();
         $limit = 10;
         $request->replace(['limit' => $limit]);
+        app()->instance('request', $request);
 
-        $users = $this->userService->all($request, PaginationType::LENGTH_AWARE);
+        $users = $this->userService->all(PaginationType::LENGTH_AWARE);
 
         $this->assertEquals($count, $users->total());
         $this->assertEquals($limit, count($users->items()));
