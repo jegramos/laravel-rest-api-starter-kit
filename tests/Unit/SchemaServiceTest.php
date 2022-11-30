@@ -9,6 +9,8 @@ use Tests\TestCase;
 
 class SchemaServiceTest extends TestCase
 {
+    private SchemaService $service;
+
     protected function setUp(): void
     {
         parent::setUp();
