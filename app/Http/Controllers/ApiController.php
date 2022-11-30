@@ -12,14 +12,14 @@ abstract class ApiController extends Controller
     /**
      * Return a success JSON success response.
      *
-     * @param array $data
+     * @param array|null $data
      * @param int $statusCode
      * @param array $headers
      * @param PaginationType|null $paginationType
      * @return JsonResponse
      */
     protected function success(
-        array $data,
+        ?array $data,
         int $statusCode,
         array $headers = [],
         ?PaginationType $paginationType = null
