@@ -88,7 +88,7 @@ class AuthController extends ApiController
             ];
         });
 
-        return $this->success($tokens->toArray(), Response::HTTP_OK);
+        return $this->success(['data' => $tokens->toArray()], Response::HTTP_OK);
     }
 
     /**

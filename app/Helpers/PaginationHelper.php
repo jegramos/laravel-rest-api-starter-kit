@@ -3,6 +3,11 @@
 namespace App\Helpers;
 
 use Arr;
+use Illuminate\Contracts\Pagination\CursorPaginator;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Contracts\Pagination\Paginator;
+use Illuminate\Pagination\AbstractPaginator;
+use InvalidArgumentException;
 
 /**
  * Please use the facade registered
@@ -24,6 +29,33 @@ class PaginationHelper
         }
 
         return $url . '&' . http_build_query(Arr::except(request()->all(), $except));
+    }
+
+    /**
+     * Re-arrange Laravel's paginate(), simplePaginate(), and cursorPaginate() methods for a cleaner API response
+     *
+     * @param AbstractPaginator $paginator
+     * @return array
+     */
+    public function formatPagination(AbstractPaginator $paginator): array
+    {
+        $data = $paginator->toArray();
+
+        switch ($paginator) {
+            case $paginator instanceof LengthAwarePaginator:
+                $result = $this->formatLengthAwarePagination($data);
+                break;
+            case $paginator instanceof Paginator:
+                $result = $this->formatSimplePagination($data);
+                break;
+            case $paginator instanceof CursorPaginator:
+                $result = $this->formatCursorPagination($data);
+                break;
+            default:
+                throw new InvalidArgumentException('Unsupported paginator class passed');
+        }
+
+        return $result;
     }
 
     /**

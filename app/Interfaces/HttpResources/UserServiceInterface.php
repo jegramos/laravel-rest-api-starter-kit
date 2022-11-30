@@ -3,49 +3,37 @@
 namespace App\Interfaces\HttpResources;
 
 use App\Enums\PaginationType;
-use Illuminate\Http\Request;
+use App\Models\User;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Contracts\Pagination\Paginator;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Pagination\CursorPaginator;
 
 interface UserServiceInterface
 {
     /**
      * Fetch a list of users
      *
-     * @param Request $request
-     * @param PaginationType|null $paginationType
-     * @return array
+     * @param PaginationType|null $pagination
+     * @return Collection|Paginator|LengthAwarePaginator|CursorPaginator
      */
-    public function all(Request $request, ?PaginationType $paginationType = null): array;
+    public function all(?PaginationType $pagination = null): Collection|Paginator|LengthAwarePaginator|CursorPaginator;
 
     /**
      * Create a new user
      *
      * @param array $userInfo
-     * @return array
+     * @return User
      */
-    public function create(array $userInfo): array;
+    public function create(array $userInfo): User;
 
-    /**
-     * Fetch a single user
-     *
-     * @param $id
-     * @return array
-     */
-    public function read($id): array;
 
     /**
      * Update an existing user
      *
      * @param $id
      * @param array $newUserInfo
-     * @return array
+     * @return User
      */
-    public function update($id, array $newUserInfo): array;
-
-    /**
-     * Delete a user
-     *
-     * @param $id
-     * @return array
-     */
-    public function destroy($id): array;
+    public function update($id, array $newUserInfo): User;
 }

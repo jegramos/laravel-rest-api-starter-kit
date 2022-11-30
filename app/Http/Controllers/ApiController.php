@@ -15,24 +15,13 @@ abstract class ApiController extends Controller
      * @param array|null $data
      * @param int $statusCode
      * @param array $headers
-     * @param PaginationType|null $paginationType
      * @return JsonResponse
      */
-    protected function success(
-        ?array $data,
-        int $statusCode,
-        array $headers = [],
-        ?PaginationType $paginationType = null
-    ): JsonResponse {
-        $results = ['success' => true];
+    protected function success(?array $data, int $statusCode, array $headers = []): JsonResponse
+    {
+        $data = $data ?? [];
 
-        $results = match ($paginationType) {
-            PaginationType::LENGTH_AWARE => array_merge($results, PaginationHelper::formatLengthAwarePagination($data)),
-            PaginationType::SIMPLE => array_merge($results, PaginationHelper::formatSimplePagination($data)),
-            PaginationType::CURSOR => array_merge($results, PaginationHelper::formatCursorPagination($data)),
-            default => array_merge($results, ['data' => $data]),
-        };
-
+        $results = array_merge(['success' => true], $data);
         return response()->json($results, $statusCode, $headers);
     }
 

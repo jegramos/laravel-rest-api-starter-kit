@@ -292,13 +292,24 @@ class UserManagementTest extends TestCase
         ];
     }
 
+    public function test_it_can_read_a_user()
+    {
+        /** @var User $user */
+        $user = User::factory()->has(UserProfile::factory())->create();
+
+        $response = $this->get("$this->baseUri/{$user->id}");
+        $response->assertStatus(200);
+    }
+
     /** @throws Throwable */
     public function test_it_can_delete_a_user()
     {
+        /** @var User $user */
         $user = User::factory()->has(UserProfile::factory())->create();
 
         $response = $this->delete("$this->baseUri/{$user->id}");
-        $response->assertStatus(200);
+        $response->assertStatus(204);
+        $this->assertDatabaseHas('users', ['id' => $user->id]);
     }
 
     /** @throws Throwable */
