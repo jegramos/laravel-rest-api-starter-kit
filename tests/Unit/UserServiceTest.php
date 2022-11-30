@@ -35,29 +35,14 @@ class UserServiceTest extends TestCase
     }
 
     /** @throws Throwable */
-    public function test_it_can_delete_a_user()
-    {
-        $user = User::factory()->has(UserProfile::factory())->create();
-        $deletedUser = $this->userService->destroy($user->id);
-        $this->assertEquals($user->id, $deletedUser['id']);
-    }
-
-    public function test_it_can_read_a_user()
-    {
-        $user = User::factory()->has(UserProfile::factory())->create();
-        $foundUser = $this->userService->read($user->id);
-        $this->assertEquals($user->id, $foundUser['id']);
-    }
-
-    /** @throws Throwable */
     public function test_it_can_update_a_user()
     {
         $user = User::factory()->has(UserProfile::factory())->create();
         $edited = ['first_name' => fake()->firstName, 'username' => fake()->unique()->userName];
         $editedUser = $this->userService->update($user->id, $edited);
 
-        $this->assertEquals($edited['first_name'], $editedUser['user_profile']['first_name']);
-        $this->assertEquals($edited['username'], $editedUser['username']);
+        $this->assertEquals($edited['first_name'], $editedUser->userProfile->first_name);
+        $this->assertEquals($edited['username'], $editedUser->username);
     }
 
     public function test_it_can_fetch_all_users()
@@ -81,8 +66,8 @@ class UserServiceTest extends TestCase
 
         $users = $this->userService->all($request, PaginationType::LENGTH_AWARE);
 
-        $this->assertEquals($count, $users['total']);
-        $this->assertEquals($limit, count($users['data']));
+        $this->assertEquals($count, $users->total());
+        $this->assertEquals($limit, count($users->items()));
     }
 
     /**

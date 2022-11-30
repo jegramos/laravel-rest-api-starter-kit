@@ -8,8 +8,12 @@ use App\Models\User;
 use App\QueryFilters\Active;
 use App\QueryFilters\Sort;
 use Carbon\Carbon;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Contracts\Pagination\Paginator;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
@@ -26,10 +30,10 @@ class UserService implements UserServiceInterface
         $this->model = $model;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function all(Request $request, ?PaginationType $paginationType = null): array
+    /** @inheritDoc */
+    public function all(
+        Request $request, ?PaginationType $paginationType = null
+    ): Collection|Paginator|LengthAwarePaginator|CursorPaginator
     {
         /** @var Builder $users */
         $users = app(Pipeline::class)
@@ -42,10 +46,10 @@ class UserService implements UserServiceInterface
 
         $limit = $request->get('limit') ?? 25;
         return match ($paginationType) {
-            PaginationType::LENGTH_AWARE => $users->paginate($limit)->toArray(),
-            PaginationType::SIMPLE => $users->simplePaginate($limit)->toArray(),
-            PaginationType::CURSOR => $users->cursorPaginate($limit)->toArray(),
-            default => $users->get()->toArray(),
+            PaginationType::LENGTH_AWARE => $users->paginate($limit),
+            PaginationType::SIMPLE => $users->simplePaginate($limit),
+            PaginationType::CURSOR => $users->cursorPaginate($limit),
+            default => $users->get(),
         };
     }
 
@@ -53,7 +57,7 @@ class UserService implements UserServiceInterface
      * @inheritDoc
      * @throws Throwable
      */
-    public function create(array $userInfo): array
+    public function create(array $userInfo): User
     {
         return DB::transaction(function () use ($userInfo) {
             $userCredentials = [
@@ -75,29 +79,15 @@ class UserService implements UserServiceInterface
             $exemptedAttributes = ['email', 'username', 'password', 'active', 'email_verified_at'];
             $user->userProfile()->create(Arr::except($userInfo, $exemptedAttributes));
 
-            return $user->load('userProfile')->toArray();
+            return $user->load('userProfile');
         }, self::MAX_TRANSACTION_DEADLOCK_ATTEMPTS);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function read($id, bool $includeProfile = true): array
-    {
-        $query = $this->model::query();
-
-        if ($includeProfile) {
-            $query->with('userProfile');
-        }
-
-        return $query->findOrFail($id)->toArray();
     }
 
     /**
      * @inheritDoc
      * @throws Throwable
      */
-    public function update($id, array $newUserInfo): array
+    public function update($id, array $newUserInfo): User
     {
         return DB::transaction(function () use ($id, $newUserInfo) {
             /** @var User $user */
@@ -114,23 +104,11 @@ class UserService implements UserServiceInterface
             $user->userProfile()->update(
                 Arr::except($newUserInfo, ['email', 'username', 'password', 'active', 'email_verified_at'])
             );
-            $user->save();
 
+            $user->save();
             $user->refresh();
 
-            return $user->toArray();
+            return $user;
         }, self::MAX_TRANSACTION_DEADLOCK_ATTEMPTS);
-    }
-
-    /**
-     * @inheritDoc
-     * @throws Throwable
-     */
-    public function destroy($id): array
-    {
-        $user = $this->model->findOrFail($id);
-        $user->delete();
-
-        return $user->toArray();
     }
 }
