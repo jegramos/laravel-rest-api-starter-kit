@@ -106,7 +106,7 @@ class Handler extends ExceptionHandler
                     [
                         'success' => false,
                         'message' => 'A validation error has occurred',
-                        'error_code' => ApiErrorCode::VALIDATION_ERROR,
+                        'error_code' => ApiErrorCode::VALIDATION,
                         'errors' => $this->transformErrors($e)
                     ],
                     Response::HTTP_UNPROCESSABLE_ENTITY
@@ -118,7 +118,7 @@ class Handler extends ExceptionHandler
                     [
                         'success' => false,
                         'message' => 'Authentication error',
-                        'error_code' => ApiErrorCode::UNAUTHORIZED_ERROR,
+                        'error_code' => ApiErrorCode::UNAUTHORIZED,
                     ],
                     Response::HTTP_UNAUTHORIZED
                 );
@@ -145,7 +145,7 @@ class Handler extends ExceptionHandler
 
                 $body = [
                     'message' => $e->getMessage(),
-                    'error_code' => ApiErrorCode::SERVER_ERROR,
+                    'error_code' => ApiErrorCode::SERVER,
                     'stack_trace' => $e->getTraceAsString(),
                 ];
 

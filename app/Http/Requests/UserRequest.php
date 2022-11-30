@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests;
 
-use App\Enums\Sex;
+use App\Enums\SexualCategory;
 use App\Rules\AlphaDashDot;
 use App\Rules\DbVarcharMaxLength;
 use App\Rules\InternationalPhoneNumberFormat;
@@ -78,7 +78,7 @@ class UserRequest extends FormRequest
                 new InternationalPhoneNumberFormat(),
                 Rule::phone()->detect()->country('PH')->fixedLine()
             ],
-            'sex' => ['nullable', new Enum(Sex::class)],
+            'sex' => ['nullable', new Enum(SexualCategory::class)],
             'birthday' => ['nullable', 'date_format:Y-m-d', 'before_or_equal:' . $this->dateToday],
             'address_line_1' => ['string', 'nullable', new DbVarcharMaxLength()],
             'address_line_2' => ['string', 'nullable', new DbVarcharMaxLength()],
@@ -122,7 +122,7 @@ class UserRequest extends FormRequest
                 new InternationalPhoneNumberFormat(),
                 Rule::phone()->detect()->country('PH')->fixedLine()
             ],
-            'sex' => ['nullable', new Enum(Sex::class)],
+            'sex' => ['nullable', new Enum(SexualCategory::class)],
             'birthday' => ['nullable', 'date_format:Y-m-d', 'before_or_equal:' . $this->dateToday],
             'address_line_1' => ['string', 'nullable', new DbVarcharMaxLength()],
             'address_line_2' => ['string', 'nullable', new DbVarcharMaxLength()],
