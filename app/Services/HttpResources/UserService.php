@@ -12,7 +12,6 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Query\Builder;
-use Illuminate\Http\Request;
 use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Arr;
@@ -31,7 +30,8 @@ class UserService implements UserServiceInterface
     }
 
     /** @inheritDoc */
-    public function all(?PaginationType $pagination = null): Collection|Paginator|LengthAwarePaginator|CursorPaginator {
+    public function all(?PaginationType $pagination = null): Collection|Paginator|LengthAwarePaginator|CursorPaginator
+    {
         /** @var Builder $users */
         $users = app(Pipeline::class)
             ->send($this->model::query()->with('userProfile'))

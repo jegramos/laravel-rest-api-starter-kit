@@ -23,7 +23,6 @@ class UserController extends ApiController
     /**
      * Display a listing of users
      *
-     * @param UserRequest $request
      * @return JsonResponse
      */
     public function index(): JsonResponse
