@@ -18,7 +18,7 @@ class AuthController extends ApiController
      * @param AuthRequest $request
      * @return JsonResponse
      */
-    public function login(AuthRequest $request): JsonResponse
+    public function store(AuthRequest $request): JsonResponse
     {
         $user = User::with('userProfile')->where('email', $request->email)->first();
 
@@ -30,8 +30,7 @@ class AuthController extends ApiController
             );
         }
 
-        // Client can optionally send 'My iPhone14', 'Google Chrome', 'etc.
-        // as the token name
+        // For the token name, clients can optionally send 'My iPhone14', 'Google Chrome', etc.
         $tokenName = $request->get('client_name') ?? 'api_token';
 
         /**
@@ -40,12 +39,7 @@ class AuthController extends ApiController
          */
         $expiresAt = now()->addHours(12);
         $token = $user->createToken($tokenName, ['*'], $expiresAt)->plainTextToken;
-
-        $data = [
-            'token' => $token,
-            'token_name' => $tokenName,
-            'expires_at' => $expiresAt
-        ];
+        $data = ['token' => $token, 'token_name' => $tokenName, 'expires_at' => $expiresAt];
 
         if ($request->get('with_user')) {
             $data['user'] = $user;
@@ -59,7 +53,7 @@ class AuthController extends ApiController
      *
      * @return JsonResponse
      */
-    public function logout(): JsonResponse
+    public function destroy(): JsonResponse
     {
         /** @var User $user */
         $user = auth()->user();
@@ -73,7 +67,7 @@ class AuthController extends ApiController
      *
      * @return JsonResponse
      */
-    public function getAccessTokens(): JsonResponse
+    public function fetch(): JsonResponse
     {
         /** @var User $user */
         $user = auth()->user();
@@ -97,14 +91,18 @@ class AuthController extends ApiController
      * @param AuthRequest $request
      * @return JsonResponse
      */
-    public function revokeAccessTokens(AuthRequest $request): JsonResponse
+    public function revoke(AuthRequest $request): JsonResponse
     {
-        /** @var User $user */
-        $user = auth()->user();
-
         $tokensToRevoke = $request->get('token_ids');
+
+        // delete everything if they pass a star (*)
+        if ($tokensToRevoke === ['*']) {
+            auth()->user()->tokens()->delete();
+            return $this->success(null, Response::HTTP_NO_CONTENT);
+        }
+
         foreach ($tokensToRevoke as $tokenId) {
-            $user->tokens()->where('id', $tokenId)->delete();
+            auth()->user()->tokens()->where('id', $tokenId)->delete();
         }
 
         return $this->success(null, Response::HTTP_NO_CONTENT);
@@ -115,12 +113,9 @@ class AuthController extends ApiController
      *
      * @return JsonResponse
      */
-    public function revokeAllAccessTokens(): JsonResponse
+    public function revokeAllTokens(): JsonResponse
     {
-        /** @var User $user */
-        $user = auth()->user();
-
-        $user->tokens()->delete();
+        auth()->user()->tokens()->delete();
 
         return $this->success(null, Response::HTTP_NO_CONTENT);
     }

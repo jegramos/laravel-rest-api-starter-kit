@@ -35,7 +35,7 @@ class AuthTest extends TestCase
     /** @throws Throwable */
     public function test_user_can_request_an_access_token()
     {
-        $response = $this->post("$this->baseUri/login", [
+        $response = $this->post("$this->baseUri/tokens", [
             'email' => $this->userCreds['email'],
             'password' => $this->userCreds['password'],
         ]);
@@ -48,7 +48,7 @@ class AuthTest extends TestCase
     /** @throws Throwable */
     public function test_user_can_request_access_token_with_user_info()
     {
-        $response = $this->post("$this->baseUri/login", [
+        $response = $this->post("$this->baseUri/tokens", [
             'email' => $this->userCreds['email'],
             'password' => $this->userCreds['password'],
             'with_user' => true
@@ -63,7 +63,7 @@ class AuthTest extends TestCase
     public function test_user_can_request_access_token_with_client_name()
     {
         $clientName = "Jeg's Chrome Browser";
-        $response = $this->post("$this->baseUri/login", [
+        $response = $this->post("$this->baseUri/tokens", [
             'email' => $this->userCreds['email'],
             'password' => $this->userCreds['password'],
             'client_name' => $clientName
@@ -78,10 +78,10 @@ class AuthTest extends TestCase
     public function test_user_can_fetch_all_access_tokens_owned()
     {
         // create token with browser
-        $this->post("$this->baseUri/login", array_merge($this->userCreds, ['client_name' => 'Chrome']));
+        $this->post("$this->baseUri/tokens", array_merge($this->userCreds, ['client_name' => 'Chrome']));
 
         // create token with phone
-        $this->post("$this->baseUri/login", array_merge($this->userCreds, ['client_name' => 'My iPhone14']));
+        $this->post("$this->baseUri/tokens", array_merge($this->userCreds, ['client_name' => 'My iPhone14']));
 
         Sanctum::actingAs($this->user);
         $response = $this->get("$this->baseUri/tokens", $this->userCreds);
@@ -99,22 +99,34 @@ class AuthTest extends TestCase
 
     public function test_user_can_revoke_current_access_token()
     {
-        Sanctum::actingAs($this->user);
-        $response = $this->post("$this->baseUri/logout");
+        $user = Sanctum::actingAs($this->user);
+        $response = $this->delete("$this->baseUri/tokens");
+
         $response->assertStatus(204);
+        $this->assertEquals(0, $user->tokens()->count());
     }
 
     public function test_user_can_revoke_specific_access_tokens()
     {
-        Sanctum::actingAs($this->user);
-        $response = $this->post("$this->baseUri/revoke-access", ['token_ids' => [4]]);
+        $this->post("$this->baseUri/tokens", array_merge($this->userCreds, ['client_name' => 'Chrome']));
+
+        $user = Sanctum::actingAs($this->user);
+        $tokenId = $user->tokens()->first()->id;
+        $response = $this->post("$this->baseUri/tokens/revoke", ['token_ids' => [$tokenId]]);
+
         $response->assertStatus(204);
+        $this->assertEquals(0, $user->tokens()->count());
     }
 
     public function test_user_can_revoke_all_access_tokens()
     {
-        Sanctum::actingAs($this->user);
-        $response = $this->post("$this->baseUri/revoke-all-access");
+        // create multiple tokens
+        $this->post("$this->baseUri/tokens", array_merge($this->userCreds, ['client_name' => 'Chrome']));
+        $this->post("$this->baseUri/tokens", array_merge($this->userCreds, ['client_name' => 'My iPhone14']));
+
+        $user = Sanctum::actingAs($this->user);
+        $response = $this->post("$this->baseUri/tokens/revoke", ['token_ids' => ['*']]);
         $response->assertStatus(204);
+        $this->assertEquals(0, $user->tokens()->count());
     }
 }

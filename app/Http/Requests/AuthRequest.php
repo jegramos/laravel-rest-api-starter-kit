@@ -28,7 +28,7 @@ class AuthRequest extends FormRequest
 
         return match ($routeName) {
             'auth.login' => $this->getLoginRules(),
-            'auth.revoke-access' => $this->getRevokeAccessRules(),
+            'auth.revoke' => $this->getRevokeAccessRules(),
             default => []
         };
     }
@@ -55,6 +55,9 @@ class AuthRequest extends FormRequest
      */
     private function getRevokeAccessRules(): array
     {
-        return ['token_ids' => ['required', 'array']];
+        return [
+            'token_ids' => ['required', 'array'],
+            'token_ids.*' => ['required']
+        ];
     }
 }

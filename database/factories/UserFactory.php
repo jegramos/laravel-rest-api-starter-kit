@@ -22,7 +22,7 @@ class UserFactory extends Factory
             'username' => fake()->unique()->userName,
             'password' => 'Sample_Password_1',
             'active' => fake()->boolean,
-            'email_verified_at' => fake()->date
+            'email_verified_at' => fake()->randomElement([null, fake()->date])
         ];
     }
 }
