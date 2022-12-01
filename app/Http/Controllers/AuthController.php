@@ -47,11 +47,11 @@ class AuthController extends ApiController
             'expires_at' => $expiresAt
         ];
 
-        if ($request->with_user) {
+        if ($request->get('with_user')) {
             $data['user'] = $user;
         }
 
-        return $this->success($data, Response::HTTP_OK);
+        return $this->success(['data' => $data], Response::HTTP_OK);
     }
 
     /**
@@ -65,7 +65,7 @@ class AuthController extends ApiController
         $user = auth()->user();
         $user->currentAccessToken()->delete();
 
-        return $this->success(null, Response::HTTP_OK);
+        return $this->success(null, Response::HTTP_NO_CONTENT);
     }
 
     /**
@@ -107,7 +107,7 @@ class AuthController extends ApiController
             $user->tokens()->where('id', $tokenId)->delete();
         }
 
-        return $this->success(null, Response::HTTP_OK);
+        return $this->success(null, Response::HTTP_NO_CONTENT);
     }
 
     /**
@@ -122,6 +122,6 @@ class AuthController extends ApiController
 
         $user->tokens()->delete();
 
-        return $this->success(null, Response::HTTP_OK);
+        return $this->success(null, Response::HTTP_NO_CONTENT);
     }
 }

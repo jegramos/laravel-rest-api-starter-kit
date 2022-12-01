@@ -12,6 +12,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
+use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 use Throwable;
 
@@ -26,6 +27,8 @@ class UserManagementTest extends TestCase
     {
         parent::setUp();
         $this->artisan('db:seed');
+        $user = User::factory()->has(UserProfile::factory())->create();
+        Sanctum::actingAs($user);
     }
 
     /**
@@ -315,28 +318,28 @@ class UserManagementTest extends TestCase
     /** @throws Throwable */
     public function test_it_can_fetch_users()
     {
-        $usersCount = 7;
-        User::factory()->count($usersCount)->has(UserProfile::factory())->create();
+        User::factory()->count(5)->has(UserProfile::factory())->create();
+        $totalUserCount = User::count('id');
 
         $response = $this->get($this->baseUri);
         $response = $response->decodeResponseJson();
 
         $this->assertIsArray($response['data']);
-        $this->assertEquals($usersCount, count($response['data']));
+        $this->assertEquals($totalUserCount, count($response['data']));
     }
 
     /** @throws Throwable */
     public function test_it_can_return_length_aware_paginated_results()
     {
-        $usersCount = 15;
-        User::factory()->count($usersCount)->has(UserProfile::factory())->create();
+        User::factory()->count(15)->has(UserProfile::factory())->create();
+        $totalUserCount = User::count('id');
 
         $limit = 5;
         $response = $this->get("$this->baseUri?limit=$limit");
         $response = $response->decodeResponseJson();
 
         $this->assertArrayHasKey('pagination', $response);
-        $this->assertEquals($usersCount, $response['pagination']['total']);
+        $this->assertEquals($totalUserCount, $response['pagination']['total']);
         $this->assertEquals($limit, count($response['data']));
     }
 
