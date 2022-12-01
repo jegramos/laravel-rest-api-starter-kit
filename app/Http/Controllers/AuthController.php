@@ -13,6 +13,22 @@ use Symfony\Component\HttpFoundation\Response;
 class AuthController extends ApiController
 {
     /**
+     * Login via session HTTP-only lax cookie
+     */
+    public function login(AuthRequest $request): JsonResponse
+    {
+        return $this->success(['data' => null], Response::HTTP_OK);
+    }
+
+    /**
+     * Logout the user (session auth)
+     */
+    public function logout(AuthRequest $request): JsonResponse
+    {
+        return $this->success(['data' => null], Response::HTTP_OK);
+    }
+
+    /**
      * Grant the user an access token
      *
      * @param AuthRequest $request
