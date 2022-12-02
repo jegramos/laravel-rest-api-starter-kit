@@ -6,6 +6,7 @@ use App\Enums\ApiErrorCode;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Http\Exceptions\PostTooLargeException;
 use Illuminate\Http\Exceptions\ThrottleRequestsException;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
@@ -133,6 +134,16 @@ class Handler extends ExceptionHandler
                         'error_code' => ApiErrorCode::RESOURCE_NOT_FOUND,
                     ],
                     Response::HTTP_NOT_FOUND
+                );
+                break;
+            case $e instanceof PostTooLargeException:
+                $response = response()->json(
+                    [
+                        'success' => false,
+                        'message' => "Request is too large",
+                        'error_code' => ApiErrorCode::PAYLOAD_TOO_LARGE,
+                    ],
+                    Response::HTTP_REQUEST_ENTITY_TOO_LARGE
                 );
                 break;
             default:

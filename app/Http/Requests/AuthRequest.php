@@ -27,7 +27,7 @@ class AuthRequest extends FormRequest
         $routeName = $this->route()->getName();
 
         return match ($routeName) {
-            'auth.login' => $this->getLoginRules(),
+            'auth.store' => $this->getLoginRules(),
             'auth.revoke' => $this->getRevokeAccessRules(),
             default => []
         };

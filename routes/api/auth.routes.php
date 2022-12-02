@@ -8,12 +8,6 @@
 use App\Http\Controllers\AuthController;
 
 Route::controller(AuthController::class)->name('auth.')->group(function () {
-    /** @uses \App\Http\Controllers\AuthController::login() */
-    Route::post('login', 'login')->name('login');
-
-    /** @uses \App\Http\Controllers\AuthController::logout() */
-    Route::post('logout', 'logout')->name('logout');
-
     /** @uses \App\Http\Controllers\AuthController::store() */
     Route::post('tokens', 'store')->name('store');
 
