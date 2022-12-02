@@ -16,6 +16,7 @@ use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
+use Spatie\Permission\Models\Permission;
 use Throwable;
 
 class UserService implements UserServiceInterface
@@ -73,6 +74,12 @@ class UserService implements UserServiceInterface
 
             $user = User::create($userCredentials);
 
+            $userRoles = empty($userInfo['roles']) ? ['standard_user'] : $userInfo['roles'];
+            $user->syncRoles($userRoles);
+            // Spatie automatically attaches a roles attr after syncing
+            // we don't want it as there is too much information provided
+            unset($user['roles']);
+
             $exemptedAttributes = ['email', 'username', 'password', 'active', 'email_verified_at'];
             $user->userProfile()->create(Arr::except($userInfo, $exemptedAttributes));
 
@@ -99,8 +106,12 @@ class UserService implements UserServiceInterface
 
             $user->update(Arr::only($newUserInfo, ['email', 'username', 'password', 'active', 'email_verified_at']));
             $user->userProfile()->update(
-                Arr::except($newUserInfo, ['email', 'username', 'password', 'active', 'email_verified_at'])
+                Arr::except($newUserInfo, ['email', 'username', 'password', 'active', 'email_verified_at', 'roles'])
             );
+
+            if (isset($newUserInfo['roles'])) {
+                $user->syncRoles($newUserInfo['roles']);
+            }
 
             $user->save();
             $user->refresh();

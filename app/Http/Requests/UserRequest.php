@@ -90,7 +90,9 @@ class UserRequest extends FormRequest
             'country_id' => ['nullable', 'exists:countries,id'],
             'profile_picture_path' => ['string', 'nullable', new DbVarcharMaxLength()],
             'active' => ['nullable', 'boolean'],
-            'email_verified' => ['nullable', 'boolean']
+            'email_verified' => ['nullable', 'boolean'],
+            'roles' => ['nullable', 'array'],
+            'roles.*' => ['required', 'exists:roles,id']
         ];
     }
 
@@ -134,7 +136,9 @@ class UserRequest extends FormRequest
             'country_id' => ['nullable', 'exists:countries,id'],
             'profile_picture_path' => ['string', 'nullable', new DbVarcharMaxLength()],
             'active' => ['nullable', 'boolean'],
-            'email_verified' => ['nullable', 'boolean']
+            'email_verified' => ['nullable', 'boolean'],
+            'roles' => ['nullable', 'array'],
+            'roles.*' => ['required', 'exists:roles,id']
         ];
     }
 
@@ -176,6 +180,8 @@ class UserRequest extends FormRequest
             'photo.max' => 'The :attribute must not exceed 2MB',
             'photo.file' => 'File triggered',
             'photo.mimes' => 'Mimes triggered',
+            'roles.array' => 'The :attribute field must be an array of role names',
+            'roles.*.exists' => 'The role ID does not exists',
 
             /** @see https://github.com/Propaganistas/Laravel-Phone#validation */
             'mobile_number.phone' => "The :attribute field format must be a valid mobile number",

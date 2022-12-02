@@ -5,6 +5,7 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use DateTimeHelper;
 use Dyrynda\Database\Support\CascadeSoftDeletes;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -13,6 +14,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Sanctum\HasApiTokens;
+use Spatie\Permission\Models\Role;
 use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
@@ -23,6 +25,12 @@ class User extends Authenticatable
     use Notifiable;
     use SoftDeletes;
     use CascadeSoftDeletes;
+
+    /**
+     * Requirement by Spatie Laravel Permissions when setting multiple auth guards
+     * @see https://spatie.be/docs/laravel-permission/v5/basic-usage/multiple-guards
+     */
+    public $guard_name = 'sanctum';
 
     /** @see https://github.com/shiftonelabs/laravel-cascade-deletes */
     protected array $cascadeDeletes = ['userProfile'];
@@ -49,6 +57,15 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+    ];
+
+    /**
+     * Dynamic computed attributes
+     *
+     * @var array<int, string>
+     */
+    protected $appends = [
+        'attached_roles',
     ];
 
     /**
@@ -83,6 +100,7 @@ class User extends Authenticatable
     }
 
     /**
+     * @Attribute
      * Hash the password whenever it is changed
      *
      * @return Attribute
@@ -92,5 +110,18 @@ class User extends Authenticatable
         return Attribute::set(
             fn ($value) => Hash::make($value)
         );
+    }
+
+    /**
+     * @Attribute
+     * Attach role names with their IDs
+     *
+     * @return Attribute
+     */
+    public function attachedRoles(): Attribute
+    {
+        return Attribute::get(function () {
+            return $this->roles()->get()->map(fn (Role $role) => ['id' => $role->id, 'name' => $role->name]);
+        });
     }
 }

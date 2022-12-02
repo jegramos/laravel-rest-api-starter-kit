@@ -21,30 +21,30 @@ class RolesAndPermissionsSeeder extends Seeder
         app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
         // Standard user permissions
-        Permission::create(['name' => 'view_profile', 'guard_name' => 'sanctum']);
-        Permission::create(['name' => 'edit_profile', 'guard_name' => 'sanctum']);
+        Permission::create(['name' => 'view_profile']);
+        Permission::create(['name' => 'edit_profile']);
         /** @var Role $standardRole */
-        $standardRole = Role::create(['name' => 'standard_user', 'guard_name' => 'sanctum']);
+        $standardRole = Role::create(['name' => 'standard_user']);
         $standardRole->givePermissionTo(Permission::all());
 
         // Admin Permissions
-        Permission::create(['name' => 'create_users', 'guard_name' => 'sanctum']);
-        Permission::create(['name' => 'edit_users', 'guard_name' => 'sanctum']);
-        Permission::create(['name' => 'delete_users', 'guard_name' => 'sanctum']);
-        Permission::create(['name' => 'view_users', 'guard_name' => 'sanctum']);
+        Permission::create(['name' => 'create_users']);
+        Permission::create(['name' => 'edit_users']);
+        Permission::create(['name' => 'delete_users']);
+        Permission::create(['name' => 'view_users']);
         /** @var Role $adminRole */
-        $adminRole = Role::create(['name' => 'admin', 'guard_name' => 'sanctum']);
+        $adminRole = Role::create(['name' => 'admin']);
         $adminRole->givePermissionTo(Permission::all());
 
         // System Support Permissions
-        $notification_per = Permission::create(['name' => 'receive_system_alerts', 'guard_name' => 'sanctum']);
+        $notification_per = Permission::create(['name' => 'receive_system_alerts']);
         /** @var Role $systemSupport */
-        $systemSupport = Role::create(['name' => 'system_support', 'guard_name' => 'sanctum']);
+        $systemSupport = Role::create(['name' => 'system_support']);
         $systemSupport->givePermissionTo($notification_per);
 
         // Super user permissions
         /** @var Role $superUserRole */
-        $superUserRole = Role::create(['name' => 'super_user', 'guard_name' => 'sanctum']);
+        $superUserRole = Role::create(['name' => 'super_user']);
         $superUserRole->givePermissionTo(Permission::all());
     }
 }

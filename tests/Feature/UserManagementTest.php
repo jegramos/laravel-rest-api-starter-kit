@@ -13,6 +13,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
 use Laravel\Sanctum\Sanctum;
+use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 use Throwable;
 
@@ -396,6 +397,32 @@ class UserManagementTest extends TestCase
 
         // clean the bucket
         Storage::disk('s3')->deleteDirectory('images/');
+    }
+
+    /** @throws Throwable */
+    public function test_it_can_set_a_default_role_as_standard_user()
+    {
+        $response = $this->post($this->baseUri, $this->getRequiredUserInputSample());
+        $response = $response->decodeResponseJson();
+
+        $this->assertEquals(1, count($response['data']['attached_roles']));
+        $this->assertEquals('standard_user', $response['data']['attached_roles'][0]['name']);
+    }
+
+    /** @throws Throwable */
+    public function test_it_can_attach_roles_to_a_user()
+    {
+        $firstRole = Role::all()->first()->getAttribute('id');
+        $secondRole = Role::all()->last()->getAttribute('id');
+        $expectedRoles = ['roles' => [$firstRole, $secondRole]];
+
+        $response = $this->post($this->baseUri, array_merge($this->getRequiredUserInputSample(), $expectedRoles));
+        $response->assertStatus(201);
+
+        $response = $response->decodeResponseJson();
+        $this->assertEquals(2, count($response['data']['attached_roles']));
+        $this->assertTrue(in_array($response['data']['attached_roles'][0]['id'], $expectedRoles['roles']));
+        $this->assertTrue(in_array($response['data']['attached_roles'][1]['id'], $expectedRoles['roles']));
     }
 
     /**
