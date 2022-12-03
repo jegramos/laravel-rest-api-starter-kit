@@ -21,6 +21,5 @@ class ProfileController extends ApiController
     public function update(): JsonResponse
     {
         return $this->success(['data' => null], Response::HTTP_OK);
-
     }
 }
