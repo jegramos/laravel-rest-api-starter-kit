@@ -3,6 +3,7 @@
 namespace App\Exceptions;
 
 use App\Enums\ApiErrorCode;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
@@ -11,6 +12,7 @@ use Illuminate\Http\Exceptions\ThrottleRequestsException;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Log;
+use Spatie\Permission\Exceptions\UnauthorizedException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -122,6 +124,17 @@ class Handler extends ExceptionHandler
                         'error_code' => ApiErrorCode::UNAUTHORIZED,
                     ],
                     Response::HTTP_UNAUTHORIZED
+                );
+                break;
+            case $e instanceof UnauthorizedException:
+            case $e instanceof AuthorizationException:
+                $response = response()->json(
+                    [
+                        'success' => false,
+                        'message' => $e->getMessage(),
+                        'error_code' => ApiErrorCode::UNAUTHORIZED,
+                    ],
+                    Response::HTTP_FORBIDDEN
                 );
                 break;
                 // if a model is not found (e.g. from Model::findOrFail)

@@ -59,7 +59,7 @@ class UserRequest extends FormRequest
     /**
      * User store rules
      */
-    private function getStoreUserRules(): array
+    public function getStoreUserRules(): array
     {
         return [
             'email' => ['required', 'email', 'unique:users,email'],

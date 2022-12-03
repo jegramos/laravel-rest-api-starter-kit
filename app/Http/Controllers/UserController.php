@@ -7,6 +7,7 @@ use App\Http\Requests\UserRequest;
 use App\Interfaces\CloudFileServices\CloudFileServiceInterface;
 use App\Interfaces\HttpResources\UserServiceInterface;
 use App\Models\User;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\JsonResponse;
 use PaginationHelper;
 use Symfony\Component\HttpFoundation\Response;
@@ -62,9 +63,11 @@ class UserController extends ApiController
      * @param $id
      * @param UserRequest $request
      * @return JsonResponse
+     * @throws AuthorizationException
      */
     public function update($id, UserRequest $request): JsonResponse
     {
+        $this->protectSuperUser($id);
         $user = $this->userService->update($id, $request->validated());
         return $this->success(['data' => $user], Response::HTTP_OK);
     }
@@ -74,10 +77,12 @@ class UserController extends ApiController
      *
      * @param $id
      * @return JsonResponse
+     * @throws AuthorizationException
      */
     public function destroy($id): JsonResponse
     {
-        User::findOrFail($id)->delete();
+        $user = $this->protectSuperUser($id);
+        $user->delete();
         return $this->success(null, Response::HTTP_NO_CONTENT);
     }
 
@@ -96,5 +101,22 @@ class UserController extends ApiController
         $this->userService->update($id, ['profile_picture_path' => $result['path']]);
 
         return $this->success(['data' => $result], Response::HTTP_OK);
+    }
+
+    /**
+     * A super_user cannot be deleted nor updated by other users
+     *
+     * @param $id
+     * @return User
+     * @throws AuthorizationException
+     */
+    private function protectSuperUser($id): User
+    {
+        $user =  User::findOrFail($id);
+        if ($user->hasRole('super_user')) {
+            throw new AuthorizationException('A super user cannot be modified nor removed by other users');
+        }
+
+        return $user;
     }
 }

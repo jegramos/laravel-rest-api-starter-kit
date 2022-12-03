@@ -8,6 +8,7 @@ use App\Models\User;
 use App\QueryFilters\Active;
 use App\QueryFilters\Sort;
 use Carbon\Carbon;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Collection;

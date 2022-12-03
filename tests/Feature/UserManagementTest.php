@@ -28,7 +28,10 @@ class UserManagementTest extends TestCase
     {
         parent::setUp();
         $this->artisan('db:seed');
+
+        /** @var User $user */
         $user = User::factory()->has(UserProfile::factory())->create();
+        $user->syncRoles('super_user');
         Sanctum::actingAs($user);
     }
 
