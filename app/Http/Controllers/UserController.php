@@ -112,7 +112,7 @@ class UserController extends ApiController
      */
     private function protectSuperUser($id): User
     {
-        $user =  User::findOrFail($id);
+        $user = User::findOrFail($id);
         if ($user->hasRole('super_user')) {
             throw new AuthorizationException('A super user cannot be modified nor removed by other users');
         }
