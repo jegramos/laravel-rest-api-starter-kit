@@ -99,4 +99,25 @@ class AuthorizationTest extends TestCase
         // clean the bucket
         Storage::disk('s3')->deleteDirectory('images/');
     }
+
+    public function test_super_users_cannot_be_deleted()
+    {
+        /** @var User $user */
+        $user = User::factory()->has(UserProfile::factory())->create();
+        $user->syncRoles('super_user');
+        // $this->user->syncRoles('super_user');
+
+        $response = $this->delete("$this->baseUri/$user->id");
+        $response->assertStatus(403);
+    }
+
+    public function test_super_users_cannot_be_updated()
+    {
+        /** @var User $user */
+        $user = User::factory()->has(UserProfile::factory())->create();
+        $user->syncRoles('super_user');
+
+        $response = $this->patchJson("$this->baseUri/$user->id", ['first_name' => 'Something']);
+        $response->assertStatus(403);
+    }
 }

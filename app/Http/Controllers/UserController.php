@@ -67,7 +67,10 @@ class UserController extends ApiController
      */
     public function update($id, UserRequest $request): JsonResponse
     {
-        $this->protectSuperUser($id);
+        if (!$this->authorize('update', User::findOrFail($id))) {
+            throw new AuthorizationException('A Super User cannot be updated');
+        }
+
         $user = $this->userService->update($id, $request->validated());
         return $this->success(['data' => $user], Response::HTTP_OK);
     }
@@ -81,8 +84,11 @@ class UserController extends ApiController
      */
     public function destroy($id): JsonResponse
     {
-        $user = $this->protectSuperUser($id);
-        $user->delete();
+        if (!$this->authorize('update', User::findOrFail($id))) {
+            throw new AuthorizationException('A Super User cannot be deleted');
+        }
+
+        User::findOrFail($id)->delete();
         return $this->success(null, Response::HTTP_NO_CONTENT);
     }
 
@@ -101,22 +107,5 @@ class UserController extends ApiController
         $this->userService->update($id, ['profile_picture_path' => $result['path']]);
 
         return $this->success(['data' => $result], Response::HTTP_OK);
-    }
-
-    /**
-     * A super_user cannot be deleted nor updated by other users
-     *
-     * @param $id
-     * @return User
-     * @throws AuthorizationException
-     */
-    private function protectSuperUser($id): User
-    {
-        $user = User::findOrFail($id);
-        if ($user->hasRole('super_user')) {
-            throw new AuthorizationException('A super user cannot be modified nor removed by other users');
-        }
-
-        return $user;
     }
 }
