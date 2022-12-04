@@ -22,14 +22,14 @@ class RolesAndPermissionsSeeder extends Seeder
 
         // Standard user permissions
         Permission::create(['name' => 'view_profile', 'guard_name' => 'sanctum']);
-        Permission::create(['name' => 'edit_profile', 'guard_name' => 'sanctum']);
+        Permission::create(['name' => 'update_profile', 'guard_name' => 'sanctum']);
         /** @var Role $standardRole */
         $standardRole = Role::create(['name' => 'standard_user', 'guard_name' => 'sanctum']);
         $standardRole->givePermissionTo(Permission::all());
 
         // Admin Permissions
         Permission::create(['name' => 'create_users', 'guard_name' => 'sanctum']);
-        Permission::create(['name' => 'edit_users', 'guard_name' => 'sanctum']);
+        Permission::create(['name' => 'update_users', 'guard_name' => 'sanctum']);
         Permission::create(['name' => 'delete_users', 'guard_name' => 'sanctum']);
         Permission::create(['name' => 'view_users', 'guard_name' => 'sanctum']);
         /** @var Role $adminRole */

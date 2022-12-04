@@ -427,21 +427,4 @@ class UserManagementTest extends TestCase
         $this->assertTrue(in_array($response['data']['attached_roles'][0]['id'], $expectedRoles['roles']));
         $this->assertTrue(in_array($response['data']['attached_roles'][1]['id'], $expectedRoles['roles']));
     }
-
-    /**
-     * Generate required user info input
-     *
-     * @return array
-     */
-    private function getRequiredUserInputSample(): array
-    {
-        return [
-            'email' => fake()->unique()->safeEmail,
-            'username' => fake()->unique()->userName,
-            'password' => 'Sample_Password_1',
-            'password_confirmation' => 'Sample_Password_1',
-            'first_name' => fake()->firstName,
-            'last_name' => fake()->lastName
-        ];
-    }
 }

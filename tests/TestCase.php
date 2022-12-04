@@ -30,4 +30,21 @@ abstract class TestCase extends BaseTestCase
     {
         return (count($arr1) === count($arr2)) && !array_diff($arr1, $arr2);
     }
+
+    /**
+     * Generate required user info input
+     *
+     * @return array
+     */
+    protected function getRequiredUserInputSample(): array
+    {
+        return [
+            'email' => fake()->unique()->safeEmail,
+            'username' => fake()->unique()->userName,
+            'password' => 'Sample_Password_1',
+            'password_confirmation' => 'Sample_Password_1',
+            'first_name' => fake()->firstName,
+            'last_name' => fake()->lastName
+        ];
+    }
 }
