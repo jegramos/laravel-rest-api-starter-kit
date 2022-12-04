@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 
-Route::controller(ProfileController::class)->name('profile.')->group(function () {
+Route::middleware(['auth:sanctum'])->controller(ProfileController::class)->name('profile.')->group(function () {
     /** @uses \App\Http\Controllers\ProfileController::view() */
     Route::get('', 'view')->name('view');
 

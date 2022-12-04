@@ -120,4 +120,24 @@ class UserService implements UserServiceInterface
             return $user;
         }, self::MAX_TRANSACTION_DEADLOCK_ATTEMPTS);
     }
+
+    /**
+     * @inheritDoc
+     * @throws Throwable
+     */
+    public function updateProfile($id, array $newUserInfo): User
+    {
+        return DB::transaction(function () use ($id, $newUserInfo) {
+            /** @var User $user */
+            $user = $this->model::with('userProfile')->findOrFail($id);
+
+            $user->update(Arr::only($newUserInfo, ['email', 'username']));
+            $user->userProfile()->update(Arr::except($newUserInfo, ['email', 'username']));
+
+            $user->save();
+            $user->refresh();
+
+            return $user;
+        }, self::MAX_TRANSACTION_DEADLOCK_ATTEMPTS);
+    }
 }

@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
@@ -24,7 +23,7 @@ class RolesAndPermissionsSeeder extends Seeder
         Permission::create(['name' => 'view_profile', 'guard_name' => 'sanctum']);
         Permission::create(['name' => 'update_profile', 'guard_name' => 'sanctum']);
         /** @var Role $standardRole */
-        $standardRole = Role::create(['name' => 'standard_user', 'guard_name' => 'sanctum']);
+        $standardRole = Role::create(['name' => \App\Enums\Role::STANDARD_USER, 'guard_name' => 'sanctum']);
         $standardRole->givePermissionTo(Permission::all());
 
         // Admin Permissions
@@ -33,18 +32,21 @@ class RolesAndPermissionsSeeder extends Seeder
         Permission::create(['name' => 'delete_users', 'guard_name' => 'sanctum']);
         Permission::create(['name' => 'view_users', 'guard_name' => 'sanctum']);
         /** @var Role $adminRole */
-        $adminRole = Role::create(['name' => 'admin', 'guard_name' => 'sanctum']);
+        $adminRole = Role::create(['name' => \App\Enums\Role::ADMIN, 'guard_name' => 'sanctum']);
         $adminRole->givePermissionTo(Permission::all());
 
         // System Support Permissions
         $notification_per = Permission::create(['name' => 'receive_system_alerts', 'guard_name' => 'sanctum']);
         /** @var Role $systemSupport */
-        $systemSupport = Role::create(['name' => 'system_support', 'guard_name' => 'sanctum']);
+        $systemSupport = Role::create(['name' => \App\Enums\Role::SYSTEM_SUPPORT, 'guard_name' => 'sanctum']);
         $systemSupport->givePermissionTo($notification_per);
 
-        // Super user permissions
-        /** @var Role $superUserRole */
-        $superUserRole = Role::create(['name' => 'super_user', 'guard_name' => 'sanctum']);
-        $superUserRole->givePermissionTo(Permission::all());
+        /**
+         * Superuser role. We allow all permissions through here
+         * @see App\Providers\AuthServiceProvider
+         *
+         * @var Role $superUserRole
+         */
+        Role::create(['name' => \App\Enums\Role::SUPER_USER, 'guard_name' => 'sanctum']);
     }
 }

@@ -6,6 +6,7 @@ namespace App\Providers;
 use App\Models\User;
 use App\Policies\UserPolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
+use Illuminate\Support\Facades\Gate;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -27,6 +28,11 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->registerPolicies();
 
-        //
+
+        // Implicitly grant "super_user" role all permissions
+        // This works in the app by using gate-related functions like auth()->user->can() and @can()
+        Gate::after(function ($user, $ability) {
+            return $user->hasRole('super_user') ? true : null;
+        });
     }
 }

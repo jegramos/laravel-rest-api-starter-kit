@@ -31,7 +31,7 @@ class UserManagementTest extends TestCase
 
         /** @var User $user */
         $user = User::factory()->has(UserProfile::factory())->create();
-        $user->syncRoles('super_user');
+        $user->syncRoles(fake()->randomElement(['super_user', 'admin']));
         Sanctum::actingAs($user);
     }
 
