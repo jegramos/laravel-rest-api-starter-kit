@@ -410,7 +410,7 @@ class UserManagementTest extends TestCase
         $response = $response->decodeResponseJson();
 
         $this->assertEquals(1, count($response['data']['attached_roles']));
-        $this->assertEquals('standard_user', $response['data']['attached_roles'][0]['name']);
+        $this->assertEquals(\App\Enums\Role::STANDARD_USER->value, $response['data']['attached_roles'][0]['name']);
     }
 
     /** @throws Throwable */

@@ -43,7 +43,7 @@ class RolesAndPermissionsSeeder extends Seeder
 
         /**
          * Superuser role. We allow all permissions through here
-         * @see App\Providers\AuthServiceProvider
+         * @see \App\Providers\AuthServiceProvider
          *
          * @var Role $superUserRole
          */

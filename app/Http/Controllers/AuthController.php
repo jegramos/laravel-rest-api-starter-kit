@@ -6,6 +6,7 @@ use App\Enums\ApiErrorCode;
 use App\Http\Requests\AuthRequest;
 use App\Models\User;
 use Hash;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\JsonResponse;
 use Laravel\Sanctum\PersonalAccessToken;
 use Symfony\Component\HttpFoundation\Response;
@@ -109,14 +110,24 @@ class AuthController extends ApiController
     }
 
     /**
-     * Revoke all access tokens of a user
+     * Response if the email is not verified
      *
      * @return JsonResponse
      */
-    public function revokeAllTokens(): JsonResponse
+    public function emailVerificationNotice(): JsonResponse
     {
-        auth()->user()->tokens()->delete();
+        return $this->error('Email address not verified', Response::HTTP_UNAUTHORIZED);
+    }
 
-        return $this->success(null, Response::HTTP_NO_CONTENT);
+    /**
+     * Verify Email
+     *
+     * @param EmailVerificationRequest $request
+     * @return JsonResponse
+     */
+    public function verifyEmail(EmailVerificationRequest $request): JsonResponse
+    {
+        $request->fulfill();
+        return $this->success(['message' => 'Email successfully verified'], Response::HTTP_UNAUTHORIZED);
     }
 }

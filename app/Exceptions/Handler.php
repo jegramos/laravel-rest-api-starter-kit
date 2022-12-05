@@ -15,6 +15,7 @@ use Log;
 use Spatie\Permission\Exceptions\UnauthorizedException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
@@ -55,7 +56,7 @@ class Handler extends ExceptionHandler
      *
      * @return void
      */
-    public function register()
+    public function register(): void
     {
         $this->reportable(function (Throwable $e) {
             //
@@ -126,8 +127,9 @@ class Handler extends ExceptionHandler
                     Response::HTTP_UNAUTHORIZED
                 );
                 break;
-            case $e instanceof UnauthorizedException:
-            case $e instanceof AuthorizationException:
+            case $e instanceof UnauthorizedException: // Spatie Auth Exception
+            case $e instanceof AuthorizationException: // Laravel Auth Exception
+            case $e instanceof HttpException && $e->getStatusCode() === Response::HTTP_FORBIDDEN: // catch abort(403)
                 $response = response()->json(
                     [
                         'success' => false,

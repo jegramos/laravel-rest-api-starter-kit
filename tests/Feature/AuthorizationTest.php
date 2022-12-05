@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Enums\Role;
 use App\Models\User;
 use App\Models\UserProfile;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -24,7 +25,7 @@ class AuthorizationTest extends TestCase
 
         /** @var User $user */
         $this->user = User::factory()->has(UserProfile::factory())->create();
-        $this->user->syncRoles('admin');
+        $this->user->syncRoles(Role::ADMIN->value);
         Sanctum::actingAs($this->user);
     }
 
@@ -33,7 +34,7 @@ class AuthorizationTest extends TestCase
         $response = $this->postJson($this->baseUri, $this->getRequiredUserInputSample());
         $response->assertStatus(201);
 
-        $this->user->syncRoles('standard_user');
+        $this->user->syncRoles(Role::STANDARD_USER->value);
         $response = $this->postJson($this->baseUri, $this->getRequiredUserInputSample());
         $response->assertStatus(403);
     }
@@ -45,7 +46,7 @@ class AuthorizationTest extends TestCase
         $response = $this->patchJson("$this->baseUri/$user->id", $this->getRequiredUserInputSample());
         $response->assertStatus(200);
 
-        $this->user->syncRoles('standard_user');
+        $this->user->syncRoles(Role::STANDARD_USER->value);
         $response = $this->patchJson("$this->baseUri/$user->id", $this->getRequiredUserInputSample());
         $response->assertStatus(403);
     }
@@ -55,7 +56,7 @@ class AuthorizationTest extends TestCase
         $response = $this->getJson("$this->baseUri");
         $response->assertStatus(200);
 
-        $this->user->syncRoles('standard_user');
+        $this->user->syncRoles(Role::STANDARD_USER->value);
         $response = $this->getJson("$this->baseUri");
         $response->assertStatus(403);
     }
@@ -67,7 +68,7 @@ class AuthorizationTest extends TestCase
         $response = $this->get("$this->baseUri/$user->id");
         $response->assertStatus(200);
 
-        $this->user->syncRoles('standard_user');
+        $this->user->syncRoles(Role::STANDARD_USER->value);
         $response = $this->get("$this->baseUri/$user->id");
         $response->assertStatus(403);
     }
@@ -79,7 +80,7 @@ class AuthorizationTest extends TestCase
         $response = $this->delete("$this->baseUri/$user->id");
         $response->assertStatus(204);
 
-        $this->user->syncRoles('standard_user');
+        $this->user->syncRoles(Role::STANDARD_USER->value);
         $response = $this->delete("$this->baseUri/$user->id");
         $response->assertStatus(403);
     }
@@ -92,7 +93,7 @@ class AuthorizationTest extends TestCase
         $response = $this->post("$this->baseUri/$user->id/profile-picture", ['photo' => $file]);
         $response->assertStatus(200);
 
-        $this->user->syncRoles('standard_user');
+        $this->user->syncRoles(Role::STANDARD_USER->value);
         $response = $this->post("$this->baseUri/$user->id/profile-picture", ['photo' => $file]);
         $response->assertStatus(403);
 
@@ -104,7 +105,7 @@ class AuthorizationTest extends TestCase
     {
         /** @var User $user */
         $user = User::factory()->has(UserProfile::factory())->create();
-        $user->syncRoles('super_user');
+        $user->syncRoles(Role::SUPER_USER->value);
         // $this->user->syncRoles('super_user');
 
         $response = $this->delete("$this->baseUri/$user->id");
@@ -115,9 +116,21 @@ class AuthorizationTest extends TestCase
     {
         /** @var User $user */
         $user = User::factory()->has(UserProfile::factory())->create();
-        $user->syncRoles('super_user');
+        $user->syncRoles(Role::SUPER_USER->value);
 
         $response = $this->patchJson("$this->baseUri/$user->id", ['first_name' => 'Something']);
+        $response->assertStatus(403);
+    }
+
+    public function test_block_unverified_email_address_from_accessing_endpoints()
+    {
+        /** @var User $user */
+        $user = User::factory()->has(UserProfile::factory())->create();
+        $user->syncRoles(Role::SUPER_USER->value);
+        $user->email_verified_at = null;
+        Sanctum::actingAs($user);
+
+        $response = $this->get("$this->baseUri");
         $response->assertStatus(403);
     }
 }
