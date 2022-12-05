@@ -8,4 +8,10 @@ Route::middleware(['auth:sanctum'])->controller(ProfileController::class)->name(
 
     /** @uses \App\Http\Controllers\ProfileController::update() */
     Route::patch('', 'update')->name('update');
+
+    /** @uses \App\Http\Controllers\ProfileController::uploadProfilePicture() */
+    Route::post('profile-picture', 'uploadProfilePicture')->name('upload.profile-picture');
+
+    /** @uses \App\Http\Controllers\ProfileController::changePassword() */
+    Route::patch('change-password', 'changePassword')->name('change.password');
 });

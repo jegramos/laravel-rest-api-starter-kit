@@ -126,7 +126,7 @@ class UserRequest extends FormRequest
             'district' => ['string', 'nullable', new DbVarcharMaxLength()],
             'city' => ['string', 'nullable', new DbVarcharMaxLength()],
             'province' => ['string', 'nullable', new DbVarcharMaxLength()],
-            'postal_code' => ['nullable',new DbVarcharMaxLength()],
+            'postal_code' => ['nullable', new DbVarcharMaxLength()],
             'country_id' => ['nullable', 'exists:countries,id'],
             'profile_picture_path' => ['string', 'nullable', new DbVarcharMaxLength()],
             'active' => ['nullable', 'boolean'],
@@ -156,7 +156,7 @@ class UserRequest extends FormRequest
     private function getUploadProfilePictureRules(): array
     {
         return [
-            'photo' => ['max:2048', 'required'] // 2Mb max
+            'photo' => ['max:2048', 'required', 'image'] // 2Mb max
         ];
     }
 
@@ -172,8 +172,6 @@ class UserRequest extends FormRequest
             'active.boolean' => 'The :attribute parameter must be either `1` (for true) or `0` (for false)',
             'country_id.exists' => 'The :attribute does not exists',
             'photo.max' => 'The :attribute must not exceed 2MB',
-            'photo.file' => 'File triggered',
-            'photo.mimes' => 'Mimes triggered',
             'roles.array' => 'The :attribute field must be an array of role names',
             'roles.*.exists' => 'The role ID does not exists',
 

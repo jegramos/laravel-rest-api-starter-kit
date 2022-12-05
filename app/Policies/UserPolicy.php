@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Enums\Role;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 use Illuminate\Auth\Access\Response;
@@ -29,7 +30,7 @@ class UserPolicy
      */
     public function delete(User $user, User $targetUser): Response
     {
-        if ($targetUser->hasRole('super_user')) {
+        if ($targetUser->hasRole(Role::SUPER_USER->value)) {
             return Response::deny();
         }
 
@@ -45,7 +46,7 @@ class UserPolicy
      */
     public function update(User $user, User $targetUser): Response
     {
-        if ($targetUser->hasRole('super_user')) {
+        if ($targetUser->hasRole(Role::SUPER_USER->value)) {
             return Response::deny();
         }
 

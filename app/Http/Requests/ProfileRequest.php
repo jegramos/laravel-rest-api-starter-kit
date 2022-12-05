@@ -9,6 +9,7 @@ use App\Rules\InternationalPhoneNumberFormat;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Enum;
+use Illuminate\Validation\Rules\Password;
 
 class ProfileRequest extends FormRequest
 {
@@ -33,12 +34,16 @@ class ProfileRequest extends FormRequest
 
         return match ($routeName) {
             'profile.update' => $this->getUpdateProfileRule(),
+            'profile.change.password' => $this->getChangePasswordRules(),
+            'profile.upload.profile-picture' => $this->getUploadProfilePictureRules(),
             default => [],
         };
     }
 
     /**
      * Profile update rules
+     *
+     * @return array
      */
     public function getUpdateProfileRule(): array
     {
@@ -69,6 +74,50 @@ class ProfileRequest extends FormRequest
             'postal_code' => ['nullable',new DbVarcharMaxLength()],
             'country_id' => ['nullable', 'exists:countries,id'],
             'profile_picture_path' => ['string', 'nullable', new DbVarcharMaxLength()],
+        ];
+    }
+
+    /**
+     * Get change password rules
+     *
+     * @return array
+     */
+    private function getChangePasswordRules(): array
+    {
+        return [
+            'email' => ['email', 'exists:users,email'],
+            'old_password' => ['string', 'required'],
+            'new_password' =>  ['string', 'required', 'confirmed', Password::min(8)->mixedCase()->numbers()],
+        ];
+    }
+
+    /**
+     * Profile photo upload rules
+     */
+    private function getUploadProfilePictureRules(): array
+    {
+        return [
+            'photo' => ['max:2048', 'required', 'image'] // 2Mb max
+        ];
+    }
+
+    /**
+     * Custom message for validation
+     *
+     * @return array
+     */
+    public function messages(): array
+    {
+        return [
+            'country_id.exists' => 'The :attribute does not exists',
+            'photo.max' => 'The :attribute must not exceed 2MB',
+
+            /** @see https://github.com/Propaganistas/Laravel-Phone#validation */
+            'mobile_number.phone' => "The :attribute field format must be a valid mobile number",
+            'telephone_number.phone' => "The :attribute field format must be a valid line number",
+
+            // As of writing, we need to add the namespace for the enum rule
+            'sex.Illuminate\Validation\Rules\Enum' => 'Valid values for the :attribute field are `male` and `female`.'
         ];
     }
 }
