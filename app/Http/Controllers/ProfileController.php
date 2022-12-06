@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\ApiErrorCode;
 use App\Http\Requests\ProfileRequest;
 use App\Interfaces\CloudFileServices\CloudFileServiceInterface;
 use App\Interfaces\HttpResources\UserServiceInterface;
 use App\Models\User;
+use Hash;
 use Illuminate\Http\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Profiler\Profile;
 
 class ProfileController extends ApiController
 {
@@ -42,11 +43,6 @@ class ProfileController extends ApiController
         return $this->success(['data' => $user], Response::HTTP_OK);
     }
 
-    public function changePassword(ProfileRequest $request): JsonResponse
-    {
-        return $this->success(null, Response::HTTP_OK);
-    }
-
     /**
      * Upload profile picture
      *
@@ -63,5 +59,30 @@ class ProfileController extends ApiController
         $this->userService->update($userId, ['profile_picture_path' => $result['path']]);
 
         return $this->success(['data' => $result], Response::HTTP_OK);
+    }
+
+    /**
+     * Change user password
+     *
+     * @param ProfileRequest $request
+     * @return JsonResponse
+     */
+    public function changePassword(ProfileRequest $request): JsonResponse
+    {
+        /** @var User $user */
+        $user = auth()->user();
+
+        if (!Hash::check($request->get('old_password'), $user->password)) {
+            return $this->error(
+                'Old password is incorrect',
+                Response::HTTP_UNPROCESSABLE_ENTITY,
+                ApiErrorCode::INCORRECT_OLD_PASSWORD
+            );
+        }
+
+        $user->password = $request->password;
+        $user->save();
+
+        return $this->success(['message' => 'Password changed successfully'], Response::HTTP_OK);
     }
 }

@@ -85,9 +85,8 @@ class ProfileRequest extends FormRequest
     private function getChangePasswordRules(): array
     {
         return [
-            'email' => ['email', 'exists:users,email'],
             'old_password' => ['string', 'required'],
-            'new_password' =>  ['string', 'required', 'confirmed', Password::min(8)->mixedCase()->numbers()],
+            'password' =>  ['string', 'required', 'confirmed', Password::min(8)->mixedCase()->numbers()],
         ];
     }
 
