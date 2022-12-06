@@ -7,11 +7,13 @@ use App\Http\Requests\AuthRequest;
 use App\Models\User;
 use App\Notifications\Auth\QueuedVerifyEmailNotification;
 use Hash;
+use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\JsonResponse;
 use Laravel\Sanctum\PersonalAccessToken;
 use Mockery\Generator\StringManipulation\Pass\Pass;
 use Password;
+use Str;
 use Symfony\Component\HttpFoundation\Response;
 
 class AuthController extends ApiController
@@ -166,6 +168,37 @@ class AuthController extends ApiController
         }
 
         $data = ['message' => 'Email verification sent', 'email' => $request->get('email')];
+        return $this->success($data, Response::HTTP_OK);
+    }
+
+    /**
+     * Forgot password request
+     *
+     * @param AuthRequest $request
+     * @return JsonResponse
+     */
+    public function resetPassword(AuthRequest $request): JsonResponse
+    {
+        $status = Password::reset(
+            $request->only('email', 'password', 'password_confirmation', 'token'),
+            function ($user, $password) {
+                $user->password = $password;
+                $user->setRememberToken(Str::random(60));
+                $user->save();
+
+                event(new PasswordReset($user));
+            }
+        );
+
+        if ($status !== Password::PASSWORD_RESET) {
+            return $this->error(
+                'Unable to reset password',
+                Response::HTTP_BAD_REQUEST,
+                ApiErrorCode::BAD_REQUEST
+            );
+        }
+
+        $data = ['message' => 'Password reset was successful'];
         return $this->success($data, Response::HTTP_OK);
     }
 }
