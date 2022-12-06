@@ -29,6 +29,7 @@ class AuthRequest extends FormRequest
         return match ($routeName) {
             'auth.store' => $this->getLoginRules(),
             'auth.revoke' => $this->getRevokeAccessRules(),
+            'auth.password.forgot' => $this->getForgotPasswordRules(),
             default => []
         };
     }
@@ -58,6 +59,30 @@ class AuthRequest extends FormRequest
         return [
             'token_ids' => ['required', 'array'],
             'token_ids.*' => ['required']
+        ];
+    }
+
+    /**
+     * Get forgot password rules
+     *
+     * @return array
+     */
+    private function getForgotPasswordRules(): array
+    {
+        return [
+            'email' => ['required', 'email', 'exists:users,email']
+        ];
+    }
+
+    /**
+     * Custom validation messages
+     *
+     * @return array
+     */
+    public function messages(): array
+    {
+        return [
+            'email.exists' => 'The :attribute is not registered'
         ];
     }
 }

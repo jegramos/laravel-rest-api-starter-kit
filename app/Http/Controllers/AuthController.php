@@ -5,10 +5,13 @@ namespace App\Http\Controllers;
 use App\Enums\ApiErrorCode;
 use App\Http\Requests\AuthRequest;
 use App\Models\User;
+use App\Notifications\Auth\QueuedVerifyEmailNotification;
 use Hash;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\JsonResponse;
 use Laravel\Sanctum\PersonalAccessToken;
+use Mockery\Generator\StringManipulation\Pass\Pass;
+use Password;
 use Symfony\Component\HttpFoundation\Response;
 
 class AuthController extends ApiController
@@ -73,15 +76,19 @@ class AuthController extends ApiController
         /** @var User $user */
         $user = auth()->user();
 
-        $tokens = $user->tokens->map(function (PersonalAccessToken $token) {
-            return [
-                'id' => $token->getAttribute('id'),
-                'name' => $token->getAttribute('name'),
-                'expires_at' => $token->getAttribute('expires_at'),
-                'last_used_at' => $token->getAttribute('last_used_at'),
-                'created_at' => $token->getAttribute('created_at')
-            ];
-        });
+        $tokens = $user->tokens
+            ->map(function (PersonalAccessToken $token) {
+                return [
+                    'id' => $token->id,
+                    'name' => $token->name,
+                    'expires_at' => $token->expires_at,
+                    'last_used_at' => $token->last_used_at,
+                    'created_at' => $token->created_at
+                ];
+            })
+            // only get un-expired tokens
+            ->reject(fn (array $token) => now() >= $token['expires_at'])
+            ->values();
 
         return $this->success(['data' => $tokens->toArray()], Response::HTTP_OK);
     }
@@ -110,16 +117,6 @@ class AuthController extends ApiController
     }
 
     /**
-     * Response if the email is not verified
-     *
-     * @return JsonResponse
-     */
-    public function emailVerificationNotice(): JsonResponse
-    {
-        return $this->error('Email address not verified', Response::HTTP_UNAUTHORIZED);
-    }
-
-    /**
      * Verify Email
      *
      * @param EmailVerificationRequest $request
@@ -129,5 +126,46 @@ class AuthController extends ApiController
     {
         $request->fulfill();
         return $this->success(['message' => 'Email successfully verified'], Response::HTTP_UNAUTHORIZED);
+    }
+
+    /**
+     * Resend the email verification notification
+     *
+     * @return JsonResponse
+     */
+    public function resendEmailVerification(): JsonResponse
+    {
+        /** @var User $user */
+        $user = auth()->user();
+
+        $user->sendEmailVerificationNotification();
+        $data = [
+            'message' => 'Email verification sent',
+            'email' => $user->email
+        ];
+
+        return $this->success($data, Response::HTTP_OK);
+    }
+
+    /**
+     * Forgot password request
+     *
+     * @param AuthRequest $request
+     * @return JsonResponse
+     */
+    public function forgotPassword(AuthRequest $request): JsonResponse
+    {
+        $status = Password::sendResetLink($request->only('email'));
+
+        if ($status !== Password::RESET_LINK_SENT) {
+            return $this->error(
+                'Unable to send password reset email',
+                Response::HTTP_FAILED_DEPENDENCY,
+                ApiErrorCode::DEPENDENCY_ERROR
+            );
+        }
+
+        $data = ['message' => 'Email verification sent', 'email' => $request->get('email')];
+        return $this->success($data, Response::HTTP_OK);
     }
 }

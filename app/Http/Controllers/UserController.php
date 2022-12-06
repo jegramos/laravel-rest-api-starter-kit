@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Enums\PaginationType;
+use App\Events\UserCreated;
 use App\Http\Requests\UserRequest;
 use App\Interfaces\CloudFileServices\CloudFileServiceInterface;
 use App\Interfaces\HttpResources\UserServiceInterface;
+use App\Listeners\SendWelcomeEmailNotification;
 use App\Models\User;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\JsonResponse;
@@ -42,6 +44,7 @@ class UserController extends ApiController
     public function store(UserRequest $request): JsonResponse
     {
         $user = $this->userService->create($request->validated());
+        UserCreated::dispatch($user);
         return $this->success(['data' => $user], Response::HTTP_CREATED);
     }
 

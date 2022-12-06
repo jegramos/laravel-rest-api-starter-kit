@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Notifications\Auth\QueuedResetPasswordNotification;
+use App\Notifications\Auth\QueuedVerifyEmailNotification;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use DateTimeHelper;
 use Dyrynda\Database\Support\CascadeSoftDeletes;
@@ -106,9 +108,7 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function password(): Attribute
     {
-        return Attribute::set(
-            fn ($value) => Hash::make($value)
-        );
+        return Attribute::set(fn ($value) => Hash::make($value));
     }
 
     /**
@@ -122,5 +122,23 @@ class User extends Authenticatable implements MustVerifyEmail
         return Attribute::get(function () {
             return $this->roles()->get()->map(fn (Role $role) => ['id' => $role->id, 'name' => $role->name]);
         });
+    }
+
+    /*
+     * Override default email verification notification
+     */
+    public function sendEmailVerificationNotification()
+    {
+        $notification = new QueuedVerifyEmailNotification($this);
+        $notification->afterCommit();
+        $this->notify($notification);
+    }
+
+    /*
+     * Override default password reset notification
+     */
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify((new QueuedResetPasswordNotification($token)));
     }
 }

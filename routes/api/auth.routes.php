@@ -19,11 +19,19 @@ Route::controller(AuthController::class)->group(function () {
     /** @uses \App\Http\Controllers\AuthController::revoke() */
     Route::middleware(['auth:sanctum', 'verified.api'])->post('tokens/revoke', 'revoke')->name('auth.revoke');
 
-    /** @uses \App\Http\Controllers\AuthController::emailVerificationNotice() */
-    Route::middleware(['auth:sanctum'])->get('email/verify', 'emailVerificationNotice')->name('verification.notice');
+    /** @uses \App\Http\Controllers\AuthController::resendEmailVerification() */
+    Route::middleware(['auth:sanctum'])
+        ->get('email/send-verification', 'resendEmailVerification')
+        ->name('verification.resend');
 
     /** @uses \App\Http\Controllers\AuthController::verifyEmail() */
     Route::middleware(['auth:sanctum', 'signed'])
-        ->get('email/verify/{id}{hash}', 'verifyEmail')
+        ->get('email/verify/{id}/{hash}', 'verifyEmail')
         ->name('verification.verify');
+
+    /** @uses \App\Http\Controllers\AuthController::forgotPassword() */
+    Route::post('forgot-password', 'forgotPassword')->name('password.forgot');
+
+    /** @uses \App\Http\Controllers\AuthController::resetPassword() */
+    // Route::get('reset-password', 'resetPassword')->name('password.reset');
 });
