@@ -13,7 +13,7 @@ grumphp:
       run_always: false
     phpcs:
       standard: [ PSR1, PSR2, PSR12 ]
-      whitelist_patterns: [ /^app\/(.*)/ ],
+      whitelist_patterns: [ /^app\/(.*)/ ]
       report: full
       metadata:
         priority: 1
