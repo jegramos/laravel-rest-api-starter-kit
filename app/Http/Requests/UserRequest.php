@@ -161,6 +161,17 @@ class UserRequest extends FormRequest
     }
 
     /**
+     * Set the email and username to lowercase
+     */
+    protected function prepareForValidation()
+    {
+        $this->merge([
+            'email' => strtolower($this->get('email')),
+            'username' => strtolower($this->get('username'))
+        ]);
+    }
+
+    /**
      * Custom message for validation
      *
      * @return array

@@ -113,7 +113,7 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
     }
 
     /**
-     * @Attribute
+     * @Appended
      * Attach role names with their IDs
      *
      * @return Attribute
@@ -123,6 +123,26 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
         return Attribute::get(function () {
             return $this->roles()->get()->map(fn (Role $role) => ['id' => $role->id, 'name' => $role->name]);
         });
+    }
+
+    /**
+     * Set username to lowercase
+     *
+     * @return Attribute
+     */
+    public function username(): Attribute
+    {
+        return Attribute::set(fn ($value) => strtolower($value));
+    }
+
+    /**
+     * Set username to lowercase
+     *
+     * @return Attribute
+     */
+    public function email(): Attribute
+    {
+        return Attribute::set(fn ($value) => strtolower($value));
     }
 
     /*
