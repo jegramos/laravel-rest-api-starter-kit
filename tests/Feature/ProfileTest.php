@@ -27,9 +27,9 @@ class ProfileTest extends TestCase
         parent::setUp();
         $this->artisan('db:seed');
 
-        $user = User::factory()->has(UserProfile::factory())->create();
-        $user->syncRoles(Role::STANDARD_USER->value);
-        Sanctum::actingAs($user);
+        $this->user = User::factory()->has(UserProfile::factory())->create();
+        $this->user->syncRoles(Role::STANDARD_USER->value);
+        Sanctum::actingAs($this->user);
     }
 
     /**
@@ -106,5 +106,26 @@ class ProfileTest extends TestCase
 
         // clean the bucket
         Storage::disk('s3')->deleteDirectory('images/');
+    }
+
+    public function test_user_can_change_password()
+    {
+        $oldPassword = 'OldPassword123';
+        $this->user->password = $oldPassword;
+        $this->user->save();
+
+        $newPassword = 'NewPassword123';
+        $input = [
+            'old_password' => $oldPassword,
+            'password' => $newPassword,
+            'password_confirmation' => $newPassword
+        ];
+        $result = $this->patchJson("$this->baseUri/change-password", $input);
+        $result->assertStatus(200);
+
+        // login again with the new password
+        $creds = ['email' => $this->user->email, 'password' => $newPassword];
+        $response = $this->post("api/v1/auth/tokens", $creds);
+        $response->assertStatus(200);
     }
 }
