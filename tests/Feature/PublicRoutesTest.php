@@ -25,7 +25,6 @@ class PublicRoutesTest extends TestCase
     {
         $email = strtoupper(fake()->email);
         User::factory()->has(UserProfile::factory())->create(['email' => $email]);
-        var_dump(User::first());
 
         $response = $this->get(self::BASE_API_URI . '/availability/email?value=' . strtoupper($email));
         $response->assertStatus(200);
