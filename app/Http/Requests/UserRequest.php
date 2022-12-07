@@ -59,11 +59,11 @@ class UserRequest extends FormRequest
     /**
      * User store rules
      */
-    private function getStoreUserRules(): array
+    public function getStoreUserRules(): array
     {
         return [
             'email' => ['required', 'email', 'unique:users,email'],
-            'username' => ['string', 'required', 'unique:users,username', new AlphaDashDot(), 'max:30'],
+            'username' => ['required', 'unique:users,username', new AlphaDashDot(), 'max:30'],
             'password' => ['string', 'required', 'confirmed', Password::min(8)->mixedCase()->numbers()],
             'first_name' => ['string', 'required', new DbVarcharMaxLength()],
             'last_name' => ['string', 'required', new DbVarcharMaxLength()],
@@ -90,7 +90,9 @@ class UserRequest extends FormRequest
             'country_id' => ['nullable', 'exists:countries,id'],
             'profile_picture_path' => ['string', 'nullable', new DbVarcharMaxLength()],
             'active' => ['nullable', 'boolean'],
-            'email_verified' => ['nullable', 'boolean']
+            'email_verified' => ['nullable', 'boolean'],
+            'roles' => ['nullable', 'array'],
+            'roles.*' => ['required', 'exists:roles,id']
         ];
     }
 
@@ -101,13 +103,7 @@ class UserRequest extends FormRequest
     {
         return [
             'email' => ['nullable', 'email', 'unique:users,email,' . request('id')],
-            'username' => [
-                'string',
-                'nullable',
-                new AlphaDashDot(),
-                'max:30',
-                'unique:users,username,' . request('id')
-            ],
+            'username' => ['nullable', new AlphaDashDot(), 'max:30', 'unique:users,username,' . request('id')],
             'password' => ['string', 'nullable', 'confirmed', Password::min(8)->mixedCase()->numbers()],
             'first_name' => ['string', 'nullable', new DbVarcharMaxLength()],
             'last_name' => ['string', 'nullable', new DbVarcharMaxLength()],
@@ -130,11 +126,13 @@ class UserRequest extends FormRequest
             'district' => ['string', 'nullable', new DbVarcharMaxLength()],
             'city' => ['string', 'nullable', new DbVarcharMaxLength()],
             'province' => ['string', 'nullable', new DbVarcharMaxLength()],
-            'postal_code' => ['nullable',new DbVarcharMaxLength()],
+            'postal_code' => ['nullable', new DbVarcharMaxLength()],
             'country_id' => ['nullable', 'exists:countries,id'],
             'profile_picture_path' => ['string', 'nullable', new DbVarcharMaxLength()],
             'active' => ['nullable', 'boolean'],
-            'email_verified' => ['nullable', 'boolean']
+            'email_verified' => ['nullable', 'boolean'],
+            'roles' => ['nullable', 'array'],
+            'roles.*' => ['required', 'exists:roles,id']
         ];
     }
 
@@ -158,7 +156,7 @@ class UserRequest extends FormRequest
     private function getUploadProfilePictureRules(): array
     {
         return [
-            'photo' => ['max:2048', 'required'] // 2Mb max
+            'photo' => ['max:2048', 'required', 'image'] // 2Mb max
         ];
     }
 
@@ -174,8 +172,8 @@ class UserRequest extends FormRequest
             'active.boolean' => 'The :attribute parameter must be either `1` (for true) or `0` (for false)',
             'country_id.exists' => 'The :attribute does not exists',
             'photo.max' => 'The :attribute must not exceed 2MB',
-            'photo.file' => 'File triggered',
-            'photo.mimes' => 'Mimes triggered',
+            'roles.array' => 'The :attribute field must be an array of role names',
+            'roles.*.exists' => 'The role ID does not exists',
 
             /** @see https://github.com/Propaganistas/Laravel-Phone#validation */
             'mobile_number.phone' => "The :attribute field format must be a valid mobile number",

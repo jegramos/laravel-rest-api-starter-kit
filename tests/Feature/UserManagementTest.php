@@ -2,16 +2,23 @@
 
 namespace Tests\Feature;
 
+use App\Events\UserCreated;
 use App\Models\Country;
 use App\Models\User;
 use App\Models\UserProfile;
+use App\Notifications\WelcomeNotification;
+use Exception;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
+use Laravel\Sanctum\Sanctum;
+use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 use Throwable;
 
@@ -21,16 +28,25 @@ class UserManagementTest extends TestCase
     use WithFaker;
 
     private string $baseUri = self::BASE_API_URI . '/users';
+    private User $user;
 
     public function setUp(): void
     {
         parent::setUp();
         $this->artisan('db:seed');
+        Notification::fake();
+
+        /** @var User $user */
+        $this->user = User::factory()->has(UserProfile::factory())->create();
+        $roles = [\App\Enums\Role::ADMIN->value, \App\Enums\Role::SUPER_USER->value];
+        $this->user->syncRoles(fake()->randomElement($roles));
+        Sanctum::actingAs($this->user);
     }
 
     /**
      * @dataProvider validCreateUserInputs
-     * @note we can't use Eloquent in data providers
+     * @note we can't use Eloquent nor faker in data providers
+     * @throws Throwable
      */
     public function test_it_can_create_a_user($input, $statusCode)
     {
@@ -39,6 +55,11 @@ class UserManagementTest extends TestCase
 
         $response = $this->postJson($this->baseUri, $input);
         $response->assertStatus($statusCode);
+
+        if ($statusCode !== 422) {
+            $createdUser = User::find($response->decodeResponseJson()['data']['id']);
+            Notification::assertSentTo($createdUser, WelcomeNotification::class);
+        }
     }
 
     public function validCreateUserInputs(): array
@@ -315,28 +336,28 @@ class UserManagementTest extends TestCase
     /** @throws Throwable */
     public function test_it_can_fetch_users()
     {
-        $usersCount = 7;
-        User::factory()->count($usersCount)->has(UserProfile::factory())->create();
+        User::factory()->count(5)->has(UserProfile::factory())->create();
+        $totalUserCount = User::count('id');
 
         $response = $this->get($this->baseUri);
         $response = $response->decodeResponseJson();
 
         $this->assertIsArray($response['data']);
-        $this->assertEquals($usersCount, count($response['data']));
+        $this->assertEquals($totalUserCount, count($response['data']));
     }
 
     /** @throws Throwable */
     public function test_it_can_return_length_aware_paginated_results()
     {
-        $usersCount = 15;
-        User::factory()->count($usersCount)->has(UserProfile::factory())->create();
+        User::factory()->count(15)->has(UserProfile::factory())->create();
+        $totalUserCount = User::count('id');
 
         $limit = 5;
         $response = $this->get("$this->baseUri?limit=$limit");
         $response = $response->decodeResponseJson();
 
         $this->assertArrayHasKey('pagination', $response);
-        $this->assertEquals($usersCount, $response['pagination']['total']);
+        $this->assertEquals($totalUserCount, $response['pagination']['total']);
         $this->assertEquals($limit, count($response['data']));
     }
 
@@ -395,20 +416,29 @@ class UserManagementTest extends TestCase
         Storage::disk('s3')->deleteDirectory('images/');
     }
 
-    /**
-     * Generate required user info input
-     *
-     * @return array
-     */
-    private function getRequiredUserInputSample(): array
+    /** @throws Throwable */
+    public function test_it_can_set_a_default_role_as_standard_user()
     {
-        return [
-            'email' => fake()->unique()->safeEmail,
-            'username' => fake()->unique()->userName,
-            'password' => 'Sample_Password_1',
-            'password_confirmation' => 'Sample_Password_1',
-            'first_name' => fake()->firstName,
-            'last_name' => fake()->lastName
-        ];
+        $response = $this->post($this->baseUri, $this->getRequiredUserInputSample());
+        $response = $response->decodeResponseJson();
+
+        $this->assertEquals(1, count($response['data']['attached_roles']));
+        $this->assertEquals(\App\Enums\Role::STANDARD_USER->value, $response['data']['attached_roles'][0]['name']);
+    }
+
+    /** @throws Throwable */
+    public function test_it_can_attach_roles_to_a_user()
+    {
+        $firstRole = Role::all()->first()->getAttribute('id');
+        $secondRole = Role::all()->last()->getAttribute('id');
+        $expectedRoles = ['roles' => [$firstRole, $secondRole]];
+
+        $response = $this->post($this->baseUri, array_merge($this->getRequiredUserInputSample(), $expectedRoles));
+        $response->assertStatus(201);
+
+        $response = $response->decodeResponseJson();
+        $this->assertEquals(2, count($response['data']['attached_roles']));
+        $this->assertTrue(in_array($response['data']['attached_roles'][0]['id'], $expectedRoles['roles']));
+        $this->assertTrue(in_array($response['data']['attached_roles'][1]['id'], $expectedRoles['roles']));
     }
 }

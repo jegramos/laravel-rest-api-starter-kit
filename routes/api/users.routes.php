@@ -1,27 +1,36 @@
 <?php
 
+use App\Enums\Permission;
 use App\Http\Controllers\UserController;
 
-/**
- *  This uses Laravel 9 Route group controllers
- *  @see https://laravel.com/docs/9.x/routing#route-group-controllers
- */
-Route::controller(UserController::class)->name('users.')->group(function () {
+Route::middleware(['auth:sanctum', 'verified.api'])->controller(UserController::class)->name('users.')->group(function () {
     /** @uses \App\Http\Controllers\UserController::store() */
-    Route::post('', 'store')->name('store');
+    Route::middleware(['permission:' . Permission::CREATE_USERS->value])
+        ->post('', 'store')
+        ->name('store');
 
     /** @uses \App\Http\Controllers\UserController::update() */
-    Route::patch('{id}', 'update')->name('update');
+    Route::middleware(['permission:' . Permission::UPDATE_USERS->value])
+        ->patch('{id}', 'update')
+        ->name('update');
 
     /** @uses \App\Http\Controllers\UserController::index() */
-    Route::get('', 'index')->name('index');
+    Route::middleware(['permission:' . Permission::VIEW_USERS->value])
+        ->get('', 'index')
+        ->name('index');
 
     /** @uses \App\Http\Controllers\UserController::read() */
-    Route::get('{id}', 'read')->name('read');
+    Route::middleware(['permission:' . Permission::VIEW_USERS->value])
+        ->get('{id}', 'read')
+        ->name('read');
 
     /** @uses \App\Http\Controllers\UserController::destroy() */
-    Route::delete('{id}', 'destroy')->name('destroy');
+    Route::middleware(['permission:' . Permission::DELETE_USERS->value])
+        ->delete('{id}', 'destroy')
+        ->name('destroy');
 
     /** @uses \App\Http\Controllers\UserController::uploadProfilePicture() */
-    Route::post('{id}/profile-picture', 'uploadProfilePicture')->name('upload.profile-picture');
+    Route::middleware(['permission:' . Permission::UPDATE_USERS->value])
+        ->post('{id}/profile-picture', 'uploadProfilePicture')
+        ->name('upload.profile-picture');
 });

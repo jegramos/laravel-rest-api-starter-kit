@@ -5,9 +5,15 @@ namespace App\Http\Controllers;
 use App\Enums\ApiErrorCode;
 use App\Http\Requests\AuthRequest;
 use App\Models\User;
+use App\Notifications\Auth\QueuedVerifyEmailNotification;
 use Hash;
+use Illuminate\Auth\Events\PasswordReset;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\JsonResponse;
 use Laravel\Sanctum\PersonalAccessToken;
+use Mockery\Generator\StringManipulation\Pass\Pass;
+use Password;
+use Str;
 use Symfony\Component\HttpFoundation\Response;
 
 class AuthController extends ApiController
@@ -18,7 +24,7 @@ class AuthController extends ApiController
      * @param AuthRequest $request
      * @return JsonResponse
      */
-    public function login(AuthRequest $request): JsonResponse
+    public function store(AuthRequest $request): JsonResponse
     {
         $user = User::with('userProfile')->where('email', $request->email)->first();
 
@@ -30,8 +36,7 @@ class AuthController extends ApiController
             );
         }
 
-        // Client can optionally send 'My iPhone14', 'Google Chrome', 'etc.
-        // as the token name
+        // For the token name, clients can optionally send 'My iPhone14', 'Google Chrome', etc.
         $tokenName = $request->get('client_name') ?? 'api_token';
 
         /**
@@ -40,18 +45,13 @@ class AuthController extends ApiController
          */
         $expiresAt = now()->addHours(12);
         $token = $user->createToken($tokenName, ['*'], $expiresAt)->plainTextToken;
+        $data = ['token' => $token, 'token_name' => $tokenName, 'expires_at' => $expiresAt];
 
-        $data = [
-            'token' => $token,
-            'token_name' => $tokenName,
-            'expires_at' => $expiresAt
-        ];
-
-        if ($request->with_user) {
+        if ($request->get('with_user')) {
             $data['user'] = $user;
         }
 
-        return $this->success($data, Response::HTTP_OK);
+        return $this->success(['data' => $data], Response::HTTP_OK);
     }
 
     /**
@@ -59,13 +59,13 @@ class AuthController extends ApiController
      *
      * @return JsonResponse
      */
-    public function logout(): JsonResponse
+    public function destroy(): JsonResponse
     {
         /** @var User $user */
         $user = auth()->user();
         $user->currentAccessToken()->delete();
 
-        return $this->success(null, Response::HTTP_OK);
+        return $this->success(null, Response::HTTP_NO_CONTENT);
     }
 
     /**
@@ -73,20 +73,24 @@ class AuthController extends ApiController
      *
      * @return JsonResponse
      */
-    public function getAccessTokens(): JsonResponse
+    public function fetch(): JsonResponse
     {
         /** @var User $user */
         $user = auth()->user();
 
-        $tokens = $user->tokens->map(function (PersonalAccessToken $token) {
-            return [
-                'id' => $token->getAttribute('id'),
-                'name' => $token->getAttribute('name'),
-                'expires_at' => $token->getAttribute('expires_at'),
-                'last_used_at' => $token->getAttribute('last_used_at'),
-                'created_at' => $token->getAttribute('created_at')
-            ];
-        });
+        $tokens = $user->tokens
+            ->map(function (PersonalAccessToken $token) {
+                return [
+                    'id' => $token->id,
+                    'name' => $token->name,
+                    'expires_at' => $token->expires_at,
+                    'last_used_at' => $token->last_used_at,
+                    'created_at' => $token->created_at
+                ];
+            })
+            // only get un-expired tokens
+            ->reject(fn (array $token) => now() >= $token['expires_at'])
+            ->values();
 
         return $this->success(['data' => $tokens->toArray()], Response::HTTP_OK);
     }
@@ -97,31 +101,104 @@ class AuthController extends ApiController
      * @param AuthRequest $request
      * @return JsonResponse
      */
-    public function revokeAccessTokens(AuthRequest $request): JsonResponse
+    public function revoke(AuthRequest $request): JsonResponse
     {
-        /** @var User $user */
-        $user = auth()->user();
-
         $tokensToRevoke = $request->get('token_ids');
-        foreach ($tokensToRevoke as $tokenId) {
-            $user->tokens()->where('id', $tokenId)->delete();
+
+        // delete everything if they pass a star (*)
+        if ($tokensToRevoke === ['*']) {
+            auth()->user()->tokens()->delete();
+            return $this->success(null, Response::HTTP_NO_CONTENT);
         }
 
-        return $this->success(null, Response::HTTP_OK);
+        foreach ($tokensToRevoke as $tokenId) {
+            auth()->user()->tokens()->where('id', $tokenId)->delete();
+        }
+
+        return $this->success(null, Response::HTTP_NO_CONTENT);
     }
 
     /**
-     * Revoke all access tokens of a user
+     * Verify Email
+     *
+     * @param EmailVerificationRequest $request
+     * @return JsonResponse
+     */
+    public function verifyEmail(EmailVerificationRequest $request): JsonResponse
+    {
+        $request->fulfill();
+        return $this->success(['message' => 'Email successfully verified'], Response::HTTP_UNAUTHORIZED);
+    }
+
+    /**
+     * Resend the email verification notification
      *
      * @return JsonResponse
      */
-    public function revokeAllAccessTokens(): JsonResponse
+    public function resendEmailVerification(): JsonResponse
     {
         /** @var User $user */
         $user = auth()->user();
 
-        $user->tokens()->delete();
+        $user->sendEmailVerificationNotification();
+        $data = [
+            'message' => 'Email verification sent',
+            'email' => $user->email
+        ];
 
-        return $this->success(null, Response::HTTP_OK);
+        return $this->success($data, Response::HTTP_OK);
+    }
+
+    /**
+     * Forgot password request
+     *
+     * @param AuthRequest $request
+     * @return JsonResponse
+     */
+    public function forgotPassword(AuthRequest $request): JsonResponse
+    {
+        $status = Password::sendResetLink($request->only('email'));
+
+        if ($status !== Password::RESET_LINK_SENT) {
+            return $this->error(
+                'Unable to send password reset email',
+                Response::HTTP_FAILED_DEPENDENCY,
+                ApiErrorCode::DEPENDENCY_ERROR
+            );
+        }
+
+        $data = ['message' => 'Email verification sent', 'email' => $request->get('email')];
+        return $this->success($data, Response::HTTP_OK);
+    }
+
+    /**
+     * Forgot password request
+     *
+     * @param AuthRequest $request
+     * @return JsonResponse
+     */
+    public function resetPassword(AuthRequest $request): JsonResponse
+    {
+        $status = Password::reset(
+            $request->only('email', 'password', 'password_confirmation', 'token'),
+            function ($user, $password) {
+                $user->password = $password;
+                $user->setRememberToken(Str::random(60));
+                $user->save();
+
+                event(new PasswordReset($user));
+            }
+        );
+
+        if ($status !== Password::PASSWORD_RESET) {
+            return $this->error(
+                'Unable to reset password',
+                Response::HTTP_BAD_REQUEST,
+                ApiErrorCode::BAD_REQUEST
+            );
+        }
+
+        $data = ['message' => 'Password reset was successful'];
+        return $this->success($data, Response::HTTP_OK);
     }
 }

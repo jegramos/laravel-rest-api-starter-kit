@@ -4,7 +4,7 @@ namespace App\Traits\Model;
 
 use Illuminate\Database\Eloquent\Casts\Attribute;
 
-/** @deprecated - Currently not working on this */
+/** @deprecated - I've ditched this approach for schema query check and caching */
 trait HasSortableAttributes
 {
     /**

@@ -64,6 +64,7 @@ class UserProfile extends Model
      * @var array<int, string>
      */
     protected $hidden = [
+        'id',
         'user_id',
         'country_id',
         'profile_picture_path'

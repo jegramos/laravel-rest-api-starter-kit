@@ -36,4 +36,13 @@ interface UserServiceInterface
      * @return User
      */
     public function update($id, array $newUserInfo): User;
+
+    /**
+     * Update the profile information of a user
+     *
+     * @param $id
+     * @param array $newUserInfo
+     * @return User
+     */
+    public function updateProfile($id, array $newUserInfo): User;
 }

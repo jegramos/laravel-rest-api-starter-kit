@@ -13,7 +13,8 @@
         "laravel/tinker": "^2.7",
         "league/flysystem-aws-s3-v3": "^3.0",
         "predis/predis": "^2.0",
-        "propaganistas/laravel-phone": "^4.4"
+        "propaganistas/laravel-phone": "^4.4",
+        "spatie/laravel-permission": "^5.7"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^2.12",
