@@ -7,7 +7,6 @@ use App\Events\UserCreated;
 use App\Http\Requests\UserRequest;
 use App\Interfaces\CloudFileServices\CloudFileServiceInterface;
 use App\Interfaces\HttpResources\UserServiceInterface;
-use App\Listeners\SendWelcomeEmailNotification;
 use App\Models\User;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\JsonResponse;

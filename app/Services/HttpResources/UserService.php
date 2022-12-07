@@ -78,7 +78,7 @@ class UserService implements UserServiceInterface
             $userRoles = empty($userInfo['roles']) ? ['standard_user'] : $userInfo['roles'];
             $user->syncRoles($userRoles);
             // Spatie automatically attaches a roles attr after syncing
-            // we don't want it as there is too much information provided
+            // we don't want it as there is too much clutter sent
             unset($user['roles']);
 
             $exemptedAttributes = ['email', 'username', 'password', 'active', 'email_verified_at'];

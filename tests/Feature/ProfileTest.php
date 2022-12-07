@@ -20,7 +20,6 @@ class ProfileTest extends TestCase
     use RefreshDatabase;
     use WithFaker;
 
-    private User $user;
     private string $baseUri = self::BASE_API_URI . '/profile';
 
     protected function setUp(): void
@@ -28,9 +27,9 @@ class ProfileTest extends TestCase
         parent::setUp();
         $this->artisan('db:seed');
 
-        $this->user = User::factory()->has(UserProfile::factory())->create();
-        $this->user->syncRoles(Role::STANDARD_USER->value);
-        Sanctum::actingAs($this->user);
+        $user = User::factory()->has(UserProfile::factory())->create();
+        $user->syncRoles(Role::STANDARD_USER->value);
+        Sanctum::actingAs($user);
     }
 
     /**

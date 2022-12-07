@@ -2,14 +2,19 @@
 
 namespace Tests\Feature;
 
+use App\Events\UserCreated;
 use App\Models\Country;
 use App\Models\User;
 use App\Models\UserProfile;
+use App\Notifications\WelcomeNotification;
+use Exception;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
 use Laravel\Sanctum\Sanctum;
@@ -23,22 +28,25 @@ class UserManagementTest extends TestCase
     use WithFaker;
 
     private string $baseUri = self::BASE_API_URI . '/users';
+    private User $user;
 
     public function setUp(): void
     {
         parent::setUp();
         $this->artisan('db:seed');
+        Notification::fake();
 
         /** @var User $user */
-        $user = User::factory()->has(UserProfile::factory())->create();
+        $this->user = User::factory()->has(UserProfile::factory())->create();
         $roles = [\App\Enums\Role::ADMIN->value, \App\Enums\Role::SUPER_USER->value];
-        $user->syncRoles(fake()->randomElement($roles));
-        Sanctum::actingAs($user);
+        $this->user->syncRoles(fake()->randomElement($roles));
+        Sanctum::actingAs($this->user);
     }
 
     /**
      * @dataProvider validCreateUserInputs
-     * @note we can't use Eloquent in data providers
+     * @note we can't use Eloquent nor faker in data providers
+     * @throws Throwable
      */
     public function test_it_can_create_a_user($input, $statusCode)
     {
@@ -47,6 +55,11 @@ class UserManagementTest extends TestCase
 
         $response = $this->postJson($this->baseUri, $input);
         $response->assertStatus($statusCode);
+
+        if ($statusCode !== 422) {
+            $createdUser = User::find($response->decodeResponseJson()['data']['id']);
+            Notification::assertSentTo($createdUser, WelcomeNotification::class);
+        }
     }
 
     public function validCreateUserInputs(): array

@@ -3,7 +3,6 @@
 namespace App\Http\Middleware;
 
 use App\Enums\ApiErrorCode;
-use App\Exceptions\EmailNotVerifiedException;
 use Closure;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\Request;
@@ -18,7 +17,6 @@ class EnsureEmailIsVerifiedApi
      * @param Request $request
      * @param Closure $next
      * @return mixed
-     * @throws EmailNotVerifiedException
      */
     public function handle(Request $request, Closure $next): mixed
     {
@@ -26,9 +24,12 @@ class EnsureEmailIsVerifiedApi
         $emailNotVerified = $request->user() instanceof MustVerifyEmail && !$request->user()->hasVerifiedEmail();
 
         if ($noUserFound || $emailNotVerified) {
-            $exception = new EmailNotVerifiedException('Email address not verified');
-            $exception->email = $request->user()->email;
-            throw $exception;
+            return response()->json([
+                    'success' => false,
+                    'message' => 'Email address is not verified',
+                    'error_code' => ApiErrorCode::EMAIL_NOT_VERIFIED,
+                    'email' => !$noUserFound ? $request->user()->email : null
+            ], Response::HTTP_FORBIDDEN);
         }
 
         return $next($request);
