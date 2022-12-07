@@ -54,5 +54,4 @@ class AvailabilityRequest extends FormRequest
             'value' => ['required']
         ];
     }
-
 }
