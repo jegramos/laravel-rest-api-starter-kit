@@ -2,7 +2,10 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Notifications\Auth\QueuedResetPasswordNotification;
+use App\Notifications\Auth\QueuedVerifyEmailNotification;
+use Illuminate\Contracts\Auth\CanResetPassword;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use DateTimeHelper;
 use Dyrynda\Database\Support\CascadeSoftDeletes;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -13,14 +16,23 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Sanctum\HasApiTokens;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Traits\HasRoles;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
 {
     use HasApiTokens;
+    use HasRoles;
     use HasFactory;
     use Notifiable;
     use SoftDeletes;
     use CascadeSoftDeletes;
+
+    /**
+     * Requirement by Spatie Laravel Permissions when setting multiple auth guards
+     * @see https://spatie.be/docs/laravel-permission/v5/basic-usage/multiple-guards
+     */
+    public $guard_name = 'sanctum';
 
     /** @see https://github.com/shiftonelabs/laravel-cascade-deletes */
     protected array $cascadeDeletes = ['userProfile'];
@@ -47,6 +59,15 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+    ];
+
+    /**
+     * Dynamic computed attributes
+     *
+     * @var array<int, string>
+     */
+    protected $appends = [
+        'attached_roles',
     ];
 
     /**
@@ -81,14 +102,44 @@ class User extends Authenticatable
     }
 
     /**
+     * @Attribute
      * Hash the password whenever it is changed
      *
      * @return Attribute
      */
     public function password(): Attribute
     {
-        return Attribute::set(
-            fn ($value) => Hash::make($value)
-        );
+        return Attribute::set(fn ($value) => Hash::make($value));
+    }
+
+    /**
+     * @Attribute
+     * Attach role names with their IDs
+     *
+     * @return Attribute
+     */
+    public function attachedRoles(): Attribute
+    {
+        return Attribute::get(function () {
+            return $this->roles()->get()->map(fn (Role $role) => ['id' => $role->id, 'name' => $role->name]);
+        });
+    }
+
+    /*
+     * Override default email verification notification
+     */
+    public function sendEmailVerificationNotification()
+    {
+        $notification = new QueuedVerifyEmailNotification($this);
+        $notification->afterCommit();
+        $this->notify($notification);
+    }
+
+    /*
+     * Override default password reset notification
+     */
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify((new QueuedResetPasswordNotification($token)));
     }
 }

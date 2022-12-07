@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Enums\PaginationType;
+use App\Events\UserCreated;
 use App\Http\Requests\UserRequest;
 use App\Interfaces\CloudFileServices\CloudFileServiceInterface;
 use App\Interfaces\HttpResources\UserServiceInterface;
 use App\Models\User;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\JsonResponse;
 use PaginationHelper;
 use Symfony\Component\HttpFoundation\Response;
@@ -41,6 +43,7 @@ class UserController extends ApiController
     public function store(UserRequest $request): JsonResponse
     {
         $user = $this->userService->create($request->validated());
+        UserCreated::dispatch($user);
         return $this->success(['data' => $user], Response::HTTP_CREATED);
     }
 
@@ -62,9 +65,14 @@ class UserController extends ApiController
      * @param $id
      * @param UserRequest $request
      * @return JsonResponse
+     * @throws AuthorizationException
      */
     public function update($id, UserRequest $request): JsonResponse
     {
+        if (!$this->authorize('update', User::findOrFail($id))) {
+            throw new AuthorizationException('A Super User cannot be updated');
+        }
+
         $user = $this->userService->update($id, $request->validated());
         return $this->success(['data' => $user], Response::HTTP_OK);
     }
@@ -74,9 +82,14 @@ class UserController extends ApiController
      *
      * @param $id
      * @return JsonResponse
+     * @throws AuthorizationException
      */
     public function destroy($id): JsonResponse
     {
+        if (!$this->authorize('update', User::findOrFail($id))) {
+            throw new AuthorizationException('A Super User cannot be deleted');
+        }
+
         User::findOrFail($id)->delete();
         return $this->success(null, Response::HTTP_NO_CONTENT);
     }

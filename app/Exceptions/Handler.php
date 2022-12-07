@@ -3,15 +3,19 @@
 namespace App\Exceptions;
 
 use App\Enums\ApiErrorCode;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Http\Exceptions\PostTooLargeException;
 use Illuminate\Http\Exceptions\ThrottleRequestsException;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Log;
+use Spatie\Permission\Exceptions\UnauthorizedException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
@@ -52,7 +56,7 @@ class Handler extends ExceptionHandler
      *
      * @return void
      */
-    public function register()
+    public function register(): void
     {
         $this->reportable(function (Throwable $e) {
             //
@@ -123,6 +127,29 @@ class Handler extends ExceptionHandler
                     Response::HTTP_UNAUTHORIZED
                 );
                 break;
+            case $e instanceof UnauthorizedException: // Spatie Auth Exception
+            case $e instanceof AuthorizationException: // Laravel Auth Exception
+            case $e instanceof HttpException && $e->getStatusCode() === Response::HTTP_FORBIDDEN: // catch abort(403)
+                $response = response()->json(
+                    [
+                        'success' => false,
+                        'message' => $e->getMessage(),
+                        'error_code' => ApiErrorCode::UNAUTHORIZED,
+                    ],
+                    Response::HTTP_FORBIDDEN
+                );
+                break;
+            case $e instanceof EmailNotVerifiedException:
+                $response = response()->json(
+                    [
+                        'success' => false,
+                        'message' => $e->getMessage(),
+                        'error_code' => ApiErrorCode::EMAIL_NOT_VERIFIED,
+                        'email' => $e->email
+                    ],
+                    Response::HTTP_FORBIDDEN
+                );
+                break;
                 // if a model is not found (e.g. from Model::findOrFail)
             case $e instanceof ModelNotFoundException:
                 $modelName = class_basename($e->getModel());
@@ -133,6 +160,16 @@ class Handler extends ExceptionHandler
                         'error_code' => ApiErrorCode::RESOURCE_NOT_FOUND,
                     ],
                     Response::HTTP_NOT_FOUND
+                );
+                break;
+            case $e instanceof PostTooLargeException:
+                $response = response()->json(
+                    [
+                        'success' => false,
+                        'message' => "Request is too large",
+                        'error_code' => ApiErrorCode::PAYLOAD_TOO_LARGE,
+                    ],
+                    Response::HTTP_REQUEST_ENTITY_TOO_LARGE
                 );
                 break;
             default:

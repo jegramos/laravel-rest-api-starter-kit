@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use App\Rules\DbVarcharMaxLength;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rules\Password;
 
 class AuthRequest extends FormRequest
 {
@@ -27,8 +28,10 @@ class AuthRequest extends FormRequest
         $routeName = $this->route()->getName();
 
         return match ($routeName) {
-            'auth.login' => $this->getLoginRules(),
-            'auth.revoke-access' => $this->getRevokeAccessRules(),
+            'auth.store' => $this->getLoginRules(),
+            'auth.revoke' => $this->getRevokeAccessRules(),
+            'auth.password.forgot' => $this->getForgotPasswordRules(),
+            'auth.password.reset' => $this->getResetPasswordRules(),
             default => []
         };
     }
@@ -55,6 +58,47 @@ class AuthRequest extends FormRequest
      */
     private function getRevokeAccessRules(): array
     {
-        return ['token_ids' => ['required', 'array']];
+        return [
+            'token_ids' => ['required', 'array'],
+            'token_ids.*' => ['required']
+        ];
+    }
+
+    /**
+     * Get forgot password rules
+     *
+     * @return array
+     */
+    private function getForgotPasswordRules(): array
+    {
+        return [
+            'email' => ['required', 'email', 'exists:users,email']
+        ];
+    }
+
+    /**
+     * Get forgot password rules
+     *
+     * @return array
+     */
+    private function getResetPasswordRules(): array
+    {
+        return [
+            'token' => ['required'],
+            'email' => ['required', 'email', 'exists:users,email'],
+            'password' => ['string', 'nullable', 'confirmed', Password::min(8)->mixedCase()->numbers()],
+        ];
+    }
+
+    /**
+     * Custom validation messages
+     *
+     * @return array
+     */
+    public function messages(): array
+    {
+        return [
+            'email.exists' => 'The :attribute is not registered'
+        ];
     }
 }

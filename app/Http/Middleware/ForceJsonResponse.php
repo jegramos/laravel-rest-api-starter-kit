@@ -15,9 +15,9 @@ class ForceJsonResponse
      *
      * @param Request $request
      * @param Closure $next
-     * @return JsonResponse
+     * @return mixed
      */
-    public function handle(Request $request, Closure $next): JsonResponse
+    public function handle(Request $request, Closure $next): mixed
     {
         /** Force the client to accept JSON */
         $request->headers->set('Accept', 'application/json');
