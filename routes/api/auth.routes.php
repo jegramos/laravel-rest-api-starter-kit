@@ -7,30 +7,30 @@ use App\Http\Controllers\AuthController;
  *  @see https://laravel.com/docs/9.x/routing#route-group-controllers
  */
 Route::controller(AuthController::class)->group(function () {
-    /** @uses \App\Http\Controllers\AuthController::store() */
+    /** @uses AuthController::store */
     Route::post('tokens', 'store')->name('auth.store');
 
-    /** @uses \App\Http\Controllers\AuthController::destroy() */
+    /** @uses AuthController::destroy */
     Route::middleware(['auth:sanctum', 'verified.api'])->delete('tokens', 'destroy')->name('auth.destroy');
 
-    /** @uses \App\Http\Controllers\AuthController::fetch() */
+    /** @uses AuthController::fetch */
     Route::middleware(['auth:sanctum', 'verified.api'])->get('tokens', 'fetch')->name('auth.fetch');
 
-    /** @uses \App\Http\Controllers\AuthController::revoke() */
+    /** @uses AuthController::revoke */
     Route::middleware(['auth:sanctum', 'verified.api'])->post('tokens/revoke', 'revoke')->name('auth.revoke');
 
-    /** @uses \App\Http\Controllers\AuthController::forgotPassword() */
+    /** @uses AuthController::forgotPassword */
     Route::post('forgot-password', 'forgotPassword')->name('auth.password.forgot');
 
-    /** @uses \App\Http\Controllers\AuthController::resetPassword() */
+    /** @uses AuthController::resetPassword */
     Route::post('reset-password', 'resetPassword')->name('auth.password.reset');
 
-    /** @uses \App\Http\Controllers\AuthController::resendEmailVerification() */
+    /** @uses AuthController::resendEmailVerification */
     Route::middleware(['auth:sanctum'])
         ->get('email/send-verification', 'resendEmailVerification')
         ->name('auth.verification.resend');
 
-    /** @uses \App\Http\Controllers\AuthController::verifyEmail() */
+    /** @uses AuthController::verifyEmail */
     Route::middleware(['auth:sanctum', 'signed'])
         ->get('email/verify/{id}/{hash}', 'verifyEmail')
         ->name('verification.verify');

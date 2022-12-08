@@ -2,6 +2,7 @@
 
 namespace App\Notifications;
 
+use App\Enums\Queue;
 use App\Mail\Auth\WelcomeMessageMail;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
@@ -22,6 +23,7 @@ class WelcomeNotification extends Notification implements ShouldQueue
      */
     public function __construct()
     {
+        $this->onQueue(Queue::EMAILS->value);
     }
 
     /**

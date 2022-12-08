@@ -113,7 +113,7 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
     }
 
     /**
-     * @Attribute
+     * @Appended
      * Attach role names with their IDs
      *
      * @return Attribute
@@ -125,14 +125,32 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
         });
     }
 
+    /**
+     * Set username to lowercase
+     *
+     * @return Attribute
+     */
+    public function username(): Attribute
+    {
+        return Attribute::set(fn ($value) => strtolower($value));
+    }
+
+    /**
+     * Set username to lowercase
+     *
+     * @return Attribute
+     */
+    public function email(): Attribute
+    {
+        return Attribute::set(fn ($value) => strtolower($value));
+    }
+
     /*
      * Override default email verification notification
      */
     public function sendEmailVerificationNotification()
     {
-        $notification = new QueuedVerifyEmailNotification($this);
-        $notification->afterCommit();
-        $this->notify($notification);
+        $this->notify(new QueuedVerifyEmailNotification($this));
     }
 
     /*
@@ -140,6 +158,6 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
      */
     public function sendPasswordResetNotification($token)
     {
-        $this->notify((new QueuedResetPasswordNotification($token)));
+        $this->notify(new QueuedResetPasswordNotification($token));
     }
 }
