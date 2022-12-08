@@ -30,7 +30,7 @@ class UserService implements UserServiceInterface
     public function all(?PaginationType $pagination = null): Collection|Paginator|LengthAwarePaginator|CursorPaginator
     {
         /** @var Builder $users */
-        $users = $this->model->withFilters();
+        $users = $this->model->filtered();
 
         $limit = request('limit') ?? 25;
         return match ($pagination) {

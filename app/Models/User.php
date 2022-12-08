@@ -101,7 +101,7 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
      * @Scope
      * Pipeline for HTTP query filters
      */
-    public function scopeWithFilters(Builder $builder): Builder
+    public function scopeFiltered(Builder $builder): Builder
     {
         return app(Pipeline::class)
             ->send($builder->with('userProfile'))
