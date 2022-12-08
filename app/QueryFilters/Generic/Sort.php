@@ -14,7 +14,7 @@ class Sort extends Filter
     {
         $filterName = $this->getFilterName();
 
-        // if `sort` is neither `asc` nor `desc`, we'll ignore the query param
+        // if `?sort=` is neither `asc` nor `desc`, we'll ignore the query param
         // and send the builder to the next pipe
         if (!in_array(request($filterName), ['asc', 'desc'])) {
             return $builder;
@@ -39,7 +39,7 @@ class Sort extends Filter
         }
 
         // handle nested sortBy. Ex. ?sort_by=user_profile.email
-        // `email` is found in a related table, [user].user_profile.email
+        // `email` is found in a related table, <parent>[user].<related>[user_profile].email
         $builderWithJoin = $this->joinRelatedTable($sortBy, $builder);
 
         // if we can't do an inner join for the relationship, we'll just send a default ID sorting
@@ -85,7 +85,7 @@ class Sort extends Filter
         $parentTableName = (clone $builder)->getModel()->getTable();
         $foreignKey = $this->constructForeignKey($parentTableName);
 
-        // Return the original builder (ignore the filter) if we can't guess the foreign key
+        // If the foreign key we've built is correct, it should be found on the related table
         if (!$schemaService->checkIfColumnExists($tableName, $foreignKey)) {
             Log::error('Unable to construct the foreign key', [
                 'class' => self::class,
@@ -95,7 +95,7 @@ class Sort extends Filter
                 'related_table_name' => $tableName
             ]);
 
-            return $builder;
+            return null;
         }
 
         return $builder->join($tableName, "$tableName.$foreignKey", '=', "$parentTableName.id");
