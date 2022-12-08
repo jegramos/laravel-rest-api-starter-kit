@@ -2,6 +2,7 @@
 
 namespace App\Notifications\Auth;
 
+use App\Enums\Queue;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -11,6 +12,12 @@ use Illuminate\Support\Facades\Lang;
 class QueuedResetPasswordNotification extends ResetPassword implements ShouldQueue
 {
     use Queueable;
+
+    public function __construct($token)
+    {
+        parent::__construct($token);
+        $this->onQueue(Queue::EMAILS->value);
+    }
 
     /**
      * Get the reset password notification mail message for the given URL.

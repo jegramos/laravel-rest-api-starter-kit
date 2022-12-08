@@ -150,9 +150,7 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
      */
     public function sendEmailVerificationNotification()
     {
-        $notification = new QueuedVerifyEmailNotification($this);
-        $notification->afterCommit();
-        $this->notify($notification);
+        $this->notify(new QueuedVerifyEmailNotification($this));
     }
 
     /*
@@ -160,6 +158,6 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
      */
     public function sendPasswordResetNotification($token)
     {
-        $this->notify((new QueuedResetPasswordNotification($token)));
+        $this->notify(new QueuedResetPasswordNotification($token));
     }
 }
