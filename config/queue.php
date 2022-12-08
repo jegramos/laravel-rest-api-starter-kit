@@ -64,11 +64,11 @@ return [
 
         'redis' => [
             'driver' => 'redis',
-            'connection' => 'default',
+            'connection' => 'queue',
             'queue' => env('REDIS_QUEUE', 'default'),
-            'retry_after' => 90,
-            'block_for' => null,
-            'after_commit' => false,
+            'retry_after' => 120,
+            'block_for' => 5,
+            'after_commit' => true,
         ],
 
     ],

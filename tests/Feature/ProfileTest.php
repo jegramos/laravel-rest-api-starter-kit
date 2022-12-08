@@ -120,7 +120,7 @@ class ProfileTest extends TestCase
             'password' => $newPassword,
             'password_confirmation' => $newPassword
         ];
-        $result = $this->patchJson("$this->baseUri/change-password", $input);
+        $result = $this->patchJson("$this->baseUri/password", $input);
         $result->assertStatus(200);
 
         // login again with the new password

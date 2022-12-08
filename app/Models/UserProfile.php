@@ -101,7 +101,7 @@ class UserProfile extends Model
     }
 
     /**
-     * @Attribute
+     * @Appended
      * Create full_name attribute
      *
      * @return Attribute
@@ -122,7 +122,7 @@ class UserProfile extends Model
     }
 
     /**
-     * @Attribute
+     * @Appended
      * Create a profile_picture_url attribute
      *
      * @return Attribute

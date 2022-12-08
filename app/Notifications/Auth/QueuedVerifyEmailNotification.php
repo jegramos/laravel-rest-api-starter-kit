@@ -2,6 +2,7 @@
 
 namespace App\Notifications\Auth;
 
+use App\Enums\Queue;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -21,6 +22,7 @@ class QueuedVerifyEmailNotification extends VerifyEmail implements ShouldQueue
     public function __construct(mixed $notifiable)
     {
         $this->notifiableName = $notifiable->userProfile->first_name;
+        $this->onQueue(Queue::EMAILS->value);
     }
 
     /**
