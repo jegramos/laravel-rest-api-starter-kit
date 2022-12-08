@@ -163,8 +163,7 @@ class Sort extends Filter
         Builder $builder,
         string $tableName,
         string $filterName
-    ): Builder
-    {
+    ): Builder {
         $schemaService = resolve(SchemaServiceInterface::class);
 
         $nestedSortBy = $this->getNestedSortByFilterValue($sortBy);
