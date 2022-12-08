@@ -1,13 +1,13 @@
 <?php
 
-namespace App\QueryFilters;
+namespace App\QueryFilters\Generic;
 
-use Illuminate\Contracts\Database\Query\Builder;
-use Illuminate\Database\Eloquent\Model;
+use App\QueryFilters\Filter;
+use Illuminate\Database\Eloquent\Builder;
 
 class Active extends Filter
 {
-    public const FILTER_NAME = 'active';
+    private const FILTER_NAME = 'active';
 
     protected function applyFilter(Builder $builder): Builder
     {

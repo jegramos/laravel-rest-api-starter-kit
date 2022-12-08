@@ -13,6 +13,13 @@ interface SchemaServiceInterface
     public function getAllColumns(string $tableName): array;
 
     /**
+     * Get all the tables from the database
+     *
+     * @return array
+     */
+    public function getAllTables(): array;
+
+    /**
      * Check if a column exists in a database table
      *
      * @param string $tableName
@@ -21,6 +28,13 @@ interface SchemaServiceInterface
      */
     public function checkIfColumnExists(string $tableName, string $columnName): bool;
 
+    /**
+     * Check if a given table exists
+     *
+     * @param string $tableName
+     * @return bool
+     */
+    public function checkIfTableExists(string $tableName): bool;
 
     /**
      * Get all column names of a table except

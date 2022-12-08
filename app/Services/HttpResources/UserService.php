@@ -5,19 +5,14 @@ namespace App\Services\HttpResources;
 use App\Enums\PaginationType;
 use App\Interfaces\HttpResources\UserServiceInterface;
 use App\Models\User;
-use App\QueryFilters\Active;
-use App\QueryFilters\Sort;
 use Carbon\Carbon;
-use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Pagination\CursorPaginator;
-use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
-use Spatie\Permission\Models\Permission;
 use Throwable;
 
 class UserService implements UserServiceInterface
@@ -35,13 +30,7 @@ class UserService implements UserServiceInterface
     public function all(?PaginationType $pagination = null): Collection|Paginator|LengthAwarePaginator|CursorPaginator
     {
         /** @var Builder $users */
-        $users = app(Pipeline::class)
-            ->send($this->model::query()->with('userProfile'))
-            ->through([
-                Active::class,
-                Sort::class,
-            ])
-            ->thenReturn();
+        $users = $this->model->withFilters();
 
         $limit = request('limit') ?? 25;
         return match ($pagination) {

@@ -4,16 +4,22 @@ namespace App\Models;
 
 use App\Notifications\Auth\QueuedResetPasswordNotification;
 use App\Notifications\Auth\QueuedVerifyEmailNotification;
-use Illuminate\Contracts\Auth\CanResetPassword;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\QueryFilters\Generic\Active;
+use App\QueryFilters\Generic\Sort;
+use App\QueryFilters\User\Email;
+use App\QueryFilters\User\Username;
 use DateTimeHelper;
 use Dyrynda\Database\Support\CascadeSoftDeletes;
+use Illuminate\Contracts\Auth\CanResetPassword;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Models\Role;
@@ -89,6 +95,23 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
             $user->username = DateTimeHelper::appendTimestamp($user->username, '::deleted_');
             $user->saveQuietly();
         });
+    }
+
+    /**
+     * @Scope
+     * Pipeline for HTTP query filters
+     */
+    public function scopeWithFilters(Builder $builder): Builder
+    {
+        return app(Pipeline::class)
+            ->send($builder->with('userProfile'))
+            ->through([
+                Active::class,
+                Sort::class,
+                Username::class,
+                Email::class
+            ])
+            ->thenReturn();
     }
 
     /**
