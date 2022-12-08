@@ -147,6 +147,8 @@ class UserRequest extends FormRequest
             'sort_by' => ['nullable', 'string'],
             'limit' => ['nullable', 'int'],
             'page' => ['nullable', 'int'],
+            'email' => ['nullable', 'email'],
+            'username' => ['nullable', 'string']
         ];
     }
 

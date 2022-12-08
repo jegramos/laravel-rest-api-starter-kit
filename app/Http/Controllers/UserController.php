@@ -25,9 +25,12 @@ class UserController extends ApiController
     /**
      * Display a listing of users
      *
+     * @param UserRequest $request
      * @return JsonResponse
+     *
+     * @noinspection PhpUnusedParameterInspection
      */
-    public function index(): JsonResponse
+    public function index(UserRequest $request): JsonResponse
     {
         $users = $this->userService->all(PaginationType::LENGTH_AWARE);
         $formatted = PaginationHelper::formatPagination($users);
