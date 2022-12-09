@@ -112,6 +112,7 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
                 Username::class,
                 Email::class,
                 Verified::class,
+                \App\QueryFilters\User\Role::class,
             ])
             ->thenReturn();
     }
@@ -173,7 +174,7 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
     /*
      * Override default email verification notification
      */
-    public function sendEmailVerificationNotification()
+    public function sendEmailVerificationNotification(): void
     {
         $this->notify(new QueuedVerifyEmailNotification($this));
     }
@@ -181,7 +182,7 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
     /*
      * Override default password reset notification
      */
-    public function sendPasswordResetNotification($token)
+    public function sendPasswordResetNotification($token): void
     {
         $this->notify(new QueuedResetPasswordNotification($token));
     }

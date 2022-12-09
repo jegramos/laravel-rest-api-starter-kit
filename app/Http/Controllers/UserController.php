@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\ApiErrorCode;
 use App\Enums\PaginationType;
 use App\Events\UserCreated;
 use App\Http\Requests\UserRequest;
@@ -11,6 +12,7 @@ use App\Models\User;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\JsonResponse;
 use PaginationHelper;
+use Spatie\Permission\Models\Role;
 use Symfony\Component\HttpFoundation\Response;
 
 class UserController extends ApiController
@@ -45,6 +47,11 @@ class UserController extends ApiController
      */
     public function store(UserRequest $request): JsonResponse
     {
+        // super_users cannot be created
+        if ($this->rolesHaveSuperUser($request)) {
+            return $this->error('Super users cannot be created', Response::HTTP_FORBIDDEN, ApiErrorCode::BAD_REQUEST);
+        }
+
         $user = $this->userService->create($request->validated());
         UserCreated::dispatch($user);
         return $this->success(['data' => $user], Response::HTTP_CREATED);
@@ -112,5 +119,31 @@ class UserController extends ApiController
         $this->userService->update($id, ['profile_picture_path' => $result['path']]);
 
         return $this->success(['data' => $result], Response::HTTP_OK);
+    }
+
+    /**
+     * Search for a user via name, email, or username
+     *
+     * @param UserRequest $request
+     * @return JsonResponse
+     */
+    public function search(UserRequest $request): JsonResponse
+    {
+        $users = $this->userService->search($request->get('query'));
+        return $this->success(['data' => $users], Response::HTTP_OK);
+    }
+
+    /**
+     * Check if the provided roles have super_user
+     *
+     * @param UserRequest $request
+     * @return bool
+     */
+    private function rolesHaveSuperUser(UserRequest $request): bool
+    {
+        // super_users cannot be created
+        $roles = $request->get('roles');
+        $superAdminRole = Role::findByName(\App\Enums\Role::SUPER_USER->value, 'sanctum');
+        return !empty($roles) && in_array($superAdminRole->id, $roles);
     }
 }

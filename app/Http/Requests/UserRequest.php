@@ -52,6 +52,7 @@ class UserRequest extends FormRequest
             'users.update' => $this->getUpdateUserRules(),
             'users.index' => $this->getFetchUsersRules(),
             'users.upload.profile-picture' => $this->getUploadProfilePictureRules(),
+            'users.search' => $this->getSearchUsersRules(),
             default => [],
         };
     }
@@ -91,8 +92,8 @@ class UserRequest extends FormRequest
             'profile_picture_path' => ['string', 'nullable', new DbVarcharMaxLength()],
             'active' => ['nullable', 'boolean'],
             'email_verified' => ['nullable', 'boolean'],
-            'roles' => ['nullable', 'array'],
-            'roles.*' => ['required', 'exists:roles,id']
+            'roles' => ['nullable', 'array', 'max:25'],
+            'roles.*' => ['required', 'exists:roles,id', 'distinct']
         ];
     }
 
@@ -131,8 +132,8 @@ class UserRequest extends FormRequest
             'profile_picture_path' => ['string', 'nullable', new DbVarcharMaxLength()],
             'active' => ['nullable', 'boolean'],
             'email_verified' => ['nullable', 'boolean'],
-            'roles' => ['nullable', 'array'],
-            'roles.*' => ['required', 'exists:roles,id']
+            'roles' => ['nullable', 'array', 'max:25'],
+            'roles.*' => ['required', 'exists:roles,id', 'distinct']
         ];
     }
 
@@ -144,12 +145,23 @@ class UserRequest extends FormRequest
         return [
             'active' => ['nullable', 'boolean'],
             'verified' => ['nullable', 'boolean'],
+            'role' => ['nullable', 'integer', 'min:1'],
             'sort' => ['nullable', 'in:asc,desc'],
             'sort_by' => ['nullable', 'string'],
             'limit' => ['nullable', 'int'],
             'page' => ['nullable', 'int'],
             'email' => ['nullable', 'email'],
             'username' => ['nullable', 'string']
+        ];
+    }
+
+    /**
+     * User search rules
+     */
+    private function getSearchUsersRules(): array
+    {
+        return [
+            'query' => ['required', 'string']
         ];
     }
 
