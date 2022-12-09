@@ -2,18 +2,16 @@
 
 namespace Tests\Feature;
 
-use App\Events\UserCreated;
 use App\Models\Country;
 use App\Models\User;
 use App\Models\UserProfile;
 use App\Notifications\WelcomeNotification;
-use Exception;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
@@ -440,5 +438,73 @@ class UserManagementTest extends TestCase
         $this->assertEquals(2, count($response['data']['attached_roles']));
         $this->assertTrue(in_array($response['data']['attached_roles'][0]['id'], $expectedRoles['roles']));
         $this->assertTrue(in_array($response['data']['attached_roles'][1]['id'], $expectedRoles['roles']));
+    }
+
+    /** @throws Throwable */
+    public function test_it_can_filter_by_email_while_ignoring_the_case()
+    {
+        $email = uuid_create() . '@email.com';
+        User::factory()->has(UserProfile::factory())->create(['email' => $email]);
+
+        $email = strtoupper($email);
+        $response = $this->get("$this->baseUri?email=$email");
+        $response->assertStatus(200);
+
+        $response = $response->decodeResponseJson();
+        $this->assertCount(1, $response['data']);
+    }
+
+    /** @throws Throwable */
+    public function test_it_can_filter_by_username_while_ignoring_the_case()
+    {
+        $username = uuid_create();
+        User::factory()->has(UserProfile::factory())->create(['username' => $username]);
+
+        $username = strtoupper($username);
+        $response = $this->get("$this->baseUri?username=$username");
+        $response->assertStatus(200);
+
+        $response = $response->decodeResponseJson();
+        $this->assertCount(1, $response['data']);
+    }
+
+    /** @throws Throwable */
+    public function test_fetch_can_be_sorted_via_last_name()
+    {
+        User::factory()->has(UserProfile::factory())->count(3)->create();
+
+        // test `asc` sort
+        $sortedLastNames = UserProfile::orderBy('last_name')->pluck('last_name')->toArray();
+        $response = $this->get("$this->baseUri?sort=asc&sort_by=user_profile.last_name");
+        $response = $response->decodeResponseJson();
+        $mappedLastNames = array_map(fn($userProfile) => $userProfile['last_name'], $response['data']);
+        $this->assertEquals($sortedLastNames, $mappedLastNames);
+
+        // test `desc` sort
+        $sortedLastNames = UserProfile::orderBy('last_name', 'desc')->pluck('last_name')->toArray();
+        $response = $this->get("$this->baseUri?sort=desc&sort_by=user_profile.last_name");
+        $response = $response->decodeResponseJson();
+        $mappedLastNames = array_map(fn($userProfile) => $userProfile['last_name'], $response['data']);
+        $this->assertEquals($sortedLastNames, $mappedLastNames);
+    }
+
+    /** @throws Throwable */
+    public function test_fetch_can_be_sorted_via_first_name()
+    {
+        User::factory()->has(UserProfile::factory())->count(3)->create();
+
+        // test `asc` sort
+        $sortedLastNames = UserProfile::orderBy('first_name')->pluck('first_name')->toArray();
+        $response = $this->get("$this->baseUri?sort=asc&sort_by=user_profile.first_name");
+        $response = $response->decodeResponseJson();
+        $mappedLastNames = array_map(fn($userProfile) => $userProfile['first_name'], $response['data']);
+        $this->assertEquals($sortedLastNames, $mappedLastNames);
+
+        // test `desc` sort
+        $sortedLastNames = UserProfile::orderBy('first_name', 'desc')->pluck('first_name')->toArray();
+        $response = $this->get("$this->baseUri?sort=desc&sort_by=user_profile.first_name");
+        $response = $response->decodeResponseJson();
+        $mappedLastNames = array_map(fn($userProfile) => $userProfile['first_name'], $response['data']);
+        $this->assertEquals($sortedLastNames, $mappedLastNames);
     }
 }
