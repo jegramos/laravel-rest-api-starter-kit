@@ -16,9 +16,9 @@ return new class () extends Migration {
             $table->id();
             $table->foreignId('user_id')->unique()->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->foreignId('country_id')->nullable()->constrained()->cascadeOnUpdate()->nullOnDelete();
-            $table->string('first_name');
-            $table->string('last_name');
-            $table->string('middle_name')->nullable();
+            $table->string('first_name')->fulltext();
+            $table->string('last_name')->fulltext();
+            $table->string('middle_name')->nullable()->fulltext();
             $table->string('mobile_number')->nullable();
             $table->string('telephone_number')->nullable();
             $table->enum('sex', ['male', 'female'])->nullable();
