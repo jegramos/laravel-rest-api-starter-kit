@@ -12,7 +12,7 @@ class Active extends Filter
     protected function applyFilter(Builder $builder): Builder
     {
         $filterName = $this->getFilterName();
-        return $builder->where('active', request($filterName));
+        return $builder->where('active', (bool) request($filterName));
     }
 
     protected function getFilterName(): string

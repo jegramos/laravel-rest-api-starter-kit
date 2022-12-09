@@ -143,6 +143,7 @@ class UserRequest extends FormRequest
     {
         return [
             'active' => ['nullable', 'boolean'],
+            'verified' => ['nullable', 'boolean'],
             'sort' => ['nullable', 'in:asc,desc'],
             'sort_by' => ['nullable', 'string'],
             'limit' => ['nullable', 'int'],
@@ -183,6 +184,7 @@ class UserRequest extends FormRequest
         return [
             'sort.in' => 'The :attribute parameter must be either `asc` or `desc`',
             'active.boolean' => 'The :attribute parameter must be either `1` (for true) or `0` (for false)',
+            'verified.boolean' => 'The :attribute parameter must be either `1` (for true) or `0` (for false)',
             'country_id.exists' => 'The :attribute does not exists',
             'photo.max' => 'The :attribute must not exceed 2MB',
             'roles.array' => 'The :attribute field must be an array of role names',

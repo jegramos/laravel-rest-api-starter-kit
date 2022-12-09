@@ -28,6 +28,20 @@ class UserFactory extends Factory
     }
 
     /**
+     * Attach a standard user role after creating or making a user model
+     *
+     * @return UserFactory
+     */
+    public function configure(): UserFactory
+    {
+        return $this->afterCreating(function (User $user) {
+            $user->assignRole(Role::STANDARD_USER->value);
+        })->afterMaking(function (User $user) {
+            $user->assignRole(Role::STANDARD_USER->value);
+        });
+    }
+
+    /**
      * @State
      * User is suspended
      *
@@ -35,8 +49,8 @@ class UserFactory extends Factory
      */
     public function suspended(): Factory
     {
-        return $this->state(function (array $attributes) {
-           return ['active' => false];
+        return $this->state(function () {
+            return ['active' => false];
         });
     }
 
@@ -48,22 +62,8 @@ class UserFactory extends Factory
      */
     public function unVerified(): Factory
     {
-        return $this->state(function (array $attributes) {
-           return ['email_verified_at' => null];
-        });
-    }
-
-    /**
-     * Attach a standard user role after creating or making a user model
-     *
-     * @return $this
-     */
-    public function configure(): UserFactory
-    {
-        return $this->afterCreating(function (User $user) {
-            $user->assignRole(Role::STANDARD_USER->value);
-        })->afterMaking(function (User $user) {
-            $user->assignRole(Role::STANDARD_USER->value);
+        return $this->state(function () {
+            return ['email_verified_at' => null];
         });
     }
 }
