@@ -477,14 +477,14 @@ class UserManagementTest extends TestCase
         $sortedLastNames = UserProfile::orderBy('last_name')->pluck('last_name')->toArray();
         $response = $this->get("$this->baseUri?sort=asc&sort_by=user_profile.last_name");
         $response = $response->decodeResponseJson();
-        $mappedLastNames = array_map(fn($userProfile) => $userProfile['last_name'], $response['data']);
+        $mappedLastNames = array_map(fn ($userProfile) => $userProfile['last_name'], $response['data']);
         $this->assertEquals($sortedLastNames, $mappedLastNames);
 
         // test `desc` sort
         $sortedLastNames = UserProfile::orderBy('last_name', 'desc')->pluck('last_name')->toArray();
         $response = $this->get("$this->baseUri?sort=desc&sort_by=user_profile.last_name");
         $response = $response->decodeResponseJson();
-        $mappedLastNames = array_map(fn($userProfile) => $userProfile['last_name'], $response['data']);
+        $mappedLastNames = array_map(fn ($userProfile) => $userProfile['last_name'], $response['data']);
         $this->assertEquals($sortedLastNames, $mappedLastNames);
     }
 
@@ -497,14 +497,14 @@ class UserManagementTest extends TestCase
         $sortedLastNames = UserProfile::orderBy('first_name')->pluck('first_name')->toArray();
         $response = $this->get("$this->baseUri?sort=asc&sort_by=user_profile.first_name");
         $response = $response->decodeResponseJson();
-        $mappedLastNames = array_map(fn($userProfile) => $userProfile['first_name'], $response['data']);
+        $mappedLastNames = array_map(fn ($userProfile) => $userProfile['first_name'], $response['data']);
         $this->assertEquals($sortedLastNames, $mappedLastNames);
 
         // test `desc` sort
         $sortedLastNames = UserProfile::orderBy('first_name', 'desc')->pluck('first_name')->toArray();
         $response = $this->get("$this->baseUri?sort=desc&sort_by=user_profile.first_name");
         $response = $response->decodeResponseJson();
-        $mappedLastNames = array_map(fn($userProfile) => $userProfile['first_name'], $response['data']);
+        $mappedLastNames = array_map(fn ($userProfile) => $userProfile['first_name'], $response['data']);
         $this->assertEquals($sortedLastNames, $mappedLastNames);
     }
 }
