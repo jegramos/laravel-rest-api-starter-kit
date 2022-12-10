@@ -7,6 +7,8 @@ Sunrise API is a Laravel 9 RESTFul starter kit for SPA and mobile clients. This 
 - Implementation Forgot and Reset Password with Email Notification
 - Implementation of S3 upload with pre-signed URL
 - Pipeline implementation of HTTP query filters
+- Implementation of search functionality with DB fulltext indexes
+- Redis-based queueing for user notifications
 - Composer and Git hook automation with GrumpPhp
 - [Clockwork](https://github.com/itsgoingd/clockwork) installed for performance monitoring while in development. Remember to install the browser extension
 - Github PR document template in `docs/pull_request_template.md`
