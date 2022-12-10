@@ -49,7 +49,7 @@ class UserController extends ApiController
     {
         // super_users cannot be created
         if ($this->rolesHaveSuperUser($request)) {
-            return $this->error('Super users cannot be created', Response::HTTP_FORBIDDEN, ApiErrorCode::BAD_REQUEST);
+            return $this->error('A Super User cannot be created', Response::HTTP_FORBIDDEN, ApiErrorCode::BAD_REQUEST);
         }
 
         $user = $this->userService->create($request->validated());

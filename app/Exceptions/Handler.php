@@ -139,17 +139,6 @@ class Handler extends ExceptionHandler
                     Response::HTTP_FORBIDDEN
                 );
                 break;
-            case $e instanceof EmailNotVerifiedException:
-                $response = response()->json(
-                    [
-                        'success' => false,
-                        'message' => $e->getMessage(),
-                        'error_code' => ApiErrorCode::EMAIL_NOT_VERIFIED,
-                        'email' => $e->email
-                    ],
-                    Response::HTTP_FORBIDDEN
-                );
-                break;
                 // if a model is not found (e.g. from Model::findOrFail)
             case $e instanceof ModelNotFoundException:
                 $modelName = class_basename($e->getModel());
