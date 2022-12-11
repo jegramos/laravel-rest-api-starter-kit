@@ -76,7 +76,7 @@ return [
             'url' => env('LOG_SLACK_WEBHOOK_URL'),
             'username' => 'Laravel Log',
             'emoji' => ':boom:',
-            'level' => env('LOG_LEVEL', 'critical'),
+            'level' => env('SLACK_LOG_LEVEL', 'critical'),
         ],
 
         'papertrail' => [
@@ -120,4 +120,13 @@ return [
         ],
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Log level for the App\Listeners\LogEventListener
+    |--------------------------------------------------------------------------
+    | Set the log level for the LogEventListener
+    |
+    */
+
+    'event_listener_level' => env('LOG_EVENT_LISTENER_LEVEL')
 ];

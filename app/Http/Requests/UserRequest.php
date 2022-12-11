@@ -103,11 +103,11 @@ class UserRequest extends FormRequest
     private function getUpdateUserRules(): array
     {
         return [
-            'email' => ['nullable', 'email', 'unique:users,email,' . request('id')],
-            'username' => ['nullable', new AlphaDashDot(), 'max:30', 'unique:users,username,' . request('id')],
-            'password' => ['string', 'nullable', 'confirmed', Password::min(8)->mixedCase()->numbers()],
-            'first_name' => ['string', 'nullable', new DbVarcharMaxLength()],
-            'last_name' => ['string', 'nullable', new DbVarcharMaxLength()],
+            'email' => ['email', 'unique:users,email,' . request('id')],
+            'username' => [new AlphaDashDot(), 'max:30', 'unique:users,username,' . request('id')],
+            'password' => ['string', 'confirmed', Password::min(8)->mixedCase()->numbers()],
+            'first_name' => ['string', new DbVarcharMaxLength()],
+            'last_name' => ['string', new DbVarcharMaxLength()],
             'middle_name' => ['string', 'nullable', new DbVarcharMaxLength()],
             'mobile_number' => [
                 'nullable',
@@ -180,10 +180,15 @@ class UserRequest extends FormRequest
      */
     protected function prepareForValidation()
     {
-        $this->merge([
-            'email' => strtolower($this->get('email')),
-            'username' => strtolower($this->get('username'))
-        ]);
+        $routeName = $this->route()->getName();
+
+        if ($this->has('email') && $routeName === 'users.search') {
+            $this->merge(['email' => strtolower($this->get('email'))]);
+        }
+
+        if ($this->has('username') && $routeName === 'users.search') {
+            $this->merge(['username' => strtolower($this->get('username'))]);
+        }
     }
 
     /**

@@ -4,9 +4,11 @@ namespace App\Providers;
 
 use App\Events\UserCreated;
 use App\Events\UserRegistered;
+use App\Listeners\LogEventListener;
 use App\Listeners\SendVerifyEmailNotification;
 use App\Listeners\SendWelcomeEmailNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
+use Illuminate\Log\Events\MessageLogged;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -22,6 +24,9 @@ class EventServiceProvider extends ServiceProvider
         UserCreated::class => [
             SendWelcomeEmailNotification::class,
             SendVerifyEmailNotification::class
+        ],
+        MessageLogged::class => [
+            LogEventListener::class,
         ],
     ];
 
