@@ -2,9 +2,12 @@
 
 namespace App\Notifications;
 
+use App\Enums\Queue;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Messages\SlackAttachment;
+use Illuminate\Notifications\Messages\SlackMessage;
 use Illuminate\Notifications\Notification;
 
 class SystemAlertNotification extends Notification implements ShouldQueue
@@ -21,7 +24,7 @@ class SystemAlertNotification extends Notification implements ShouldQueue
      */
     public function __construct(string $level, string $message)
     {
-        $this->onQueue('emails');
+        $this->onQueue(Queue::NOTIFICATIONS->value);
         $this->level = strtoupper($level);
         $this->message = $message;
     }
@@ -32,9 +35,9 @@ class SystemAlertNotification extends Notification implements ShouldQueue
      * @param  mixed  $notifiable
      * @return array
      */
-    public function via($notifiable): array
+    public function via(mixed $notifiable): array
     {
-        return ['mail'];
+        return ['mail', 'slack'];
     }
 
     /**
@@ -44,7 +47,7 @@ class SystemAlertNotification extends Notification implements ShouldQueue
      * @param  mixed  $notifiable
      * @return MailMessage
      */
-    public function toMail($notifiable): MailMessage
+    public function toMail(mixed $notifiable): MailMessage
     {
         return (new MailMessage())
                     ->greeting("System Notification: $this->level")
@@ -58,12 +61,30 @@ class SystemAlertNotification extends Notification implements ShouldQueue
     }
 
     /**
+     * Get the Slack representation of the notification.
+     *
+     * @param  mixed  $notifiable
+     * @return SlackMessage
+     */
+    public function toSlack(mixed $notifiable): SlackMessage
+    {
+        $title = config('app.name') . " System Notification: $this->level";
+        $message = $this->message;
+
+        return (new SlackMessage)
+            ->error()
+            ->attachment(function (SlackAttachment $attachment) use ($title, $message) {
+                $attachment->title($title)->content($message);
+            });
+    }
+
+    /**
      * Get the array representation of the notification.
      *
      * @param  mixed  $notifiable
      * @return array
      */
-    public function toArray($notifiable): array
+    public function toArray(mixed $notifiable): array
     {
         return [
             //

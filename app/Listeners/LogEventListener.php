@@ -8,8 +8,6 @@ use Illuminate\Log\Events\MessageLogged;
 
 class LogEventListener
 {
-    // use InteractsWithQueue;
-
     public const LOG_LEVELS = [
         'debug' => 1,
         'info' => 2,
@@ -30,16 +28,20 @@ class LogEventListener
     public function handle(MessageLogged $event): void
     {
         // Only send email notifications when in prod or testing
-        if (app()->environment() != 'production') {
+        if (!in_array(app()->environment(), ['production', 'local'])) {
             return;
         }
 
-        if (self::LOG_LEVELS[$event->level] >= self::LOG_LEVELS[config('logging.event_listener_level')]) {
-            $users = User::permission(['receive_system_alerts'])->get();
-            /** @var User $user */
-            foreach ($users as $user) {
-                $user->notify(new SystemAlertNotification($event->level, $event->message));
-            }
+        // check the logging level set in config
+        if (self::LOG_LEVELS[$event->level] < self::LOG_LEVELS[config('logging.event_listener_level')]) {
+            return;
+        }
+
+        // send a notification to all users with the system alert permission
+        $users = User::permission(['receive_system_alerts'])->cursor();
+        /** @var User $user */
+        foreach ($users as $user) {
+            $user->notify(new SystemAlertNotification($event->level, $event->message));
         }
     }
 }

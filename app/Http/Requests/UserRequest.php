@@ -180,13 +180,11 @@ class UserRequest extends FormRequest
      */
     protected function prepareForValidation()
     {
-        $routeName = $this->route()->getName();
-
-        if ($this->has('email') && $routeName === 'users.search') {
+        if ($this->has('email')) {
             $this->merge(['email' => strtolower($this->get('email'))]);
         }
 
-        if ($this->has('username') && $routeName === 'users.search') {
+        if ($this->has('username')) {
             $this->merge(['username' => strtolower($this->get('username'))]);
         }
     }

@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Notifications\Notification;
 use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Sanctum\HasApiTokens;
@@ -185,5 +186,17 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
     public function sendPasswordResetNotification($token): void
     {
         $this->notify(new QueuedResetPasswordNotification($token));
+    }
+
+    /**
+     * @SlackIntegration
+     * Route notifications for the Slack channel.
+     *
+     * @param  Notification  $notification
+     * @return string
+     */
+    public function routeNotificationForSlack(Notification $notification): string
+    {
+        return config('integrations.slack.webhooks.dev-alerts');
     }
 }

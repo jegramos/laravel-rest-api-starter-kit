@@ -163,11 +163,7 @@ class Handler extends ExceptionHandler
                 break;
             default:
                 // if we f** up somewhere else
-                // TODO: Reporting
-                Log::error(
-                    'An error was encountered',
-                    ['error_message' => $e->getMessage(), 'error' => $e->getTraceAsString()]
-                );
+                Log::error($e->getMessage(), ['stack_trace' => $e->getTraceAsString()]);
 
                 $body = [
                     'message' => $e->getMessage(),
