@@ -71,7 +71,7 @@ class SystemAlertNotification extends Notification implements ShouldQueue
         $title = config('app.name') . " System Notification: $this->level";
         $message = $this->message;
 
-        return (new SlackMessage)
+        return (new SlackMessage())
             ->error()
             ->attachment(function (SlackAttachment $attachment) use ($title, $message) {
                 $attachment->title($title)->content($message);
