@@ -27,7 +27,6 @@ interface UserServiceInterface
      */
     public function create(array $userInfo): User;
 
-
     /**
      * Update an existing user
      *
@@ -45,4 +44,16 @@ interface UserServiceInterface
      * @return User
      */
     public function updateProfile($id, array $newUserInfo): User;
+
+    /**
+     * Search for a user
+     *
+     * @param string $term
+     * @param PaginationType|null $pagination
+     * @return Collection|Paginator|LengthAwarePaginator|CursorPaginator
+     */
+    public function search(
+        string $term,
+        ?PaginationType $pagination = null
+    ): Collection|Paginator|LengthAwarePaginator|CursorPaginator;
 }

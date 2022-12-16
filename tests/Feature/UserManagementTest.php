@@ -2,21 +2,19 @@
 
 namespace Tests\Feature;
 
-use App\Events\UserCreated;
 use App\Models\Country;
 use App\Models\User;
 use App\Models\UserProfile;
 use App\Notifications\WelcomeNotification;
-use Exception;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Str;
 use Laravel\Sanctum\Sanctum;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
@@ -429,8 +427,8 @@ class UserManagementTest extends TestCase
     /** @throws Throwable */
     public function test_it_can_attach_roles_to_a_user()
     {
-        $firstRole = Role::all()->first()->getAttribute('id');
-        $secondRole = Role::all()->last()->getAttribute('id');
+        $firstRole = Role::query()->where('name', \App\Enums\Role::STANDARD_USER->value)->first()->id;
+        $secondRole = Role::query()->where('name', \App\Enums\Role::ADMIN->value)->first()->id;
         $expectedRoles = ['roles' => [$firstRole, $secondRole]];
 
         $response = $this->post($this->baseUri, array_merge($this->getRequiredUserInputSample(), $expectedRoles));
@@ -440,5 +438,180 @@ class UserManagementTest extends TestCase
         $this->assertEquals(2, count($response['data']['attached_roles']));
         $this->assertTrue(in_array($response['data']['attached_roles'][0]['id'], $expectedRoles['roles']));
         $this->assertTrue(in_array($response['data']['attached_roles'][1]['id'], $expectedRoles['roles']));
+    }
+
+    /** @throws Throwable */
+    public function test_it_can_filter_by_email_while_ignoring_the_case()
+    {
+        $email = uuid_create() . '@email.com';
+        User::factory()->has(UserProfile::factory())->create(['email' => $email]);
+
+        $email = strtoupper($email);
+        $response = $this->get("$this->baseUri?email=$email");
+        $response->assertStatus(200);
+
+        $response = $response->decodeResponseJson();
+        $this->assertCount(1, $response['data']);
+    }
+
+    /** @throws Throwable */
+    public function test_it_can_filter_by_username_while_ignoring_the_case()
+    {
+        $username = uuid_create();
+        User::factory()->has(UserProfile::factory())->create(['username' => $username]);
+
+        $username = strtoupper($username);
+        $response = $this->get("$this->baseUri?username=$username");
+        $response->assertStatus(200);
+
+        $response = $response->decodeResponseJson();
+        $this->assertCount(1, $response['data']);
+    }
+
+    /** @throws Throwable */
+    public function test_it_can_filter_via_email_verified_status()
+    {
+        User::query()->delete();
+
+        // Create 3 unverified accounts, and 2 verified ones
+        User::factory()->has(UserProfile::factory())->count(3)->unVerified()->create();
+        User::factory()->has(UserProfile::factory())->count(2)->create();
+
+        $response = $this->get("$this->baseUri?verified=1");
+        $response->decodeResponseJson();
+        $this->assertEquals(2, count($response['data']));
+
+        $response = $this->get("$this->baseUri?verified=0");
+        $response->decodeResponseJson();
+        $this->assertEquals(3, count($response['data']));
+    }
+
+    /** @throws Throwable */
+    public function test_it_can_filter_via_role_id()
+    {
+        User::query()->delete();
+
+        // Create 5 standard users
+        User::factory()->has(UserProfile::factory())->count(5)->unVerified()->create();
+
+        $superUser = User::first();
+        $role = Role::query()->where('name', '=', \App\Enums\Role::SUPER_USER->value)->first();
+        $superUser->syncRoles($role->id);
+
+        $response = $this->get("$this->baseUri?role=$role->id");
+        $response = $response->decodeResponseJson();
+
+        $this->assertEquals(1, count($response['data']));
+    }
+
+    /** @throws Throwable */
+    public function test_fetch_can_be_sorted_via_last_name()
+    {
+        User::factory()->has(UserProfile::factory())->count(3)->create();
+
+        // test `asc` sort
+        $sortedLastNames = UserProfile::orderBy('last_name')->pluck('last_name')->toArray();
+        $response = $this->get("$this->baseUri?sort=asc&sort_by=user_profile.last_name");
+        $response = $response->decodeResponseJson();
+        $mappedLastNames = array_map(fn ($userProfile) => $userProfile['last_name'], $response['data']);
+        $this->assertEquals($sortedLastNames, $mappedLastNames);
+
+        // test `desc` sort
+        $sortedLastNames = UserProfile::orderBy('last_name', 'desc')->pluck('last_name')->toArray();
+        $response = $this->get("$this->baseUri?sort=desc&sort_by=user_profile.last_name");
+        $response = $response->decodeResponseJson();
+        $mappedLastNames = array_map(fn ($userProfile) => $userProfile['last_name'], $response['data']);
+        $this->assertEquals($sortedLastNames, $mappedLastNames);
+    }
+
+    /** @throws Throwable */
+    public function test_fetch_can_be_sorted_via_first_name()
+    {
+        User::factory()->has(UserProfile::factory())->count(3)->create();
+
+        // test `asc` sort
+        $sortedLastNames = UserProfile::orderBy('first_name')->pluck('first_name')->toArray();
+        $response = $this->get("$this->baseUri?sort=asc&sort_by=user_profile.first_name");
+        $response = $response->decodeResponseJson();
+        $mappedLastNames = array_map(fn ($userProfile) => $userProfile['first_name'], $response['data']);
+        $this->assertEquals($sortedLastNames, $mappedLastNames);
+
+        // test `desc` sort
+        $sortedLastNames = UserProfile::orderBy('first_name', 'desc')->pluck('first_name')->toArray();
+        $response = $this->get("$this->baseUri?sort=desc&sort_by=user_profile.first_name");
+        $response = $response->decodeResponseJson();
+        $mappedLastNames = array_map(fn ($userProfile) => $userProfile['first_name'], $response['data']);
+        $this->assertEquals($sortedLastNames, $mappedLastNames);
+    }
+
+    /**
+     * @throws Throwable
+     */
+    public function test_it_can_search_via_last_name()
+    {
+        User::query()->delete();
+        $last_name = User::factory()->has(UserProfile::factory())->create()->userProfile->last_name;
+
+        $last_name = Str::substr($last_name, 2);
+        $response = $this->get("$this->baseUri/search?query=$last_name");
+        $response = $response->decodeResponseJson();
+        $this->assertEquals(1, count($response['data']));
+    }
+
+    /**
+     * @throws Throwable
+     */
+    public function test_it_can_search_via_first_name()
+    {
+        User::query()->delete();
+        $first_name = User::factory()->has(UserProfile::factory())->create()->userProfile->first_name;
+
+        $first_name = Str::substr($first_name, 2);
+        $response = $this->get("$this->baseUri/search?query=$first_name");
+        $response = $response->decodeResponseJson();
+        $this->assertEquals(1, count($response['data']));
+    }
+
+    /**
+     * @throws Throwable
+     */
+    public function test_it_can_search_via_middle_name()
+    {
+        User::query()->delete();
+        $middle_name = User::factory()->has(UserProfile::factory())->create()->userProfile->middle_name;
+
+        $middle_name = Str::substr($middle_name, 2);
+        $response = $this->get("$this->baseUri/search?query=$middle_name");
+        $response = $response->decodeResponseJson();
+        $this->assertEquals(1, count($response['data']));
+    }
+
+    /**
+     * @throws Throwable
+     */
+    public function test_it_can_prefix_search_via_email()
+    {
+        User::query()->delete();
+        $email = User::factory()->has(UserProfile::factory())->create()->email;
+
+        $email = Str::substr($email, 0, -2);
+        $response = $this->get("$this->baseUri/search?query=$email");
+        $response = $response->decodeResponseJson();
+        $this->assertEquals(1, count($response['data']));
+    }
+
+
+    /**
+     * @throws Throwable
+     */
+    public function test_it_can_prefix_search_via_username()
+    {
+        User::query()->delete();
+        $username = User::factory()->has(UserProfile::factory())->create()->username;
+
+        $username = Str::substr($username, 0, -2);
+        $response = $this->get("$this->baseUri/search?query=$username");
+        $response = $response->decodeResponseJson();
+        $this->assertEquals(1, count($response['data']));
     }
 }
