@@ -52,6 +52,7 @@ class UserRequest extends FormRequest
             'users.update' => $this->getUpdateUserRules(),
             'users.index' => $this->getFetchUsersRules(),
             'users.upload.profile-picture' => $this->getUploadProfilePictureRules(),
+            'users.search' => $this->getSearchUsersRules(),
             default => [],
         };
     }
@@ -91,8 +92,8 @@ class UserRequest extends FormRequest
             'profile_picture_path' => ['string', 'nullable', new DbVarcharMaxLength()],
             'active' => ['nullable', 'boolean'],
             'email_verified' => ['nullable', 'boolean'],
-            'roles' => ['nullable', 'array'],
-            'roles.*' => ['required', 'exists:roles,id']
+            'roles' => ['nullable', 'array', 'max:25'],
+            'roles.*' => ['required', 'exists:roles,id', 'distinct']
         ];
     }
 
@@ -102,11 +103,11 @@ class UserRequest extends FormRequest
     private function getUpdateUserRules(): array
     {
         return [
-            'email' => ['nullable', 'email', 'unique:users,email,' . request('id')],
-            'username' => ['nullable', new AlphaDashDot(), 'max:30', 'unique:users,username,' . request('id')],
-            'password' => ['string', 'nullable', 'confirmed', Password::min(8)->mixedCase()->numbers()],
-            'first_name' => ['string', 'nullable', new DbVarcharMaxLength()],
-            'last_name' => ['string', 'nullable', new DbVarcharMaxLength()],
+            'email' => ['email', 'unique:users,email,' . request('id')],
+            'username' => [new AlphaDashDot(), 'max:30', 'unique:users,username,' . request('id')],
+            'password' => ['string', 'confirmed', Password::min(8)->mixedCase()->numbers()],
+            'first_name' => ['string', new DbVarcharMaxLength()],
+            'last_name' => ['string', new DbVarcharMaxLength()],
             'middle_name' => ['string', 'nullable', new DbVarcharMaxLength()],
             'mobile_number' => [
                 'nullable',
@@ -131,8 +132,8 @@ class UserRequest extends FormRequest
             'profile_picture_path' => ['string', 'nullable', new DbVarcharMaxLength()],
             'active' => ['nullable', 'boolean'],
             'email_verified' => ['nullable', 'boolean'],
-            'roles' => ['nullable', 'array'],
-            'roles.*' => ['required', 'exists:roles,id']
+            'roles' => ['nullable', 'array', 'max:25'],
+            'roles.*' => ['required', 'exists:roles,id', 'distinct']
         ];
     }
 
@@ -143,10 +144,24 @@ class UserRequest extends FormRequest
     {
         return [
             'active' => ['nullable', 'boolean'],
+            'verified' => ['nullable', 'boolean'],
+            'role' => ['nullable', 'integer', 'min:1'],
             'sort' => ['nullable', 'in:asc,desc'],
             'sort_by' => ['nullable', 'string'],
             'limit' => ['nullable', 'int'],
             'page' => ['nullable', 'int'],
+            'email' => ['nullable', 'email'],
+            'username' => ['nullable', 'string']
+        ];
+    }
+
+    /**
+     * User search rules
+     */
+    private function getSearchUsersRules(): array
+    {
+        return [
+            'query' => ['required', 'string']
         ];
     }
 
@@ -165,10 +180,13 @@ class UserRequest extends FormRequest
      */
     protected function prepareForValidation()
     {
-        $this->merge([
-            'email' => strtolower($this->get('email')),
-            'username' => strtolower($this->get('username'))
-        ]);
+        if ($this->has('email')) {
+            $this->merge(['email' => strtolower($this->get('email'))]);
+        }
+
+        if ($this->has('username')) {
+            $this->merge(['username' => strtolower($this->get('username'))]);
+        }
     }
 
     /**
@@ -181,6 +199,7 @@ class UserRequest extends FormRequest
         return [
             'sort.in' => 'The :attribute parameter must be either `asc` or `desc`',
             'active.boolean' => 'The :attribute parameter must be either `1` (for true) or `0` (for false)',
+            'verified.boolean' => 'The :attribute parameter must be either `1` (for true) or `0` (for false)',
             'country_id.exists' => 'The :attribute does not exists',
             'photo.max' => 'The :attribute must not exceed 2MB',
             'roles.array' => 'The :attribute field must be an array of role names',

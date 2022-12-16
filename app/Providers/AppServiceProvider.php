@@ -29,13 +29,12 @@ class AppServiceProvider extends ServiceProvider
         /**
          * Notify developers if query load times reach the threshold
          */
-        $threshold = 700; // in milliseconds
+        $threshold = 5 * 1000; // in milliseconds
         DB::whenQueryingForLongerThan($threshold, function (Connection $connection, QueryExecuted $event) {
             Log::warning('DB query took too long', [
                 'connection_name' => $connection->getName(),
                 'event' => $event
             ]);
-            /** @TODO: Notify development team...*/
         });
     }
 

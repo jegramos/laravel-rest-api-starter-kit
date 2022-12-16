@@ -4,7 +4,7 @@ namespace App\QueryFilters;
 
 use Closure;
 use Exception;
-use Illuminate\Contracts\Database\Query\Builder;
+use Illuminate\Database\Eloquent\Builder;
 
 abstract class Filter
 {

@@ -5,13 +5,10 @@ namespace App\Http\Controllers;
 use App\Enums\ApiErrorCode;
 use App\Http\Requests\AuthRequest;
 use App\Models\User;
-use App\Notifications\Auth\QueuedVerifyEmailNotification;
 use Hash;
-use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\JsonResponse;
 use Laravel\Sanctum\PersonalAccessToken;
-use Mockery\Generator\StringManipulation\Pass\Pass;
 use Password;
 use Str;
 use Symfony\Component\HttpFoundation\Response;
@@ -185,8 +182,6 @@ class AuthController extends ApiController
                 $user->password = $password;
                 $user->setRememberToken(Str::random(60));
                 $user->save();
-
-                event(new PasswordReset($user));
             }
         );
 

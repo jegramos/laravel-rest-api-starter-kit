@@ -5,19 +5,14 @@ namespace App\Services\HttpResources;
 use App\Enums\PaginationType;
 use App\Interfaces\HttpResources\UserServiceInterface;
 use App\Models\User;
-use App\QueryFilters\Active;
-use App\QueryFilters\Sort;
 use Carbon\Carbon;
-use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Contracts\Pagination\Paginator;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Query\Builder;
 use Illuminate\Pagination\CursorPaginator;
-use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
-use Spatie\Permission\Models\Permission;
 use Throwable;
 
 class UserService implements UserServiceInterface
@@ -35,21 +30,8 @@ class UserService implements UserServiceInterface
     public function all(?PaginationType $pagination = null): Collection|Paginator|LengthAwarePaginator|CursorPaginator
     {
         /** @var Builder $users */
-        $users = app(Pipeline::class)
-            ->send($this->model::query()->with('userProfile'))
-            ->through([
-                Active::class,
-                Sort::class,
-            ])
-            ->thenReturn();
-
-        $limit = request('limit') ?? 25;
-        return match ($pagination) {
-            PaginationType::LENGTH_AWARE => $users->paginate($limit),
-            PaginationType::SIMPLE => $users->simplePaginate($limit),
-            PaginationType::CURSOR => $users->cursorPaginate($limit),
-            default => $users->get(),
-        };
+        $users = $this->model->filtered();
+        return $this->buildPagination($pagination, $users);
     }
 
     /**
@@ -139,5 +121,52 @@ class UserService implements UserServiceInterface
 
             return $user;
         }, self::MAX_TRANSACTION_DEADLOCK_ATTEMPTS);
+    }
+
+    /**
+     * Search user via email, username, last_name, first_name, and middle_name
+     *
+     * @param string $term
+     * @param PaginationType|null $pagination
+     * @return Collection|Paginator|LengthAwarePaginator|CursorPaginator
+     */
+    public function search(
+        string          $term,
+        ?PaginationType $pagination = null
+    ): Collection|Paginator|LengthAwarePaginator|CursorPaginator {
+        $users = $this->model::query()
+            ->with('userProfile')
+            ->join('user_profiles', 'user_profiles.user_id', '=', 'users.id')
+
+            // Do a prefix match for username and email to preserve indexing performance
+            ->where('users.email', 'like', "$term%")
+            ->orWhere('users.username', 'like', "$term%")
+
+            // Do a full match search for the names as they have a fullText index in our migrations
+            ->orWhere('user_profiles.first_name', 'like', "%$term%")
+            ->orWhere('user_profiles.last_name', 'like', "%$term%")
+            ->orWhere('user_profiles.middle_name', 'like', "%$term%");
+
+        return $this->buildPagination($pagination, $users);
+    }
+
+    /**
+     * Build pagination
+     *
+     * @param PaginationType|null $pagination
+     * @param Builder $builder
+     * @return Paginator|Collection|LengthAwarePaginator|CursorPaginator
+     */
+    private function buildPagination(
+        ?PaginationType $pagination,
+        Builder         $builder
+    ): Paginator|Collection|LengthAwarePaginator|CursorPaginator {
+        $limit = request('limit') ?? 25;
+        return match ($pagination) {
+            PaginationType::LENGTH_AWARE => $builder->paginate($limit),
+            PaginationType::SIMPLE => $builder->simplePaginate($limit),
+            PaginationType::CURSOR => $builder->cursorPaginate($limit),
+            default => $builder->get(),
+        };
     }
 }

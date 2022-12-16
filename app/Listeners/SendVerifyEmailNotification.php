@@ -8,16 +8,6 @@ use App\Events\UserRegistered;
 class SendVerifyEmailNotification
 {
     /**
-     * Create the event listener.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        //
-    }
-
-    /**
      * Handle the event.
      *
      * @param UserRegistered|UserCreated $event
