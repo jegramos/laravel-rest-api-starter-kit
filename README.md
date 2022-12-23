@@ -5,6 +5,7 @@ Sunrise API is a Laravel 9 RESTFul starter kit for SPA and mobile clients. This 
 - Implementation of Role-based Access Control with [Spatie](https://spatie.be/docs/laravel-permission/v5/introduction)
 - Implementation of CRUD for user profile with profile picture upload
 - Implementation Forgot and Reset Password with Email Notification
+- International phone number validation support
 - Implementation of S3 upload with pre-signed URL
 - System Alert notifications for critical errors/warnings (Email & Slack)
 - Pipeline implementation of HTTP query filters
