@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\AlphaDashDot;
 use App\Rules\DbVarcharMaxLength;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rules\Password;
@@ -32,6 +33,7 @@ class AuthRequest extends FormRequest
             'auth.revoke' => $this->getRevokeAccessRules(),
             'auth.password.forgot' => $this->getForgotPasswordRules(),
             'auth.password.reset' => $this->getResetPasswordRules(),
+            'auth.register' => $this->getRegisterRules(),
             default => []
         };
     }
@@ -87,6 +89,22 @@ class AuthRequest extends FormRequest
             'token' => ['required'],
             'email' => ['required', 'email', 'exists:users,email'],
             'password' => ['string', 'nullable', 'confirmed', Password::min(8)->mixedCase()->numbers()],
+        ];
+    }
+    /**
+     * Get register user rules
+     *
+     * @return array
+     */
+    private function getRegisterRules(): array
+    {
+        return [
+            'email' => ['required', 'email', 'unique:users,email'],
+            'username' => ['required', 'unique:users,username', new AlphaDashDot(), 'max:30'],
+            'password' => ['string', 'required', 'confirmed', 'max:100', Password::min(8)->mixedCase()->numbers()],
+            'first_name' => ['string', 'required', new DbVarcharMaxLength()],
+            'last_name' => ['string', 'required', new DbVarcharMaxLength()],
+            'middle_name' => ['string', 'nullable', new DbVarcharMaxLength()],
         ];
     }
 

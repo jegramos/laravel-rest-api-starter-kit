@@ -65,7 +65,7 @@ class UserRequest extends FormRequest
         return [
             'email' => ['required', 'email', 'unique:users,email'],
             'username' => ['required', 'unique:users,username', new AlphaDashDot(), 'max:30'],
-            'password' => ['string', 'required', 'confirmed', Password::min(8)->mixedCase()->numbers()],
+            'password' => ['string', 'required', 'confirmed', 'max:100', Password::min(8)->mixedCase()->numbers()],
             'first_name' => ['string', 'required', new DbVarcharMaxLength()],
             'last_name' => ['string', 'required', new DbVarcharMaxLength()],
             'middle_name' => ['string', 'nullable', new DbVarcharMaxLength()],
@@ -105,7 +105,7 @@ class UserRequest extends FormRequest
         return [
             'email' => ['email', 'unique:users,email,' . request('id')],
             'username' => [new AlphaDashDot(), 'max:30', 'unique:users,username,' . request('id')],
-            'password' => ['string', 'confirmed', Password::min(8)->mixedCase()->numbers()],
+            'password' => ['string', 'confirmed', 'max:100', Password::min(8)->mixedCase()->numbers()],
             'first_name' => ['string', new DbVarcharMaxLength()],
             'last_name' => ['string', new DbVarcharMaxLength()],
             'middle_name' => ['string', 'nullable', new DbVarcharMaxLength()],

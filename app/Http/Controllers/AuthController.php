@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Enums\ApiErrorCode;
+use App\Events\UserCreated;
 use App\Http\Requests\AuthRequest;
+use App\Interfaces\HttpResources\UserServiceInterface;
 use App\Models\User;
 use Hash;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
@@ -49,6 +51,21 @@ class AuthController extends ApiController
         }
 
         return $this->success(['data' => $data], Response::HTTP_OK);
+    }
+
+    /**
+     * Register a new user
+     *
+     * @param AuthRequest $request
+     * @param UserServiceInterface $userService
+     * @return JsonResponse
+     */
+    public function register(AuthRequest $request, UserServiceInterface $userService): JsonResponse
+    {
+        $user = $userService->create($request->validated());
+
+        UserCreated::dispatch($user);
+        return $this->success(['data' => $user], Response::HTTP_CREATED);
     }
 
     /**
