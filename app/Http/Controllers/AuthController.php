@@ -104,7 +104,7 @@ class AuthController extends ApiController
                 ];
             })
             // only get un-expired tokens
-            ->reject(fn(array $token) => now() >= $token['expires_at'])
+            ->reject(fn (array $token) => now() >= $token['expires_at'])
             ->values();
 
         return $this->success(['data' => $tokens->toArray()], Response::HTTP_OK);
