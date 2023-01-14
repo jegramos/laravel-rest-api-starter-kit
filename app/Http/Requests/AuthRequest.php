@@ -89,6 +89,7 @@ class AuthRequest extends FormRequest
             'token' => ['required'],
             'email' => ['required', 'email', 'exists:users,email'],
             'password' => ['string', 'nullable', 'confirmed', Password::min(8)->mixedCase()->numbers()],
+            'client_name' => ['nullable', 'string', new DbVarcharMaxLength()],
         ];
     }
     /**

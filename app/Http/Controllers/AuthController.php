@@ -38,13 +38,8 @@ class AuthController extends ApiController
         // For the token name, clients can optionally send 'My iPhone14', 'Google Chrome', etc.
         $tokenName = $request->get('client_name') ?? 'api_token';
 
-        /**
-         * We'll set the abilities to allow everything [*]. Authorization will be handled by Spatie
-         * @see https://spatie.be/docs/laravel-permission/v5/introduction
-         */
-        $expiresAt = now()->addHours(12);
-        $token = $user->createToken($tokenName, ['*'], $expiresAt)->plainTextToken;
-        $data = ['token' => $token, 'token_name' => $tokenName, 'expires_at' => $expiresAt];
+        /** @var User $user */
+        $data = $this->bindAuthToken($user, $tokenName);
 
         if ($request->get('with_user')) {
             $data['user'] = $user;
@@ -64,8 +59,14 @@ class AuthController extends ApiController
     {
         $user = $userService->create($request->validated());
 
+        // For the token name, clients can optionally send 'My iPhone14', 'Google Chrome', etc.
+        $tokenName = $request->get('client_name') ?? 'api_token';
+
+        $data = $this->bindAuthToken($user, $tokenName);
+        $data['user'] = $user;
+
         UserCreated::dispatch($user);
-        return $this->success(['data' => $user], Response::HTTP_CREATED);
+        return $this->success(['data' => $data], Response::HTTP_CREATED);
     }
 
     /**
@@ -103,7 +104,7 @@ class AuthController extends ApiController
                 ];
             })
             // only get un-expired tokens
-            ->reject(fn (array $token) => now() >= $token['expires_at'])
+            ->reject(fn(array $token) => now() >= $token['expires_at'])
             ->values();
 
         return $this->success(['data' => $tokens->toArray()], Response::HTTP_OK);
@@ -212,5 +213,25 @@ class AuthController extends ApiController
 
         $data = ['message' => 'Password reset was successful'];
         return $this->success($data, Response::HTTP_OK);
+    }
+
+    /**
+     * Create a token for the user with expiration
+     *
+     * @param User $user
+     * @param string $tokenName
+     * @param int $expires_at_hours
+     *
+     * @return array
+     */
+    private function bindAuthToken(User $user, string $tokenName, int $expires_at_hours = 12): array
+    {
+        /**
+         * We'll set the abilities to allow everything [*]. Authorization will be handled by Spatie
+         * @see https://spatie.be/docs/laravel-permission/v5/introduction
+         */
+        $expiresAt = now()->addHours($expires_at_hours);
+        $token = $user->createToken($tokenName, ['*'], $expiresAt)->plainTextToken;
+        return ['token' => $token, 'token_name' => $tokenName, 'expires_at' => $expiresAt];
     }
 }
