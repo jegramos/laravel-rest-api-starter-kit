@@ -70,7 +70,7 @@ class AuthenticationTest extends TestCase
         $response = $this->postJson("$this->baseUri/register", $input);
         $response->assertStatus(201);
 
-        $createdUser = User::find($response->decodeResponseJson()['data']['id']);
+        $createdUser = User::find($response->decodeResponseJson()['data']['user']['id']);
         Notification::assertSentTo($createdUser, WelcomeNotification::class);
         Notification::assertSentTo($createdUser, QueuedVerifyEmailNotification::class);
     }
@@ -88,7 +88,7 @@ class AuthenticationTest extends TestCase
         ];
 
         $response = $this->postJson("$this->baseUri/register", $input);
-        $roles = $response->decodeResponseJson()['data']['attached_roles'];
+        $roles = $response->decodeResponseJson()['data']['user']['attached_roles'];
         $this->assertEquals(1, count($roles));
         $this->assertEquals(Role::STANDARD_USER->value, $roles[0]['name']);
     }
