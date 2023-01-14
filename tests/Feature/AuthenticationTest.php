@@ -2,9 +2,12 @@
 
 namespace Tests\Feature;
 
+use App\Enums\Role;
 use App\Models\User;
 use App\Models\UserProfile;
 use App\Notifications\Auth\QueuedResetPasswordNotification;
+use App\Notifications\Auth\QueuedVerifyEmailNotification;
+use App\Notifications\WelcomeNotification;
 use Exception;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -27,6 +30,8 @@ class AuthenticationTest extends TestCase
         parent::setUp();
         $this->artisan('db:seed');
 
+        Notification::fake();
+
         $this->userCreds = [
             'email' => 'jegramos-test@sample.com',
             'password' => 'Jeg123123!'
@@ -46,6 +51,46 @@ class AuthenticationTest extends TestCase
         $result = $response->decodeResponseJson();
         $this->assertArrayHasKey('token', $result['data']);
         $response->assertStatus(200);
+    }
+
+    /**
+     * @throws Throwable
+     */
+    public function test_it_can_register_a_user()
+    {
+        $input = [
+            'email' => fake()->unique()->email,
+            'username' => fake()->unique()->userName,
+            'first_name' => fake()->firstName,
+            'last_name' => fake()->lastName,
+            'password' => 'SamplePass123',
+            'password_confirmation' => 'SamplePass123'
+        ];
+
+        $response = $this->postJson("$this->baseUri/register", $input);
+        $response->assertStatus(201);
+
+        $createdUser = User::find($response->decodeResponseJson()['data']['id']);
+        Notification::assertSentTo($createdUser, WelcomeNotification::class);
+        Notification::assertSentTo($createdUser, QueuedVerifyEmailNotification::class);
+    }
+
+    /** @throws Throwable */
+    public function test_a_user_created_via_registration_is_always_a_standard_user()
+    {
+        $input = [
+            'email' => fake()->unique()->email,
+            'username' => fake()->unique()->userName,
+            'first_name' => fake()->firstName,
+            'last_name' => fake()->lastName,
+            'password' => 'SamplePass123',
+            'password_confirmation' => 'SamplePass123'
+        ];
+
+        $response = $this->postJson("$this->baseUri/register", $input);
+        $roles = $response->decodeResponseJson()['data']['attached_roles'];
+        $this->assertEquals(1, count($roles));
+        $this->assertEquals(Role::STANDARD_USER->value, $roles[0]['name']);
     }
 
     /** @throws Throwable */

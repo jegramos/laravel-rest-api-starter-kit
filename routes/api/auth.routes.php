@@ -19,6 +19,9 @@ Route::controller(AuthController::class)->group(function () {
     /** @uses AuthController::revoke */
     Route::middleware(['auth:sanctum', 'verified.api'])->post('tokens/revoke', 'revoke')->name('auth.revoke');
 
+    /** @uses AuthController::register */
+    Route::post('register', 'register')->name('auth.register');
+
     /** @uses AuthController::forgotPassword */
     Route::post('forgot-password', 'forgotPassword')->name('auth.password.forgot');
 

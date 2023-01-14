@@ -3,6 +3,7 @@
 namespace App\Services\HttpResources;
 
 use App\Enums\PaginationType;
+use App\Enums\Role;
 use App\Interfaces\HttpResources\UserServiceInterface;
 use App\Models\User;
 use Carbon\Carbon;
@@ -55,9 +56,9 @@ class UserService implements UserServiceInterface
                 $userCredentials['email_verified_at'] = $userInfo['email_verified'] ? Carbon::now('utc') : null;
             }
 
-            $user = User::create($userCredentials);
+            $user = $this->model::create($userCredentials);
 
-            $userRoles = empty($userInfo['roles']) ? ['standard_user'] : $userInfo['roles'];
+            $userRoles = empty($userInfo['roles']) ? [Role::STANDARD_USER->value] : $userInfo['roles'];
             $user->syncRoles($userRoles);
             // Spatie automatically attaches a roles attr after syncing
             // we don't want it as there is too much clutter sent
