@@ -31,7 +31,7 @@ class QueuedVerifyEmailNotification extends VerifyEmail implements ShouldQueue
     /**
      * Build the mail representation of the notification.
      *
-     * @param  mixed  $notifiable
+     * @param mixed $notifiable
      * @return MailMessage
      */
     public function toMail(mixed $notifiable): MailMessage
@@ -48,7 +48,7 @@ class QueuedVerifyEmailNotification extends VerifyEmail implements ShouldQueue
     /**
      * Get the verify-email notification mail message for the given URL.
      *
-     * @param  string  $url
+     * @param string $url
      * @return MailMessage
      */
     protected function buildMailMessage($url): MailMessage
@@ -74,6 +74,7 @@ class QueuedVerifyEmailNotification extends VerifyEmail implements ShouldQueue
             return call_user_func(static::$createUrlCallback, $notifiable);
         }
 
+        // this returns https://<api.domain.com>/api/v1/auth/email/verify/<id>/<hash>?expires=<value>&signature=<value>
         $apiRoute = URL::temporarySignedRoute(
             'verification.verify',
             Carbon::now()->addMinutes(Config::get('auth.verification.expire', 60)),
@@ -84,7 +85,14 @@ class QueuedVerifyEmailNotification extends VerifyEmail implements ShouldQueue
             false
         );
 
+        // returns /api/v1/auth/email/verify/1/1
+        $apiBase = route('verification.verify', ['id' => 1, 'hash' => 1], false);
+
+        // strip the id and hash value
+        $apiBase = explode('1/1', $apiBase)[0];
+
+        // transform to: https://spa.domain.com/auth/verify-email/<id>/<hash>?expires=<value>&signature=<value>
         $frontEndUrl = config('clients.web.url.verify-email');
-        return $frontEndUrl . '/' . explode('/api/v1/auth/email/verify/', $apiRoute)[1];
+        return $frontEndUrl . '/' . explode($apiBase, $apiRoute)[1];
     }
 }
