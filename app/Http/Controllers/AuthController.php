@@ -142,7 +142,7 @@ class AuthController extends ApiController
     public function verifyEmail(EmailVerificationRequest $request): JsonResponse
     {
         $request->fulfill();
-        return $this->success(['message' => 'Email successfully verified'], Response::HTTP_UNAUTHORIZED);
+        return $this->success(['message' => 'Email successfully verified'], Response::HTTP_OK);
     }
 
     /**
