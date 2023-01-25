@@ -34,7 +34,7 @@ Route::controller(AuthController::class)->group(function () {
         ->name('auth.verification.resend');
 
     /** @uses AuthController::verifyEmail */
-    Route::middleware(['signed'])
+    Route::middleware(['auth:sanctum', 'signed:relative'])
         ->get('email/verify/{id}/{hash}', 'verifyEmail')
         ->name('verification.verify');
 });
