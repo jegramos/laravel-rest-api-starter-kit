@@ -182,7 +182,7 @@ class AuthController extends ApiController
             );
         }
 
-        $data = ['message' => 'Email verification sent', 'email' => $request->get('email')];
+        $data = ['message' => 'Password reset request sent', 'email' => $request->get('email')];
         return $this->success($data, Response::HTTP_OK);
     }
 

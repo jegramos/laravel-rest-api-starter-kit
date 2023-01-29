@@ -107,9 +107,4 @@ return [
     */
 
     'password_timeout' => 10800,
-
-    /**
-     * Custom configs
-     */
-    'front_end_reset_password_url' => env('FRONT_END_RESET_PASSWORD_URL')
 ];
