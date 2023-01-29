@@ -52,7 +52,7 @@ class QueuedResetPasswordNotification extends ResetPassword implements ShouldQue
             return call_user_func(static::$createUrlCallback, $notifiable, $this->token);
         }
 
-        $frontendUrl = config('auth.front_end_reset_password_url');
+        $frontendUrl = config('clients.web.url.reset-password');
         $frontendUrl .= '?token=' . $this->token . '&email=' . urlencode($notifiable->getEmailForPasswordReset());
         return $frontendUrl;
     }
