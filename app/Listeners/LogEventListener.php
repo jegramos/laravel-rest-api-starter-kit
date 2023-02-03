@@ -27,8 +27,8 @@ class LogEventListener
      */
     public function handle(MessageLogged $event): void
     {
-        // Only send email notifications when in prod or testing
-        if (!in_array(app()->environment(), ['production', 'local'])) {
+        // Only send email notifications when in prod, uat, or development
+        if (!in_array(app()->environment(), ['production', 'uat', 'development'])) {
             return;
         }
 
