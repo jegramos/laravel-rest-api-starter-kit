@@ -48,8 +48,8 @@ class ProfileRequest extends FormRequest
     public function getUpdateProfileRule(): array
     {
         return [
-            'email' => ['nullable', 'email', 'unique:users,email,' . request('id')],
-            'username' => ['nullable', new AlphaDashDot(), 'max:30', 'unique:users,username,' . request('id')],
+            'email' => ['nullable', 'email', 'unique:users,email,' . auth()->id()],
+            'username' => ['nullable', new AlphaDashDot(), 'max:30', 'unique:users,username,' . auth()->id()],
             'first_name' => ['string', 'nullable', new DbVarcharMaxLength()],
             'last_name' => ['string', 'nullable', new DbVarcharMaxLength()],
             'middle_name' => ['string', 'nullable', new DbVarcharMaxLength()],
