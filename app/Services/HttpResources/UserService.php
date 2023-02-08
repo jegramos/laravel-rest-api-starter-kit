@@ -97,7 +97,6 @@ class UserService implements UserServiceInterface
                 $user->syncRoles($newUserInfo['roles']);
             }
 
-            $user->save();
             $user->refresh();
 
             return $user;
@@ -116,8 +115,6 @@ class UserService implements UserServiceInterface
 
             $user->update(Arr::only($newUserInfo, ['email', 'username']));
             $user->userProfile()->update(Arr::except($newUserInfo, ['email', 'username']));
-
-            $user->save();
             $user->refresh();
 
             return $user;
