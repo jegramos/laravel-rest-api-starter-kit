@@ -31,7 +31,7 @@ class UserPolicy
     public function delete(User $user, User $targetUser): Response
     {
         if ($targetUser->hasRole(Role::SUPER_USER->value)) {
-            return Response::deny();
+            return Response::deny('A super user cannot be deleted.');
         }
 
         return Response::allow();
@@ -47,7 +47,7 @@ class UserPolicy
     public function update(User $user, User $targetUser): Response
     {
         if ($targetUser->hasRole(Role::SUPER_USER->value)) {
-            return Response::deny();
+            return Response::deny('A super user cannot be updated.');
         }
 
         return Response::allow();
