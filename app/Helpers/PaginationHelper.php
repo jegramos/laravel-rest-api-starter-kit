@@ -34,10 +34,10 @@ class PaginationHelper
     /**
      * Re-arrange Laravel's paginate(), simplePaginate(), and cursorPaginate() methods for a cleaner API response
      *
-     * @param AbstractPaginator $paginator
+     * @param CursorPaginator|AbstractPaginator $paginator
      * @return array
      */
-    public function formatPagination(AbstractPaginator $paginator): array
+    public function formatPagination(CursorPaginator|AbstractPaginator $paginator): array
     {
         $data = $paginator->toArray();
 

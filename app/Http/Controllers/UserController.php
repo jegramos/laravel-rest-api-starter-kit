@@ -79,10 +79,7 @@ class UserController extends ApiController
      */
     public function update($id, UserRequest $request): JsonResponse
     {
-        if (!$this->authorize('update', User::findOrFail($id))) {
-            throw new AuthorizationException('A Super User cannot be updated');
-        }
-
+        $this->authorize('update', User::findOrFail($id));
         $user = $this->userService->update($id, $request->validated());
         return $this->success(['data' => $user], Response::HTTP_OK);
     }
@@ -96,10 +93,7 @@ class UserController extends ApiController
      */
     public function destroy($id): JsonResponse
     {
-        if (!$this->authorize('update', User::findOrFail($id))) {
-            throw new AuthorizationException('A Super User cannot be deleted');
-        }
-
+        $this->authorize('delete', User::findOrFail($id));
         User::findOrFail($id)->delete();
         return $this->success(null, Response::HTTP_NO_CONTENT);
     }
