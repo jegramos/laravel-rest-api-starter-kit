@@ -182,13 +182,6 @@ class UserManagementTest extends TestCase
                 continue;
             }
 
-            // format birthday as ISO for correct checking
-            if ($key === 'birthday') {
-                $value = Carbon::create($value)->toISOString();
-                $this->assertEquals($value, $response['data']['user_profile']['birthday']);
-                continue;
-            }
-
             // profile details are wrapped with a `user_profile` field
             if (!in_array($key, ['username', 'email', 'active'])) {
                 $result = $response['data']['user_profile'][$key];
