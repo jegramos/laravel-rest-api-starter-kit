@@ -76,7 +76,7 @@ class UserProfile extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'birthday' => 'date',
+        'birthday' => 'date:Y-m-d',
         'sex' => SexualCategory::class, // Laravel 9 enum casting. @see https://laravel.com/docs/9.x/releases
     ];
 
