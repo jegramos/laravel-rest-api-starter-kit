@@ -10,6 +10,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Enum;
 use Illuminate\Validation\Rules\Password;
+use Propaganistas\LaravelPhone\Rules\Phone as PhoneRule;
 
 class UserRequest extends FormRequest
 {
@@ -72,12 +73,12 @@ class UserRequest extends FormRequest
             'mobile_number' => [
                 'nullable',
                 new InternationalPhoneNumberFormat(),
-                Rule::phone()->detect()->country('PH')->mobile()
+                (new PhoneRule())->lenient()->country('PH')->mobile()
             ],
             'telephone_number' => [
                 'nullable',
                 new InternationalPhoneNumberFormat(),
-                Rule::phone()->detect()->country('PH')->fixedLine()
+                (new PhoneRule())->lenient()->country('PH')->fixedLine()
             ],
             'sex' => ['nullable', new Enum(SexualCategory::class)],
             'birthday' => ['nullable', 'date_format:Y-m-d', 'before_or_equal:' . $this->dateToday],
@@ -112,12 +113,12 @@ class UserRequest extends FormRequest
             'mobile_number' => [
                 'nullable',
                 new InternationalPhoneNumberFormat(),
-                Rule::phone()->detect()->country('PH')->mobile()
+                (new PhoneRule())->lenient()->country('PH')->mobile()
             ],
             'telephone_number' => [
                 'nullable',
                 new InternationalPhoneNumberFormat(),
-                Rule::phone()->detect()->country('PH')->fixedLine()
+                (new PhoneRule())->lenient()->country('PH')->fixedLine()
             ],
             'sex' => ['nullable', new Enum(SexualCategory::class)],
             'birthday' => ['nullable', 'date_format:Y-m-d', 'before_or_equal:' . $this->dateToday],
