@@ -73,12 +73,12 @@ class UserRequest extends FormRequest
             'mobile_number' => [
                 'nullable',
                 new InternationalPhoneNumberFormat(),
-                (new PhoneRule())->lenient()->country('PH')->mobile()
+                (new PhoneRule())->country('PH')->mobile()
             ],
             'telephone_number' => [
                 'nullable',
                 new InternationalPhoneNumberFormat(),
-                (new PhoneRule())->lenient()->country('PH')->fixedLine()
+                (new PhoneRule())->country('PH')->fixedLine()
             ],
             'sex' => ['nullable', new Enum(SexualCategory::class)],
             'birthday' => ['nullable', 'date_format:Y-m-d', 'before_or_equal:' . $this->dateToday],
@@ -113,12 +113,12 @@ class UserRequest extends FormRequest
             'mobile_number' => [
                 'nullable',
                 new InternationalPhoneNumberFormat(),
-                (new PhoneRule())->lenient()->country('PH')->mobile()
+                (new PhoneRule())->country('PH')->mobile()
             ],
             'telephone_number' => [
                 'nullable',
                 new InternationalPhoneNumberFormat(),
-                (new PhoneRule())->lenient()->country('PH')->fixedLine()
+                (new PhoneRule())->country('PH')->fixedLine()
             ],
             'sex' => ['nullable', new Enum(SexualCategory::class)],
             'birthday' => ['nullable', 'date_format:Y-m-d', 'before_or_equal:' . $this->dateToday],
