@@ -413,8 +413,8 @@ class UserManagementTest extends TestCase
         $response = $this->post($this->baseUri, $this->getRequiredUserInputSample());
         $response = $response->decodeResponseJson();
 
-        $this->assertEquals(1, count($response['data']['attached_roles']));
-        $this->assertEquals(\App\Enums\Role::STANDARD_USER->value, $response['data']['attached_roles'][0]['name']);
+        $this->assertEquals(1, count($response['data']['roles']));
+        $this->assertEquals(\App\Enums\Role::STANDARD_USER->value, $response['data']['roles'][0]['name']);
     }
 
     /** @throws Throwable */
@@ -428,9 +428,9 @@ class UserManagementTest extends TestCase
         $response->assertStatus(201);
 
         $response = $response->decodeResponseJson();
-        $this->assertEquals(2, count($response['data']['attached_roles']));
-        $this->assertTrue(in_array($response['data']['attached_roles'][0]['id'], $expectedRoles['roles']));
-        $this->assertTrue(in_array($response['data']['attached_roles'][1]['id'], $expectedRoles['roles']));
+        $this->assertEquals(2, count($response['data']['roles']));
+        $this->assertTrue(in_array($response['data']['roles'][0]['id'], $expectedRoles['roles']));
+        $this->assertTrue(in_array($response['data']['roles'][1]['id'], $expectedRoles['roles']));
     }
 
     /** @throws Throwable */

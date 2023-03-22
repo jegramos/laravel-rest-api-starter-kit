@@ -24,7 +24,6 @@ use Illuminate\Notifications\Notification;
 use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Sanctum\HasApiTokens;
-use Spatie\Permission\Models\Role;
 use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
@@ -70,12 +69,12 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
     ];
 
     /**
-     * Dynamic computed attributes
+     * The attributes that should be eager-loaded
      *
      * @var array<int, string>
      */
-    protected $appends = [
-        'attached_roles',
+    protected $with = [
+        'roles:id,name'
     ];
 
     /**
@@ -137,19 +136,6 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
     public function password(): Attribute
     {
         return Attribute::set(fn ($value) => Hash::make($value));
-    }
-
-    /**
-     * @Appended
-     * Attach role names with their IDs
-     *
-     * @return Attribute
-     */
-    public function attachedRoles(): Attribute
-    {
-        return Attribute::get(function () {
-            return $this->roles()->get()->map(fn (Role $role) => ['id' => $role->id, 'name' => $role->name]);
-        });
     }
 
     /**

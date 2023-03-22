@@ -88,7 +88,7 @@ class AuthenticationTest extends TestCase
         ];
 
         $response = $this->postJson("$this->baseUri/register", $input);
-        $roles = $response->decodeResponseJson()['data']['user']['attached_roles'];
+        $roles = $response->decodeResponseJson()['data']['user']['roles'];
         $this->assertEquals(1, count($roles));
         $this->assertEquals(Role::STANDARD_USER->value, $roles[0]['name']);
     }
