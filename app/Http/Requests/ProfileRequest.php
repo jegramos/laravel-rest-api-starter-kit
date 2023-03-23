@@ -14,6 +14,21 @@ use Propaganistas\LaravelPhone\Rules\Phone as PhoneRule;
 
 class ProfileRequest extends FormRequest
 {
+    private string $dateToday;
+
+    public function __construct(
+        array $query = [],
+        array $request = [],
+        array $attributes = [],
+        array $cookies = [],
+        array $files = [],
+        array $server = [],
+        $content = null
+    ) {
+        parent::__construct($query, $request, $attributes, $cookies, $files, $server, $content);
+        $this->dateToday = date('Y-m-d');
+    }
+
     /**
      * Determine if the user is authorized to make this request.
      *
