@@ -30,9 +30,6 @@ class QueuedVerifyEmailNotification extends VerifyEmail implements ShouldQueue
 
     /**
      * Build the mail representation of the notification.
-     *
-     * @param mixed $notifiable
-     * @return MailMessage
      */
     public function toMail(mixed $notifiable): MailMessage
     {
@@ -48,14 +45,13 @@ class QueuedVerifyEmailNotification extends VerifyEmail implements ShouldQueue
     /**
      * Get the verify-email notification mail message for the given URL.
      *
-     * @param string $url
-     * @return MailMessage
+     * @param  string  $url
      */
     protected function buildMailMessage($url): MailMessage
     {
         return (new MailMessage())
             ->subject(Lang::get('Verify Your Email Address'))
-            ->greeting('Hey, ' . $this->notifiableName)
+            ->greeting('Hey, '.$this->notifiableName)
             ->line(Lang::get('Please click the button below to verify your email address.'))
             ->action(Lang::get('Verify Email Address'), $url)
             ->line(Lang::get('If you did not create an account, please ignore this email.'));
@@ -65,7 +61,6 @@ class QueuedVerifyEmailNotification extends VerifyEmail implements ShouldQueue
      * Overwrite the default verification URL as it points back to the
      * API endpoint and not the SPA
      *
-     * @param $notifiable
      * @return mixed|string
      */
     protected function verificationUrl($notifiable): mixed
@@ -93,6 +88,7 @@ class QueuedVerifyEmailNotification extends VerifyEmail implements ShouldQueue
 
         // transform to: https://spa.domain.com/auth/verify-email/<id>/<hash>?expires=<value>&signature=<value>
         $frontEndUrl = config('clients.web.url.verify-email');
-        return $frontEndUrl . '/' . explode($apiBase, $apiRoute)[1];
+
+        return $frontEndUrl.'/'.explode($apiBase, $apiRoute)[1];
     }
 }

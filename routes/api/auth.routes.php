@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 
 /**
  *  This uses Laravel 9 Route group controllers
+ *
  *  @see https://laravel.com/docs/9.x/routing#route-group-controllers
  */
 Route::controller(AuthController::class)->group(function () {

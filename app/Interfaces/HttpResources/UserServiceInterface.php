@@ -13,44 +13,26 @@ interface UserServiceInterface
 {
     /**
      * Fetch a list of users
-     *
-     * @param PaginationType|null $pagination
-     * @return Collection|Paginator|LengthAwarePaginator|CursorPaginator
      */
     public function all(?PaginationType $pagination = null): Collection|Paginator|LengthAwarePaginator|CursorPaginator;
 
     /**
      * Create a new user
-     *
-     * @param array $userInfo
-     * @return User
      */
     public function create(array $userInfo): User;
 
     /**
      * Update an existing user
-     *
-     * @param $id
-     * @param array $newUserInfo
-     * @return User
      */
     public function update($id, array $newUserInfo): User;
 
     /**
      * Update the profile information of a user
-     *
-     * @param $id
-     * @param array $newUserInfo
-     * @return User
      */
     public function updateProfile($id, array $newUserInfo): User;
 
     /**
      * Search for a user
-     *
-     * @param string $term
-     * @param PaginationType|null $pagination
-     * @return Collection|Paginator|LengthAwarePaginator|CursorPaginator
      */
     public function search(
         string $term,

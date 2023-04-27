@@ -97,7 +97,7 @@ class UserServiceTest extends TestCase
             'province' => 'Province 1',
             'postal_code' => $this->faker->postcode,
             'country' => $this->faker->country,
-            'profile_picture_path' => $this->faker->filePath
+            'profile_picture_path' => $this->faker->filePath,
         ];
     }
 }

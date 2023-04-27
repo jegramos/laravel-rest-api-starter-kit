@@ -6,23 +6,17 @@ grumphp:
   parallel:
     enabled: false
   tasks:
-    laravel_cs_fixer:
+    laravel_pint:
       ide_helper: true
     securitychecker_enlightn:
       lockfile: ./composer.lock
       run_always: false
-    phpcs:
-      standard: [ PSR1, PSR2, PSR12 ]
-      whitelist_patterns: [ /^app\/(.*)/ ]
-      report: full
-      metadata:
-        priority: 1
     phpunit:
       always_execute: true
 services:
-  App\Services\Grump\LaravelPhpCsFixer:
+  App\Services\Grump\LaravelPint:
     arguments:
       - '@process_builder'
       - '@formatter.raw_process'
     tags:
-      - { name: grumphp.task, task: laravel_cs_fixer, priority: 2 }
+      - { name: grumphp.task, task: laravel_pint, priority: 1 }

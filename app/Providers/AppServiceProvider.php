@@ -13,13 +13,12 @@ class AppServiceProvider extends ServiceProvider
 {
     /**
      * Register any application services.
-     *
-     * @return void
      */
     public function register(): void
     {
         /**
          * Load IDE helper for non-production environment
+         *
          * @see https://github.com/barryvdh/laravel-ide-helper
          */
         if ($this->app->isLocal()) {
@@ -33,15 +32,13 @@ class AppServiceProvider extends ServiceProvider
         DB::whenQueryingForLongerThan($threshold, function (Connection $connection, QueryExecuted $event) {
             Log::warning('DB query took too long', [
                 'connection_name' => $connection->getName(),
-                'event' => $event
+                'event' => $event,
             ]);
         });
     }
 
     /**
      * Bootstrap any application services.
-     *
-     * @return void
      */
     public function boot(): void
     {

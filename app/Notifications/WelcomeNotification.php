@@ -25,9 +25,6 @@ class WelcomeNotification extends Notification implements ShouldQueue
 
     /**
      * Get the notification's delivery channels.
-     *
-     * @param mixed $notifiable
-     * @return array
      */
     public function via(mixed $notifiable): array
     {
@@ -37,16 +34,14 @@ class WelcomeNotification extends Notification implements ShouldQueue
     /**
      * @Channel
      * Get the mail representation of the notification.
-     *
-     * @param mixed $notifiable
-     * @return MailMessage
      */
     public function toMail(mixed $notifiable): MailMessage
     {
-        $emailVerified = !$notifiable->email_verified_at;
+        $emailVerified = ! $notifiable->email_verified_at;
+
         return (new MailMessage())
             ->subject(Lang::get('Welcome aboard!'))
-            ->greeting('Welcome to Sunrise, ' . $notifiable->userProfile->first_name)
+            ->greeting('Welcome to Sunrise, '.$notifiable->userProfile->first_name)
             ->line(Lang::get('Your account has been successfully created!'))
             ->lineIf(
                 $emailVerified,
@@ -59,9 +54,6 @@ class WelcomeNotification extends Notification implements ShouldQueue
 
     /**
      * Get the array representation of the notification.
-     *
-     * @param mixed $notifiable
-     * @return array
      */
     public function toArray(mixed $notifiable): array
     {

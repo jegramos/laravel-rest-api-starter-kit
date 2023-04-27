@@ -10,7 +10,7 @@ class Verified extends Filter
     public const FILTER_NAME = 'verified';
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     protected function applyFilter(Builder $builder): Builder
     {
@@ -24,7 +24,7 @@ class Verified extends Filter
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     protected function getFilterName(): string
     {

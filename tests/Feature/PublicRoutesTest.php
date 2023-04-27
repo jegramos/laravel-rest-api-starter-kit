@@ -26,7 +26,7 @@ class PublicRoutesTest extends TestCase
         $email = strtoupper(fake()->email);
         User::factory()->has(UserProfile::factory())->create(['email' => $email]);
 
-        $response = $this->get(self::BASE_API_URI . '/availability/email?value=' . strtoupper($email));
+        $response = $this->get(self::BASE_API_URI.'/availability/email?value='.strtoupper($email));
         $response->assertStatus(200);
 
         $response = $response->decodeResponseJson();
@@ -39,7 +39,7 @@ class PublicRoutesTest extends TestCase
         $username = strtoupper(fake()->userName);
         User::factory()->has(UserProfile::factory())->create(['username' => $username]);
 
-        $response = $this->get(self::BASE_API_URI . '/availability/username?value=' . strtolower($username));
+        $response = $this->get(self::BASE_API_URI.'/availability/username?value='.strtolower($username));
         $response->assertStatus(200);
 
         $response = $response->decodeResponseJson();
@@ -49,7 +49,7 @@ class PublicRoutesTest extends TestCase
     /** @throws Throwable */
     public function test_user_can_retrieve_a_list_of_countries()
     {
-        $response = $this->get(self::BASE_API_URI . '/countries');
+        $response = $this->get(self::BASE_API_URI.'/countries');
         $response->assertStatus(200);
 
         $response = $response->decodeResponseJson();

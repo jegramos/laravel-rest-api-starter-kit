@@ -11,8 +11,6 @@ class AuthRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return bool
      */
     public function authorize(): bool
     {
@@ -40,8 +38,6 @@ class AuthRequest extends FormRequest
 
     /**
      * Get the login rules
-     *
-     * @return array
      */
     private function getLoginRules(): array
     {
@@ -49,39 +45,33 @@ class AuthRequest extends FormRequest
             'email' => ['required', 'email'],
             'password' => ['required', 'string'],
             'client_name' => ['nullable', 'string', new DbVarcharMaxLength()],
-            'with_user' => ['nullable', 'bool'] // send the token back with user information
+            'with_user' => ['nullable', 'bool'], // send the token back with user information
         ];
     }
 
     /**
      * Get revoke access rules
-     *
-     * @return array
      */
     private function getRevokeAccessRules(): array
     {
         return [
             'token_ids' => ['required', 'array'],
-            'token_ids.*' => ['required']
+            'token_ids.*' => ['required'],
         ];
     }
 
     /**
      * Get forgot password rules
-     *
-     * @return array
      */
     private function getForgotPasswordRules(): array
     {
         return [
-            'email' => ['required', 'email', 'exists:users,email']
+            'email' => ['required', 'email', 'exists:users,email'],
         ];
     }
 
     /**
      * Get forgot password rules
-     *
-     * @return array
      */
     private function getResetPasswordRules(): array
     {
@@ -92,10 +82,9 @@ class AuthRequest extends FormRequest
             'client_name' => ['nullable', 'string', new DbVarcharMaxLength()],
         ];
     }
+
     /**
      * Get register user rules
-     *
-     * @return array
      */
     private function getRegisterRules(): array
     {
@@ -111,13 +100,11 @@ class AuthRequest extends FormRequest
 
     /**
      * Custom validation messages
-     *
-     * @return array
      */
     public function messages(): array
     {
         return [
-            'email.exists' => 'The :attribute is not registered'
+            'email.exists' => 'The :attribute is not registered',
         ];
     }
 }

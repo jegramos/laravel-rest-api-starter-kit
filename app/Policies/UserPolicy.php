@@ -23,10 +23,6 @@ class UserPolicy
 
     /**
      * Superusers cannot be deleted
-     *
-     * @param User $user
-     * @param User $targetUser
-     * @return Response
      */
     public function delete(User $user, User $targetUser): Response
     {
@@ -39,10 +35,6 @@ class UserPolicy
 
     /**
      * Superusers cannot be edited
-     *
-     * @param User $user
-     * @param User $targetUser
-     * @return Response
      */
     public function update(User $user, User $targetUser): Response
     {

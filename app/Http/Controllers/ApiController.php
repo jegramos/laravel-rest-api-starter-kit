@@ -9,29 +9,18 @@ abstract class ApiController extends Controller
 {
     /**
      * Return a success JSON success response.
-     *
-     * @param array|null $data
-     * @param int $statusCode
-     * @param array $headers
-     * @return JsonResponse
      */
     protected function success(?array $data, int $statusCode, array $headers = []): JsonResponse
     {
         $data = $data ?? [];
 
         $results = array_merge(['success' => true], $data);
+
         return response()->json($results, $statusCode, $headers);
     }
 
     /**
      * Return a formatted JSON error response
-     *
-     * @param string $message
-     * @param int $statusCode
-     * @param ApiErrorCode|null $errorCode
-     * @param array $errors
-     * @param array $headers
-     * @return JsonResponse
      */
     protected function error(
         string $message,
@@ -46,7 +35,7 @@ abstract class ApiController extends Controller
             'error_message' => $message,
         ];
 
-        if (!empty($errors)) {
+        if (! empty($errors)) {
             $results['errors'] = $errors;
         }
 

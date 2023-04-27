@@ -22,33 +22,26 @@ class ProfileController extends ApiController
 
     /**
      * Fetch the user information of the currently authenticated user
-     *
-     * @return JsonResponse
      */
     public function view(): JsonResponse
     {
         $user = User::findOrFail(auth()->user()->id)->load('userProfile');
+
         return $this->success(['data' => $user], Response::HTTP_OK);
     }
 
     /**
      * Update the authenticated user's profile
-     *
-     * @param ProfileRequest $request
-     * @return JsonResponse
      */
     public function update(ProfileRequest $request): JsonResponse
     {
         $user = $this->userService->update(auth()->user()->id, $request->validated());
+
         return $this->success(['data' => $user], Response::HTTP_OK);
     }
 
     /**
      * Upload profile picture
-     *
-     * @param ProfileRequest $request
-     * @param CloudFileServiceInterface $uploader
-     * @return JsonResponse
      */
     public function uploadProfilePicture(ProfileRequest $request, CloudFileServiceInterface $uploader): JsonResponse
     {
@@ -63,16 +56,13 @@ class ProfileController extends ApiController
 
     /**
      * Change user password
-     *
-     * @param ProfileRequest $request
-     * @return JsonResponse
      */
     public function changePassword(ProfileRequest $request): JsonResponse
     {
         /** @var User $user */
         $user = auth()->user();
 
-        if (!Hash::check($request->get('old_password'), $user->password)) {
+        if (! Hash::check($request->get('old_password'), $user->password)) {
             return $this->error(
                 'Old password is incorrect',
                 Response::HTTP_UNPROCESSABLE_ENTITY,

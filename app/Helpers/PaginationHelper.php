@@ -11,16 +11,13 @@ use InvalidArgumentException;
 
 /**
  * Please use the facade registered
+ *
  * @see \App\Providers\FacadeServiceProvider
  */
 class PaginationHelper
 {
     /**
      * Append the other URL query inputs
-     *
-     * @param string|null $url
-     * @param array $except
-     * @return string|null
      */
     private function appendUrlQueryInputs(?string $url, array $except = ['page']): ?string
     {
@@ -28,14 +25,11 @@ class PaginationHelper
             return null;
         }
 
-        return $url . '&' . http_build_query(Arr::except(request()->all(), $except));
+        return $url.'&'.http_build_query(Arr::except(request()->all(), $except));
     }
 
     /**
      * Re-arrange Laravel's paginate(), simplePaginate(), and cursorPaginate() methods for a cleaner API response
-     *
-     * @param CursorPaginator|AbstractPaginator $paginator
-     * @return array
      */
     public function formatPagination(CursorPaginator|AbstractPaginator $paginator): array
     {
@@ -62,9 +56,6 @@ class PaginationHelper
      * Re-arrange Laravel's paginate() method results for a cleaner API response
      * Convert an Illuminate\Contracts\Pagination\LengthAwarePaginator instance to an array and pass as the argument
      * ex. Model::select('name')->paginate()->toArray()
-     *
-     * @param array $results
-     * @return array
      */
     public function formatLengthAwarePagination(array $results): array
     {
@@ -94,9 +85,6 @@ class PaginationHelper
      * Re-arrange Laravel's simplePaginate() method results for a cleaner API response
      * Convert an Illuminate\Contracts\Pagination\Paginator instance to an array and pass as the argument
      * ex. Model::select('name')->simplePaginate()->toArray()
-     *
-     * @param array $results
-     * @return array
      */
     public function formatSimplePagination(array $results): array
     {
@@ -122,9 +110,6 @@ class PaginationHelper
      * Re-arrange Laravel's simplePaginate() method results for a cleaner API response.
      * Convert an Illuminate\Contracts\Pagination\CursorPaginator instance to an array and pass as the argument
      * ex. Model::select('name')->cursorPaginate()->toArray()
-     *
-     * @param array $results
-     * @return array
      */
     public function formatCursorPagination(array $results): array
     {

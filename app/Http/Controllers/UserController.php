@@ -27,8 +27,6 @@ class UserController extends ApiController
     /**
      * Display a listing of users
      *
-     * @param UserRequest $request
-     * @return JsonResponse
      *
      * @noinspection PhpUnusedParameterInspection
      */
@@ -36,14 +34,12 @@ class UserController extends ApiController
     {
         $users = $this->userService->all(PaginationType::LENGTH_AWARE);
         $formatted = PaginationHelper::formatPagination($users);
+
         return $this->success($formatted, Response::HTTP_OK);
     }
 
     /**
      * Persist a user record
-     *
-     * @param UserRequest $request
-     * @return JsonResponse
      */
     public function store(UserRequest $request): JsonResponse
     {
@@ -54,57 +50,48 @@ class UserController extends ApiController
 
         $user = $this->userService->create($request->validated());
         UserCreated::dispatch($user);
+
         return $this->success(['data' => $user], Response::HTTP_CREATED);
     }
 
     /**
      * Fetch a single user's details
-     *
-     * @param $id
-     * @return JsonResponse
      */
     public function read($id): JsonResponse
     {
         $user = User::with('userProfile')->findOrFail($id);
+
         return $this->success(['data' => $user], Response::HTTP_OK);
     }
 
     /**
      * Update a user
      *
-     * @param $id
-     * @param UserRequest $request
-     * @return JsonResponse
      * @throws AuthorizationException
      */
     public function update($id, UserRequest $request): JsonResponse
     {
         $this->authorize('update', User::findOrFail($id));
         $user = $this->userService->update($id, $request->validated());
+
         return $this->success(['data' => $user], Response::HTTP_OK);
     }
 
     /**
      * Delete a user
      *
-     * @param $id
-     * @return JsonResponse
      * @throws AuthorizationException
      */
     public function destroy($id): JsonResponse
     {
         $this->authorize('delete', User::findOrFail($id));
         User::findOrFail($id)->delete();
+
         return $this->success(null, Response::HTTP_NO_CONTENT);
     }
 
     /**
      * Upload profile picture
-     *
-     * @param $id
-     * @param UserRequest $request
-     * @param CloudFileServiceInterface $uploader
-     * @return JsonResponse
      */
     public function uploadProfilePicture($id, UserRequest $request, CloudFileServiceInterface $uploader): JsonResponse
     {
@@ -117,27 +104,23 @@ class UserController extends ApiController
 
     /**
      * Search for a user via name, email, or username
-     *
-     * @param UserRequest $request
-     * @return JsonResponse
      */
     public function search(UserRequest $request): JsonResponse
     {
         $users = $this->userService->search($request->get('query'));
+
         return $this->success(['data' => $users], Response::HTTP_OK);
     }
 
     /**
      * Check if the provided roles have super_user
-     *
-     * @param UserRequest $request
-     * @return bool
      */
     private function rolesHaveSuperUser(UserRequest $request): bool
     {
         // super_users cannot be created
         $roles = $request->get('roles');
         $superAdminRole = Role::findByName(\App\Enums\Role::SUPER_USER->value, 'sanctum');
-        return !empty($roles) && in_array($superAdminRole->id, $roles);
+
+        return ! empty($roles) && in_array($superAdminRole->id, $roles);
     }
 }

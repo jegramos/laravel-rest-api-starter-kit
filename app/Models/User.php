@@ -37,12 +37,14 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
 
     /**
      * Requirement by Spatie Laravel Permissions when setting multiple auth guards
+     *
      * @see https://spatie.be/docs/laravel-permission/v5/basic-usage/multiple-guards
      */
     public $guard_name = 'sanctum';
 
     /** @see https://github.com/shiftonelabs/laravel-cascade-deletes */
     protected array $cascadeDeletes = ['userProfile'];
+
     protected $dates = ['deleted_at'];
 
     /**
@@ -55,7 +57,7 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
         'username',
         'password',
         'active',
-        'email_verified_at'
+        'email_verified_at',
     ];
 
     /**
@@ -74,7 +76,7 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
      * @var array<int, string>
      */
     protected $with = [
-        'roles:id,name'
+        'roles:id,name',
     ];
 
     /**
@@ -84,7 +86,7 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
-        'active' => 'boolean'
+        'active' => 'boolean',
     ];
 
     protected static function boot()
@@ -119,8 +121,6 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
 
     /**
      * A User has exactly one profile information
-     *
-     * @return HasOne
      */
     public function userProfile(): HasOne
     {
@@ -130,8 +130,6 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
     /**
      * @Attribute
      * Hash the password whenever it is changed
-     *
-     * @return Attribute
      */
     public function password(): Attribute
     {
@@ -140,8 +138,6 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
 
     /**
      * Set username to lowercase
-     *
-     * @return Attribute
      */
     public function username(): Attribute
     {
@@ -150,8 +146,6 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
 
     /**
      * Set username to lowercase
-     *
-     * @return Attribute
      */
     public function email(): Attribute
     {
@@ -177,9 +171,6 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
     /**
      * @SlackIntegration
      * Route notifications for the Slack channel.
-     *
-     * @param  Notification  $notification
-     * @return string
      */
     public function routeNotificationForSlack(Notification $notification): string
     {

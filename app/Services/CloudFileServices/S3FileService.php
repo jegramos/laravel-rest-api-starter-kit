@@ -9,12 +9,12 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class S3FileService implements CloudFileServiceInterface
 {
-    /** @inheritDoc */
+    /** {@inheritDoc} */
     public function upload($ownerId, UploadedFile $file, ?string $parentDir = null, ?string $childDir = null): array
     {
         $topPath = $parentDir ? "$parentDir/" : '';
         $childPath = $childDir ? "/$childDir" : '';
-        $fullPath = $topPath . $ownerId . $childPath;
+        $fullPath = $topPath.$ownerId.$childPath;
 
         $s3Path = Storage::disk('s3')->put($fullPath, $file);
 
@@ -26,11 +26,11 @@ class S3FileService implements CloudFileServiceInterface
         return [
             'owner_id' => $ownerId,
             'path' => $s3Path,
-            'url' => $this->generateTmpUrl($s3Path, 60)
+            'url' => $this->generateTmpUrl($s3Path, 60),
         ];
     }
 
-    /** @inheritDoc */
+    /** {@inheritDoc} */
     public function delete(string $path): bool
     {
         return Storage::disk('s3')->deleteDirectory($path);
@@ -38,11 +38,10 @@ class S3FileService implements CloudFileServiceInterface
 
     /**
      * Generate a presigned URL
+     *
      * @see https://docs.aws.amazon.com/AmazonS3/latest/userguide/ShareObjectPreSignedURL.html
      *
-     * @param $path
-     * @param int $timeLimit (in seconds)
-     * @return string
+     * @param  int  $timeLimit (in seconds)
      */
     public function generateTmpUrl($path, int $timeLimit): string
     {
