@@ -61,7 +61,7 @@ class CodeFormatter extends Command
 
         $this->info("\u{1F9FA} Code cleanup done!");
 
-        // Add changes to git if success
+        // Add changes to Git if success
         if ($exitCode === Command::SUCCESS) {
             exec('git add .');
         }
