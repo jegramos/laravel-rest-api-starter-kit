@@ -46,7 +46,6 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
 
     /**
      * @Library
-     *
      * @see https://github.com/shiftonelabs/laravel-cascade-deletes
      */
     protected array $cascadeDeletes = ['userProfile'];

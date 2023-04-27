@@ -14,7 +14,8 @@ class CodeFormatter extends Command
      */
     protected $signature = 'app:styler
                            {--i|ide_helper : Run style fixer with barryvdh/laravel-ide-helper}
-                           {--t|test       : Run the style fixer without changing the files}';
+                           {--t|test       : Run the style fixer without changing the files}
+                           {--a|add        : Add the formatting changes to Git}';
 
     /**
      * The console command description.
@@ -62,7 +63,7 @@ class CodeFormatter extends Command
         $this->info("\u{1F9FA} Code cleanup done!");
 
         // Add changes to Git if success
-        if ($exitCode === Command::SUCCESS) {
+        if ($exitCode === Command::SUCCESS && ! $this->option('test') && $this->option('add')) {
             exec('git add .');
         }
 
