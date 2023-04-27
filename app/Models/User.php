@@ -7,6 +7,7 @@ use App\Notifications\Auth\QueuedVerifyEmailNotification;
 use App\QueryFilters\Generic\Active;
 use App\QueryFilters\Generic\Sort;
 use App\QueryFilters\User\Email;
+use App\QueryFilters\User\Role;
 use App\QueryFilters\User\Username;
 use App\QueryFilters\User\Verified;
 use DateTimeHelper;
@@ -36,13 +37,18 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
     use CascadeSoftDeletes;
 
     /**
+     * @Library
      * Requirement by Spatie Laravel Permissions when setting multiple auth guards
      *
      * @see https://spatie.be/docs/laravel-permission/v5/basic-usage/multiple-guards
      */
-    public $guard_name = 'sanctum';
+    public string $guard_name = 'sanctum';
 
-    /** @see https://github.com/shiftonelabs/laravel-cascade-deletes */
+    /**
+     * @Library
+     *
+     * @see https://github.com/shiftonelabs/laravel-cascade-deletes
+     */
     protected array $cascadeDeletes = ['userProfile'];
 
     protected $dates = ['deleted_at'];
@@ -89,7 +95,7 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
         'active' => 'boolean',
     ];
 
-    protected static function boot()
+    protected static function boot(): void
     {
         parent::boot();
 
@@ -114,7 +120,7 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
                 Username::class,
                 Email::class,
                 Verified::class,
-                \App\QueryFilters\User\Role::class,
+                Role::class,
             ])
             ->thenReturn();
     }

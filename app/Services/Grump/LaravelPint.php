@@ -40,7 +40,7 @@ class LaravelPint extends AbstractExternalTask
     {
         /** @see \App\Console\Commands\CodeFormatter */
         $config = $this->getConfig()->getOptions();
-        $command = 'php artisan app:styler -i';
+        $command = 'php artisan app:styler -i -a';
 
         if (! $config['ide_helper']) {
             $command = 'php artisan app:styler';
