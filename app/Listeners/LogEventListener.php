@@ -16,19 +16,16 @@ class LogEventListener
         'error' => 5,
         'critical' => 6,
         'alert' => 7,
-        'emergency' => 8
+        'emergency' => 8,
     ];
 
     /**
      * Handle the event.
-     *
-     * @param MessageLogged $event
-     * @return void
      */
     public function handle(MessageLogged $event): void
     {
         // Only send email notifications when in prod, uat, or development
-        if (!in_array(app()->environment(), ['production', 'uat', 'development'])) {
+        if (! in_array(app()->environment(), ['production', 'uat', 'development'])) {
             return;
         }
 

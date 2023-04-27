@@ -15,7 +15,6 @@ class DateTimeHelperTest extends TestCase
         $this->dateTimeHelper = new DateTimeHelper();
     }
 
-
     /** @dataProvider stringSamples */
     public function test_it_can_append_current_timestamp_with_a_separator(array $input)
     {
@@ -31,7 +30,7 @@ class DateTimeHelperTest extends TestCase
         $timeStamp = explode('::', $string)[1];
 
         $datetime = date('Y-m-d', $timeStamp);
-        $this->assertTrue(!!strtotime($datetime));
+        $this->assertTrue((bool) strtotime($datetime));
     }
 
     public function stringSamples(): array
@@ -40,7 +39,7 @@ class DateTimeHelperTest extends TestCase
             [['message1', null]],
             [['another message', '-']],
             [['message number 3', '_']],
-            [['message_number_4', '::']]
+            [['message_number_4', '::']],
         ];
     }
 }

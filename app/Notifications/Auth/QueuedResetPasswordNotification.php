@@ -23,7 +23,6 @@ class QueuedResetPasswordNotification extends ResetPassword implements ShouldQue
      * Get the reset password notification mail message for the given URL.
      *
      * @param  string  $url
-     * @return MailMessage
      */
     protected function buildMailMessage($url): MailMessage
     {
@@ -35,7 +34,7 @@ class QueuedResetPasswordNotification extends ResetPassword implements ShouldQue
             ->action(Lang::get('Reset Password'), $url)
             ->line(Lang::get(
                 'This password reset link will expire in :count minutes.',
-                ['count' => config('auth.passwords.' . config('auth.defaults.passwords') . '.expire')]
+                ['count' => config('auth.passwords.'.config('auth.defaults.passwords').'.expire')]
             ))
             ->line(Lang::get('If you did not request a password reset, no further action is required.'));
     }
@@ -44,7 +43,6 @@ class QueuedResetPasswordNotification extends ResetPassword implements ShouldQue
      * Get the reset URL for the given notifiable.
      *
      * @param  mixed  $notifiable
-     * @return string
      */
     protected function resetUrl($notifiable): string
     {
@@ -53,7 +51,8 @@ class QueuedResetPasswordNotification extends ResetPassword implements ShouldQue
         }
 
         $frontendUrl = config('clients.web.url.reset-password');
-        $frontendUrl .= '?token=' . $this->token . '&email=' . urlencode($notifiable->getEmailForPasswordReset());
+        $frontendUrl .= '?token='.$this->token.'&email='.urlencode($notifiable->getEmailForPasswordReset());
+
         return $frontendUrl;
     }
 }

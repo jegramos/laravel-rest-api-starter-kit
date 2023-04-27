@@ -29,8 +29,6 @@ class UserFactory extends Factory
 
     /**
      * Attach a standard user role after creating or making a user model
-     *
-     * @return UserFactory
      */
     public function configure(): UserFactory
     {
@@ -44,8 +42,6 @@ class UserFactory extends Factory
     /**
      * @State
      * User is suspended
-     *
-     * @return Factory
      */
     public function suspended(): Factory
     {
@@ -57,8 +53,6 @@ class UserFactory extends Factory
     /**
      * @State
      * User has their email unverified
-     *
-     * @return Factory
      */
     public function unVerified(): Factory
     {

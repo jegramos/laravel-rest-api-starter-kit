@@ -17,7 +17,9 @@ class PaginationHelperTest extends TestCase
     use WithFaker;
 
     private PaginationHelper $paginationHelper;
+
     private UserServiceInterface $userRepository;
+
     private int $usersCount;
 
     protected function setUp(): void
@@ -34,7 +36,7 @@ class PaginationHelperTest extends TestCase
         $expectedFields = [
             'total', 'current_page', 'last_page',
             'first_page_url', 'next_page_url', 'prev_page_url',
-            'last_page_url', 'from', 'to', 'per_page', 'path'
+            'last_page_url', 'from', 'to', 'per_page', 'path',
         ];
         $this->assertTrue(Arr::has($results['pagination'], $expectedFields));
     }

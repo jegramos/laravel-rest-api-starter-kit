@@ -19,7 +19,7 @@ return [
         |
         */
         'webhooks' => [
-            'dev-alerts' => env('SLACK_INCOMING_WEBHOOK_DEV_ALERTS')
-        ]
-    ]
+            'dev-alerts' => env('SLACK_INCOMING_WEBHOOK_DEV_ALERTS'),
+        ],
+    ],
 ];

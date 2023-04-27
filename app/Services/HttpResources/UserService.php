@@ -27,16 +27,18 @@ class UserService implements UserServiceInterface
         $this->model = $model;
     }
 
-    /** @inheritDoc */
+    /** {@inheritDoc} */
     public function all(?PaginationType $pagination = null): Collection|Paginator|LengthAwarePaginator|CursorPaginator
     {
         /** @var Builder $users */
         $users = $this->model->filtered();
+
         return $this->buildPagination($pagination, $users);
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
+     *
      * @throws Throwable
      */
     public function create(array $userInfo): User
@@ -70,7 +72,8 @@ class UserService implements UserServiceInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
+     *
      * @throws Throwable
      */
     public function update($id, array $newUserInfo): User
@@ -102,7 +105,8 @@ class UserService implements UserServiceInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
+     *
      * @throws Throwable
      */
     public function updateProfile($id, array $newUserInfo): User
@@ -121,13 +125,9 @@ class UserService implements UserServiceInterface
 
     /**
      * Search user via email, username, last_name, first_name, and middle_name
-     *
-     * @param string $term
-     * @param PaginationType|null $pagination
-     * @return Collection|Paginator|LengthAwarePaginator|CursorPaginator
      */
     public function search(
-        string          $term,
+        string $term,
         ?PaginationType $pagination = null
     ): Collection|Paginator|LengthAwarePaginator|CursorPaginator {
         $users = $this->model::query()
@@ -148,16 +148,13 @@ class UserService implements UserServiceInterface
 
     /**
      * Build pagination
-     *
-     * @param PaginationType|null $pagination
-     * @param Builder $builder
-     * @return Paginator|Collection|LengthAwarePaginator|CursorPaginator
      */
     private function buildPagination(
         ?PaginationType $pagination,
-        Builder         $builder
+        Builder $builder
     ): Paginator|Collection|LengthAwarePaginator|CursorPaginator {
         $limit = request('limit') ?? 25;
+
         return match ($pagination) {
             PaginationType::LENGTH_AWARE => $builder->paginate($limit),
             PaginationType::SIMPLE => $builder->simplePaginate($limit),

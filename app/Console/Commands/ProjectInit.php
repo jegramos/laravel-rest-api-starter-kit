@@ -22,8 +22,6 @@ class ProjectInit extends Command
 
     /**
      * Execute the console command.
-     *
-     * @return int
      */
     public function handle(): int
     {
@@ -31,6 +29,7 @@ class ProjectInit extends Command
         $this->call('migrate:refresh');
         $this->call('db:seed');
         $this->call('app:styler', ['--ide_helper' => true]);
+
         return Command::SUCCESS;
     }
 }

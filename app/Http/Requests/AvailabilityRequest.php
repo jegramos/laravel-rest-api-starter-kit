@@ -8,8 +8,6 @@ class AvailabilityRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return bool
      */
     public function authorize(): bool
     {
@@ -24,6 +22,7 @@ class AvailabilityRequest extends FormRequest
     public function rules(): array
     {
         $routeName = $this->route()->getName();
+
         return match ($routeName) {
             'availability.email' => $this->getEmailAvailabilityRules(),
             'availability.username' => $this->getUsernameAvailabilityRues(),
@@ -33,25 +32,21 @@ class AvailabilityRequest extends FormRequest
 
     /**
      * Get email availability rules
-     *
-     * @return array
      */
     private function getEmailAvailabilityRules(): array
     {
         return [
-            'value' => ['required', 'email']
+            'value' => ['required', 'email'],
         ];
     }
 
     /**
      * Get username availability
-     *
-     * @return array
      */
     private function getUsernameAvailabilityRues(): array
     {
         return [
-            'value' => ['required']
+            'value' => ['required'],
         ];
     }
 }

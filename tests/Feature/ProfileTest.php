@@ -9,7 +9,6 @@ use App\Models\UserProfile;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
@@ -20,7 +19,7 @@ class ProfileTest extends TestCase
     use RefreshDatabase;
     use WithFaker;
 
-    private string $baseUri = self::BASE_API_URI . '/profile';
+    private string $baseUri = self::BASE_API_URI.'/profile';
 
     protected function setUp(): void
     {
@@ -34,8 +33,6 @@ class ProfileTest extends TestCase
 
     /**
      * A basic feature test example.
-     *
-     * @return void
      */
     public function test_user_can_view_profile(): void
     {
@@ -64,7 +61,7 @@ class ProfileTest extends TestCase
             'district' => 'District 1',
             'city' => 'City 1',
             'province' => 'Province 1',
-            'postal_code' => '221'
+            'postal_code' => '221',
         ];
 
         $response = $this->patchJson($this->baseUri, $edits);
@@ -75,6 +72,7 @@ class ProfileTest extends TestCase
             // check for credentials correctness
             if (in_array($key, ['username', 'email'])) {
                 $this->assertEquals($value, $result['data'][$key]);
+
                 continue;
             }
 
@@ -82,6 +80,7 @@ class ProfileTest extends TestCase
             if ($key === 'country_id') {
                 $result = $response['data']['user_profile']['country']['id'];
                 $this->assertEquals($value, $result);
+
                 continue;
             }
 
@@ -111,14 +110,14 @@ class ProfileTest extends TestCase
         $input = [
             'old_password' => $oldPassword,
             'password' => $newPassword,
-            'password_confirmation' => $newPassword
+            'password_confirmation' => $newPassword,
         ];
         $result = $this->patchJson("$this->baseUri/password", $input);
         $result->assertStatus(200);
 
         // login again with the new password
         $creds = ['email' => $this->user->email, 'password' => $newPassword];
-        $response = $this->post("api/v1/auth/tokens", $creds);
+        $response = $this->post('api/v1/auth/tokens', $creds);
         $response->assertStatus(200);
     }
 }

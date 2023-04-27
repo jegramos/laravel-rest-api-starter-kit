@@ -10,12 +10,11 @@ class CountryController extends ApiController
 {
     /**
      * Retrieve all countries
-     *
-     * @return JsonResponse
      */
     public function fetch(): JsonResponse
     {
         $countries = Country::all();
+
         return $this->success(['data' => $countries], Response::HTTP_OK);
     }
 }

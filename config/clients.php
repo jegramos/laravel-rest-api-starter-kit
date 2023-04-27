@@ -21,7 +21,7 @@ return [
         'url' => [
             'base' => env('FRONT_END_URL'),
             'reset-password' => env('FRONT_END_RESET_PASSWORD_URL'),
-            'verify-email' => env('FRONT_END_VERIFY_EMAIL_URL')
+            'verify-email' => env('FRONT_END_VERIFY_EMAIL_URL'),
         ],
-    ]
+    ],
 ];

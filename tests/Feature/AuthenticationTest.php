@@ -21,8 +21,10 @@ class AuthenticationTest extends TestCase
     use RefreshDatabase;
     use WithFaker;
 
-    private string $baseUri = self::BASE_API_URI . '/auth';
+    private string $baseUri = self::BASE_API_URI.'/auth';
+
     private array $userCreds;
+
     private User $user;
 
     public function setUp(): void
@@ -34,7 +36,7 @@ class AuthenticationTest extends TestCase
 
         $this->userCreds = [
             'email' => 'jegramos-test@sample.com',
-            'password' => 'Jeg123123!'
+            'password' => 'Jeg123123!',
         ];
 
         $this->user = User::factory($this->userCreds)->has(UserProfile::factory())->create();
@@ -64,7 +66,7 @@ class AuthenticationTest extends TestCase
             'first_name' => fake()->firstName,
             'last_name' => fake()->lastName,
             'password' => 'SamplePass123',
-            'password_confirmation' => 'SamplePass123'
+            'password_confirmation' => 'SamplePass123',
         ];
 
         $response = $this->postJson("$this->baseUri/register", $input);
@@ -84,7 +86,7 @@ class AuthenticationTest extends TestCase
             'first_name' => fake()->firstName,
             'last_name' => fake()->lastName,
             'password' => 'SamplePass123',
-            'password_confirmation' => 'SamplePass123'
+            'password_confirmation' => 'SamplePass123',
         ];
 
         $response = $this->postJson("$this->baseUri/register", $input);
@@ -99,7 +101,7 @@ class AuthenticationTest extends TestCase
         $response = $this->post("$this->baseUri/tokens", [
             'email' => $this->userCreds['email'],
             'password' => $this->userCreds['password'],
-            'with_user' => true
+            'with_user' => true,
         ]);
 
         $result = $response->decodeResponseJson();
@@ -114,7 +116,7 @@ class AuthenticationTest extends TestCase
         $response = $this->post("$this->baseUri/tokens", [
             'email' => $this->userCreds['email'],
             'password' => $this->userCreds['password'],
-            'client_name' => $clientName
+            'client_name' => $clientName,
         ]);
 
         $result = $response->decodeResponseJson();
@@ -199,7 +201,7 @@ class AuthenticationTest extends TestCase
             'token' => $token,
             'email' => $this->user->email,
             'password' => $newPassword,
-            'password_confirmation' => $newPassword
+            'password_confirmation' => $newPassword,
         ];
 
         $response = $this->postJson("$this->baseUri/reset-password", $input);

@@ -35,8 +35,6 @@ class CreateUser extends Command
 
     /**
      * Execute the console command.
-     *
-     * @return int
      */
     public function handle(): int
     {
@@ -63,6 +61,7 @@ class CreateUser extends Command
             Validator::validate($data, $createUserRules);
         } catch (ValidationException $e) {
             $this->error($e->getMessage());
+
             return Command::FAILURE;
         }
 
@@ -74,8 +73,6 @@ class CreateUser extends Command
 
     /**
      * Get all roles in the database
-     *
-     * @return array
      */
     public function getAllRoles(): array
     {
