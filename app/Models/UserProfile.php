@@ -45,7 +45,7 @@ class UserProfile extends Model
      * @var array<int, string>
      */
     protected $with = [
-        'country'
+        'country',
     ];
 
     /**
@@ -55,7 +55,7 @@ class UserProfile extends Model
      */
     protected $appends = [
         'full_name',
-        'profile_picture_url'
+        'profile_picture_url',
     ];
 
     /**
@@ -67,7 +67,7 @@ class UserProfile extends Model
         'id',
         'user_id',
         'country_id',
-        'profile_picture_path'
+        'profile_picture_path',
     ];
 
     /**
@@ -103,8 +103,6 @@ class UserProfile extends Model
     /**
      * @Appended
      * Create full_name attribute
-     *
-     * @return Attribute
      */
     public function fullName(): Attribute
     {
@@ -124,17 +122,16 @@ class UserProfile extends Model
     /**
      * @Appended
      * Create a profile_picture_url attribute
-     *
-     * @return Attribute
      */
     public function profilePictureUrl(): Attribute
     {
         return Attribute::get(function () {
-            if (!$this->profile_picture_path) {
+            if (! $this->profile_picture_path) {
                 return null;
             }
 
             $cloudFileManager = resolve(CloudFileServiceInterface::class);
+
             return $cloudFileManager->generateTmpUrl($this->profile_picture_path, 60 * 3);
         });
     }

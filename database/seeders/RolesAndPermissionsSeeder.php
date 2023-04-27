@@ -11,8 +11,6 @@ class RolesAndPermissionsSeeder extends Seeder
 {
     /**
      * Run the database seeds.
-     *
-     * @return void
      */
     public function run(): void
     {
@@ -43,6 +41,7 @@ class RolesAndPermissionsSeeder extends Seeder
 
         /**
          * Superuser role. We allow all permissions through here
+         *
          * @see \App\Providers\AuthServiceProvider
          *
          * @var Role $superUserRole

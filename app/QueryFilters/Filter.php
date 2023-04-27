@@ -15,7 +15,7 @@ abstract class Filter
      */
     public function handle(Builder $request, Closure $next): Builder
     {
-        if (!request()->has($this->getFilterName())) {
+        if (! request()->has($this->getFilterName())) {
             return $next($request);
         }
 
@@ -26,16 +26,11 @@ abstract class Filter
 
     /**
      * Get the filter name
-     *
-     * @return string
      */
     abstract protected function getFilterName(): string;
 
     /**
      * Apply the query filter
-     *
-     * @param Builder $builder
-     * @return Builder
      */
     abstract protected function applyFilter(Builder $builder): Builder;
 }

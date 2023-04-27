@@ -31,8 +31,6 @@ class UserRequest extends FormRequest
 
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return bool
      */
     public function authorize(): bool
     {
@@ -73,15 +71,15 @@ class UserRequest extends FormRequest
             'mobile_number' => [
                 'nullable',
                 new InternationalPhoneNumberFormat(),
-                (new PhoneRule())->country('PH')->mobile()
+                (new PhoneRule())->country('PH')->mobile(),
             ],
             'telephone_number' => [
                 'nullable',
                 new InternationalPhoneNumberFormat(),
-                (new PhoneRule())->country('PH')->fixedLine()
+                (new PhoneRule())->country('PH')->fixedLine(),
             ],
             'sex' => ['nullable', new Enum(SexualCategory::class)],
-            'birthday' => ['nullable', 'date_format:Y-m-d', 'before_or_equal:' . $this->dateToday],
+            'birthday' => ['nullable', 'date_format:Y-m-d', 'before_or_equal:'.$this->dateToday],
             'address_line_1' => ['string', 'nullable', new DbVarcharMaxLength()],
             'address_line_2' => ['string', 'nullable', new DbVarcharMaxLength()],
             'address_line_3' => ['string', 'nullable', new DbVarcharMaxLength()],
@@ -94,7 +92,7 @@ class UserRequest extends FormRequest
             'active' => ['nullable', 'boolean'],
             'email_verified' => ['nullable', 'boolean'],
             'roles' => ['nullable', 'array', 'max:25'],
-            'roles.*' => ['required', 'exists:roles,id', 'distinct']
+            'roles.*' => ['required', 'exists:roles,id', 'distinct'],
         ];
     }
 
@@ -104,8 +102,8 @@ class UserRequest extends FormRequest
     private function getUpdateUserRules(): array
     {
         return [
-            'email' => ['email', 'unique:users,email,' . request('id')],
-            'username' => [new AlphaDashDot(), 'max:30', 'unique:users,username,' . request('id')],
+            'email' => ['email', 'unique:users,email,'.request('id')],
+            'username' => [new AlphaDashDot(), 'max:30', 'unique:users,username,'.request('id')],
             'password' => ['string', 'confirmed', 'max:100', Password::min(8)->mixedCase()->numbers()],
             'first_name' => ['string', new DbVarcharMaxLength()],
             'last_name' => ['string', new DbVarcharMaxLength()],
@@ -113,15 +111,15 @@ class UserRequest extends FormRequest
             'mobile_number' => [
                 'nullable',
                 new InternationalPhoneNumberFormat(),
-                (new PhoneRule())->country('PH')->mobile()
+                (new PhoneRule())->country('PH')->mobile(),
             ],
             'telephone_number' => [
                 'nullable',
                 new InternationalPhoneNumberFormat(),
-                (new PhoneRule())->country('PH')->fixedLine()
+                (new PhoneRule())->country('PH')->fixedLine(),
             ],
             'sex' => ['nullable', new Enum(SexualCategory::class)],
-            'birthday' => ['nullable', 'date_format:Y-m-d', 'before_or_equal:' . $this->dateToday],
+            'birthday' => ['nullable', 'date_format:Y-m-d', 'before_or_equal:'.$this->dateToday],
             'address_line_1' => ['string', 'nullable', new DbVarcharMaxLength()],
             'address_line_2' => ['string', 'nullable', new DbVarcharMaxLength()],
             'address_line_3' => ['string', 'nullable', new DbVarcharMaxLength()],
@@ -134,7 +132,7 @@ class UserRequest extends FormRequest
             'active' => ['nullable', 'boolean'],
             'email_verified' => ['nullable', 'boolean'],
             'roles' => ['nullable', 'array', 'max:25'],
-            'roles.*' => ['required', 'exists:roles,id', 'distinct']
+            'roles.*' => ['required', 'exists:roles,id', 'distinct'],
         ];
     }
 
@@ -152,7 +150,7 @@ class UserRequest extends FormRequest
             'limit' => ['nullable', 'int'],
             'page' => ['nullable', 'int'],
             'email' => ['nullable', 'email'],
-            'username' => ['nullable', 'string']
+            'username' => ['nullable', 'string'],
         ];
     }
 
@@ -162,7 +160,7 @@ class UserRequest extends FormRequest
     private function getSearchUsersRules(): array
     {
         return [
-            'query' => ['required', 'string']
+            'query' => ['required', 'string'],
         ];
     }
 
@@ -172,7 +170,7 @@ class UserRequest extends FormRequest
     private function getUploadProfilePictureRules(): array
     {
         return [
-            'photo' => ['max:2048', 'required', 'image'] // 2Mb max
+            'photo' => ['max:2048', 'required', 'image'], // 2Mb max
         ];
     }
 
@@ -192,8 +190,6 @@ class UserRequest extends FormRequest
 
     /**
      * Custom message for validation
-     *
-     * @return array
      */
     public function messages(): array
     {
@@ -207,11 +203,11 @@ class UserRequest extends FormRequest
             'roles.*.exists' => 'The role ID does not exists',
 
             /** @see https://github.com/Propaganistas/Laravel-Phone#validation */
-            'mobile_number.phone' => "The :attribute field format must be a valid mobile number",
-            'telephone_number.phone' => "The :attribute field format must be a valid line number",
+            'mobile_number.phone' => 'The :attribute field format must be a valid mobile number',
+            'telephone_number.phone' => 'The :attribute field format must be a valid line number',
 
             // As of writing, we need to add the namespace for the enum rule
-            'sex.Illuminate\Validation\Rules\Enum' => 'Valid values for the :attribute field are `male` and `female`.'
+            'sex.Illuminate\Validation\Rules\Enum' => 'Valid values for the :attribute field are `male` and `female`.',
         ];
     }
 }

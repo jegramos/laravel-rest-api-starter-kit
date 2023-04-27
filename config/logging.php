@@ -128,5 +128,5 @@ return [
     |
     */
 
-    'event_listener_level' => env('LOG_EVENT_LISTENER_LEVEL')
+    'event_listener_level' => env('LOG_EVENT_LISTENER_LEVEL'),
 ];

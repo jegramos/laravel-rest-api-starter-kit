@@ -29,12 +29,11 @@ class WelcomeMessageMail extends Mailable implements ShouldQueue
 
     /**
      * Get the message envelope.
-     *
-     * @return Envelope
      */
     public function envelope(): Envelope
     {
         $firstName = $this->user->userProfile->first_name;
+
         return new Envelope(
             subject: "Welcome Aboard, $firstName",
         );
@@ -42,8 +41,6 @@ class WelcomeMessageMail extends Mailable implements ShouldQueue
 
     /**
      * Get the message content definition.
-     *
-     * @return Content
      */
     public function content(): Content
     {
@@ -54,8 +51,6 @@ class WelcomeMessageMail extends Mailable implements ShouldQueue
 
     /**
      * Get the attachments for the message.
-     *
-     * @return array
      */
     public function attachments(): array
     {

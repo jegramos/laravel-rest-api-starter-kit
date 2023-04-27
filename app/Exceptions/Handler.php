@@ -53,8 +53,6 @@ class Handler extends ExceptionHandler
 
     /**
      * Register the exception handling callbacks for the application.
-     *
-     * @return void
      */
     public function register(): void
     {
@@ -66,14 +64,13 @@ class Handler extends ExceptionHandler
     /**
      * Modify some of Laravel's default error responses
      *
-     * @param Request $request
-     * @param Throwable $e
-     * @return Response
+     * @param  Request  $request
+     *
      * @throws Throwable
      */
     public function render($request, Throwable $e): Response
     {
-        if (!$request->is('api/*')) {
+        if (! $request->is('api/*')) {
             return parent::render($request, $e);
         }
 
@@ -82,9 +79,6 @@ class Handler extends ExceptionHandler
 
     /**
      * Create a JSON error response based on Exception
-     *
-     * @param Throwable $e
-     * @return JsonResponse
      */
     private function createApiErrorResponse(Throwable $e): JsonResponse
     {
@@ -111,7 +105,7 @@ class Handler extends ExceptionHandler
                         'success' => false,
                         'message' => 'A validation error has occurred',
                         'error_code' => ApiErrorCode::VALIDATION,
-                        'errors' => $this->transformErrors($e)
+                        'errors' => $this->transformErrors($e),
                     ],
                     Response::HTTP_UNPROCESSABLE_ENTITY
                 );
@@ -155,7 +149,7 @@ class Handler extends ExceptionHandler
                 $response = response()->json(
                     [
                         'success' => false,
-                        'message' => "Request is too large",
+                        'message' => 'Request is too large',
                         'error_code' => ApiErrorCode::PAYLOAD_TOO_LARGE,
                     ],
                     Response::HTTP_REQUEST_ENTITY_TOO_LARGE

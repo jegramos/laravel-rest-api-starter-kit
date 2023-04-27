@@ -14,7 +14,7 @@ class CodeFormatter extends Command
      */
     protected $signature = 'app:styler
                            {--i|ide_helper : Run style fixer with barryvdh/laravel-ide-helper}
-                           {--c|check      : Run the style fixer without changing the files}';
+                           {--t|test       : Run the style fixer without changing the files}';
 
     /**
      * The console command description.
@@ -25,32 +25,36 @@ class CodeFormatter extends Command
 
     /**
      * Execute the console command.
+     *
      * @see https://github.com/stechstudio/Laravel-PHP-CS-Fixer
      * @see https://github.com/barryvdh/laravel-ide-helper
-     *
-     * @return int
      */
     public function handle(): int
     {
-        $fixer_args = $this->option('check') ? ['--dry-run' => true, '--diff' => true] : [];
-        $commands = [
-            ['cmd' => 'fixer:fix', 'args' => $fixer_args]
-        ];
-
-        if ($this->option('ide_helper')) {
-            $commands[] = ['cmd' => 'ide-helper:generate', 'args' => []];
-            $commands[] = ['cmd' => 'ide-helper:meta', 'args' => []];
-            $commands[] = ['cmd' => 'ide-helper:models', 'args' => ['--nowrite' => true]];
-        }
+        $pintTestArg = $this->option('test') ? '--test' : '';
+        $pintCommand = 'vendor/bin/pint '.$pintTestArg;
 
         $this->info("\u{1F9F9} Cleaning up your dirty code...");
-
         $exitCode = Command::SUCCESS;
-        foreach ($commands as $command) {
+
+        exec($pintCommand, $output, $exitCode);
+
+        foreach ($output as $message) {
+            echo $message.PHP_EOL;
+        }
+
+        $ideHelperCommands = [];
+        if ($this->option('ide_helper')) {
+            $ideHelperCommands[] = ['cmd' => 'ide-helper:generate', 'args' => []];
+            $ideHelperCommands[] = ['cmd' => 'ide-helper:meta', 'args' => []];
+            $ideHelperCommands[] = ['cmd' => 'ide-helper:models', 'args' => ['--nowrite' => true]];
+        }
+
+        foreach ($ideHelperCommands as $ideHelperCommand) {
             try {
-                $this->call($command['cmd'], $command['args']);
+                $this->call($ideHelperCommand['cmd'], $ideHelperCommand['args']);
             } catch (Throwable $th) {
-                $this->error("\u{1F645}  Error: " . $th->getMessage());
+                $this->error("\u{1F645}  Error: ".$th->getMessage());
                 $exitCode = Command::FAILURE;
             }
         }

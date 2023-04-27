@@ -11,8 +11,6 @@ trait HasSortableAttributes
      * @Internal - This method is used internally by Eloquent
      * Add `sortable_fields` to the appends attribute of the target class
      * if `appendSortableFields` is set to true
-     *
-     * @return void
      */
     public function initializeHasSortableAttributes(): void
     {
@@ -36,7 +34,7 @@ trait HasSortableAttributes
                 $timestamps = ['created_at', 'updated_at'];
 
                 return
-                    is_array($this->fillable) && !empty($this->fillable)
+                    is_array($this->fillable) && ! empty($this->fillable)
                         ? array_merge($this->fillable, $timestamps)
                         : [];
             }

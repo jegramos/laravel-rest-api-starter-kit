@@ -19,15 +19,12 @@ class AuthController extends ApiController
 {
     /**
      * Grant the user an access token
-     *
-     * @param AuthRequest $request
-     * @return JsonResponse
      */
     public function store(AuthRequest $request): JsonResponse
     {
         $user = User::with('userProfile')->where('email', $request->email)->first();
 
-        if (!$user || !Hash::check($request->get('password'), $user->password)) {
+        if (! $user || ! Hash::check($request->get('password'), $user->password)) {
             return $this->error(
                 'Invalid username or password',
                 Response::HTTP_UNAUTHORIZED,
@@ -50,10 +47,6 @@ class AuthController extends ApiController
 
     /**
      * Register a new user
-     *
-     * @param AuthRequest $request
-     * @param UserServiceInterface $userService
-     * @return JsonResponse
      */
     public function register(AuthRequest $request, UserServiceInterface $userService): JsonResponse
     {
@@ -66,13 +59,12 @@ class AuthController extends ApiController
         $data['user'] = $user;
 
         UserCreated::dispatch($user);
+
         return $this->success(['data' => $data], Response::HTTP_CREATED);
     }
 
     /**
      * Revoke the current access token of the user
-     *
-     * @return JsonResponse
      */
     public function destroy(): JsonResponse
     {
@@ -85,8 +77,6 @@ class AuthController extends ApiController
 
     /**
      * Retrieve all the access tokens of a user
-     *
-     * @return JsonResponse
      */
     public function fetch(): JsonResponse
     {
@@ -100,7 +90,7 @@ class AuthController extends ApiController
                     'name' => $token->name,
                     'expires_at' => $token->expires_at,
                     'last_used_at' => $token->last_used_at,
-                    'created_at' => $token->created_at
+                    'created_at' => $token->created_at,
                 ];
             })
             // only get un-expired tokens
@@ -112,9 +102,6 @@ class AuthController extends ApiController
 
     /**
      * Revoke specified access tokens owned by the user
-     *
-     * @param AuthRequest $request
-     * @return JsonResponse
      */
     public function revoke(AuthRequest $request): JsonResponse
     {
@@ -123,6 +110,7 @@ class AuthController extends ApiController
         // delete everything if they pass a star (*)
         if ($tokensToRevoke === ['*']) {
             auth()->user()->tokens()->delete();
+
             return $this->success(null, Response::HTTP_NO_CONTENT);
         }
 
@@ -135,20 +123,16 @@ class AuthController extends ApiController
 
     /**
      * Verify Email
-     *
-     * @param EmailVerificationRequest $request
-     * @return JsonResponse
      */
     public function verifyEmail(EmailVerificationRequest $request): JsonResponse
     {
         $request->fulfill();
+
         return $this->success(['message' => 'Email successfully verified'], Response::HTTP_OK);
     }
 
     /**
      * Resend the email verification notification
-     *
-     * @return JsonResponse
      */
     public function resendEmailVerification(): JsonResponse
     {
@@ -158,7 +142,7 @@ class AuthController extends ApiController
         $user->sendEmailVerificationNotification();
         $data = [
             'message' => 'Email verification sent',
-            'email' => $user->email
+            'email' => $user->email,
         ];
 
         return $this->success($data, Response::HTTP_OK);
@@ -166,9 +150,6 @@ class AuthController extends ApiController
 
     /**
      * Forgot password request
-     *
-     * @param AuthRequest $request
-     * @return JsonResponse
      */
     public function forgotPassword(AuthRequest $request): JsonResponse
     {
@@ -183,14 +164,12 @@ class AuthController extends ApiController
         }
 
         $data = ['message' => 'Password reset request sent', 'email' => $request->get('email')];
+
         return $this->success($data, Response::HTTP_OK);
     }
 
     /**
      * Forgot password request
-     *
-     * @param AuthRequest $request
-     * @return JsonResponse
      */
     public function resetPassword(AuthRequest $request): JsonResponse
     {
@@ -212,26 +191,23 @@ class AuthController extends ApiController
         }
 
         $data = ['message' => 'Password reset was successful'];
+
         return $this->success($data, Response::HTTP_OK);
     }
 
     /**
      * Create a token for the user with expiration
-     *
-     * @param User $user
-     * @param string $tokenName
-     * @param int $expires_at_hours
-     *
-     * @return array
      */
     private function bindAuthToken(User $user, string $tokenName, int $expires_at_hours = 12): array
     {
         /**
          * We'll set the abilities to allow everything [*]. Authorization will be handled by Spatie
+         *
          * @see https://spatie.be/docs/laravel-permission/v5/introduction
          */
         $expiresAt = now()->addHours($expires_at_hours);
         $token = $user->createToken($tokenName, ['*'], $expiresAt)->plainTextToken;
+
         return ['token' => $token, 'token_name' => $tokenName, 'expires_at' => $expiresAt];
     }
 }

@@ -8,7 +8,7 @@ use Schema;
 
 class SchemaService implements SchemaServiceInterface
 {
-    /** @inheritDoc */
+    /** {@inheritDoc} */
     public function getAllColumns(string $tableName): array
     {
         return Cache::rememberForever($this->getAllColumnsCacheKey($tableName), function () use ($tableName) {
@@ -16,42 +16,42 @@ class SchemaService implements SchemaServiceInterface
         });
     }
 
-    /** @inheritDoc */
+    /** {@inheritDoc} */
     public function getAllTables(): array
     {
         return Cache::rememberForever($this->getAllTablesCacheKey(), function () {
             $tables = Schema::getAllTables();
             // strip off all the objects and keys.
-            return  array_map(fn ($table) => reset($table), $tables);
+            return array_map(fn ($table) => reset($table), $tables);
         });
     }
 
-    /** @inheritDoc */
+    /** {@inheritDoc} */
     public function checkIfColumnExists(string $tableName, string $columnName): bool
     {
         $allColumns = $this->getAllColumns($tableName);
+
         return in_array($columnName, $allColumns);
     }
 
-    /** @inheritDoc */
+    /** {@inheritDoc} */
     public function checkIfTableExists(string $tableName): bool
     {
         $allTables = $this->getAllTables();
+
         return in_array($tableName, $allTables);
     }
 
-    /** @inheritDoc */
+    /** {@inheritDoc} */
     public function getAllColumnNamesExcept(string $tableName, array $excludedColumns): array
     {
         $allColumns = $this->getAllColumns($tableName);
+
         return array_diff($allColumns, $excludedColumns);
     }
 
     /**
      * Returns the cache key for fetching all the column names of database table
-     *
-     * @param $tableName
-     * @return string
      */
     private function getAllColumnsCacheKey($tableName): string
     {
@@ -70,8 +70,6 @@ class SchemaService implements SchemaServiceInterface
 
     /**
      * Returns the cache key for fetching all the column names of database table
-     *
-     * @return string
      */
     private function getAllTablesCacheKey(): string
     {

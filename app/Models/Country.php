@@ -18,6 +18,6 @@ class Country extends Model
         'iso',
         'name',
         'iso3',
-        'num_code'
+        'num_code',
     ];
 }

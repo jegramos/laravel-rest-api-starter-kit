@@ -15,6 +15,7 @@ class SystemAlertNotification extends Notification implements ShouldQueue
     use Queueable;
 
     private string $level;
+
     private string $message;
 
     /**
@@ -31,9 +32,6 @@ class SystemAlertNotification extends Notification implements ShouldQueue
 
     /**
      * Get the notification's delivery channels.
-     *
-     * @param  mixed  $notifiable
-     * @return array
      */
     public function via(mixed $notifiable): array
     {
@@ -43,32 +41,26 @@ class SystemAlertNotification extends Notification implements ShouldQueue
     /**
      * @Channel
      * Get the mail representation of the notification.
-     *
-     * @param  mixed  $notifiable
-     * @return MailMessage
      */
     public function toMail(mixed $notifiable): MailMessage
     {
         return (new MailMessage())
-                    ->greeting("System Notification: $this->level")
-                    ->level($this->level)
-                    ->line('Issue: ')
-                    ->line($this->message)
-                    ->line(
-                        "You received this notification because you've been registered 
+            ->greeting("System Notification: $this->level")
+            ->level($this->level)
+            ->line('Issue: ')
+            ->line($this->message)
+            ->line(
+                "You received this notification because you've been registered 
                         with a System Support role"
-                    );
+            );
     }
 
     /**
      * Get the Slack representation of the notification.
-     *
-     * @param  mixed  $notifiable
-     * @return SlackMessage
      */
     public function toSlack(mixed $notifiable): SlackMessage
     {
-        $title = config('app.name') . " System Notification: $this->level";
+        $title = config('app.name')." System Notification: $this->level";
         $message = $this->message;
 
         return (new SlackMessage())
@@ -80,9 +72,6 @@ class SystemAlertNotification extends Notification implements ShouldQueue
 
     /**
      * Get the array representation of the notification.
-     *
-     * @param  mixed  $notifiable
-     * @return array
      */
     public function toArray(mixed $notifiable): array
     {

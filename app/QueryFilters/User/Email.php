@@ -10,7 +10,7 @@ class Email extends Filter
     private const FILTER_NAME = 'email';
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     protected function applyFilter(Builder $builder): Builder
     {
@@ -21,7 +21,7 @@ class Email extends Filter
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     protected function getFilterName(): string
     {

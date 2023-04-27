@@ -16,7 +16,8 @@ class AuthorizationTest extends TestCase
     use RefreshDatabase;
 
     private User $user;
-    private string $baseUri = self::BASE_API_URI . '/users';
+
+    private string $baseUri = self::BASE_API_URI.'/users';
 
     protected function setUp(): void
     {

@@ -10,9 +10,6 @@ class SendWelcomeEmailNotification
 {
     /**
      * Handle the event.
-     *
-     * @param UserRegistered|UserCreated $event
-     * @return void
      */
     public function handle(UserRegistered|UserCreated $event): void
     {

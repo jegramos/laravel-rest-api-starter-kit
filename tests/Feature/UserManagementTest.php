@@ -10,7 +10,6 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
@@ -25,7 +24,8 @@ class UserManagementTest extends TestCase
     use RefreshDatabase;
     use WithFaker;
 
-    private string $baseUri = self::BASE_API_URI . '/users';
+    private string $baseUri = self::BASE_API_URI.'/users';
+
     private User $user;
 
     public function setUp(): void
@@ -43,7 +43,9 @@ class UserManagementTest extends TestCase
 
     /**
      * @dataProvider validCreateUserInputs
+     *
      * @note we can't use Eloquent nor faker in data providers
+     *
      * @throws Throwable
      */
     public function test_it_can_create_a_user($input, $statusCode)
@@ -68,7 +70,7 @@ class UserManagementTest extends TestCase
             'password' => 'Sample_Password_1',
             'password_confirmation' => 'Sample_Password_1',
             'first_name' => 'Jeg',
-            'last_name' => 'Ramos'
+            'last_name' => 'Ramos',
         ];
 
         $allFields = array_merge($requiredFieldsOnly, [
@@ -85,7 +87,7 @@ class UserManagementTest extends TestCase
             'district' => 'District 1',
             'city' => 'City 1',
             'province' => 'Province 1',
-            'postal_code' => '211'
+            'postal_code' => '211',
         ]);
 
         $missingRequiredFields = Arr::except(
@@ -96,7 +98,7 @@ class UserManagementTest extends TestCase
         return [
             [$requiredFieldsOnly, 201],
             [$allFields, 201],
-            [$missingRequiredFields, 422]
+            [$missingRequiredFields, 422],
         ];
     }
 
@@ -146,7 +148,7 @@ class UserManagementTest extends TestCase
             'province' => 'Province 1',
             'postal_code' => fake()->postcode,
             'country_id' => Country::first()->id,
-            'profile_picture_path' => fake()->filePath
+            'profile_picture_path' => fake()->filePath,
         ];
 
         $response = $this->patchJson("$this->baseUri/$user->id", $edits);
@@ -164,7 +166,8 @@ class UserManagementTest extends TestCase
             // when email_verified is set to `true`, response will have
             // an email_verified_at key with a timestamp value -- and it will be set to null if it's `false`
             if ($key === 'email_verified') {
-                $this->assertEquals($value, !!strtotime($response['data']['email_verified_at']));
+                $this->assertEquals($value, (bool) strtotime($response['data']['email_verified_at']));
+
                 continue;
             }
 
@@ -172,6 +175,7 @@ class UserManagementTest extends TestCase
             if ($key === 'country_id') {
                 $result = $response['data']['user_profile']['country']['id'];
                 $this->assertEquals($value, $result);
+
                 continue;
             }
 
@@ -179,13 +183,15 @@ class UserManagementTest extends TestCase
             if ($key === 'profile_picture_path') {
                 $result = $response['data']['user_profile']['profile_picture_url'];
                 $this->assertTrue(URL::isValidUrl($result));
+
                 continue;
             }
 
             // profile details are wrapped with a `user_profile` field
-            if (!in_array($key, ['username', 'email', 'active'])) {
+            if (! in_array($key, ['username', 'email', 'active'])) {
                 $result = $response['data']['user_profile'][$key];
                 $this->assertEquals($value, $result);
+
                 continue;
             }
 
@@ -214,7 +220,7 @@ class UserManagementTest extends TestCase
         $user = User::factory()->has(UserProfile::factory())->create();
         $input = [
             'email' => $user->email,
-            'username' => $user->username
+            'username' => $user->username,
         ];
 
         $response = $this->patchJson("$this->baseUri/{$user->id}", $input);
@@ -235,7 +241,7 @@ class UserManagementTest extends TestCase
             'password' => 'Sample_Password_1',
             'password_confirmation' => 'Sample_Password_1',
             'first_name' => 'Jeg',
-            'last_name' => 'Ramos'
+            'last_name' => 'Ramos',
         ];
 
         return [
@@ -267,7 +273,7 @@ class UserManagementTest extends TestCase
             'password' => 'Sample_Password_1',
             'password_confirmation' => 'Sample_Password_1',
             'first_name' => 'Jeg',
-            'last_name' => 'Ramos'
+            'last_name' => 'Ramos',
         ];
 
         return [
@@ -293,7 +299,7 @@ class UserManagementTest extends TestCase
             'password' => 'Sample_Password_1',
             'password_confirmation' => 'Sample_Password_1',
             'first_name' => 'Jeg',
-            'last_name' => 'Ramos'
+            'last_name' => 'Ramos',
         ];
 
         return [
@@ -393,7 +399,7 @@ class UserManagementTest extends TestCase
         $response = $this->postJson($this->baseUri, $input);
         $response = $response->decodeResponseJson();
         $user = User::find($response['data']['id']);
-        $this->assertTrue(!!strtotime($user->email_verified_at->toDateString()));
+        $this->assertTrue((bool) strtotime($user->email_verified_at->toDateString()));
     }
 
     public function test_it_can_upload_profile_picture()
@@ -436,7 +442,7 @@ class UserManagementTest extends TestCase
     /** @throws Throwable */
     public function test_it_can_filter_by_email_while_ignoring_the_case()
     {
-        $email = uuid_create() . '@email.com';
+        $email = uuid_create().'@email.com';
         User::factory()->has(UserProfile::factory())->create(['email' => $email]);
 
         $email = strtoupper($email);
@@ -592,7 +598,6 @@ class UserManagementTest extends TestCase
         $response = $response->decodeResponseJson();
         $this->assertEquals(1, count($response['data']));
     }
-
 
     /**
      * @throws Throwable
