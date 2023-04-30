@@ -1,8 +1,5 @@
 grumphp:
-  process_timeout: 180
-  fixer:
-    enabled: true
-    fix_by_default: true
+  process_timeout: 3200
   parallel:
     enabled: false
   tasks:
