@@ -117,7 +117,6 @@ class UserController extends ApiController
      */
     private function rolesHaveSuperUser(UserRequest $request): bool
     {
-        // super_users cannot be created
         $roles = $request->get('roles');
         $superAdminRole = Role::findByName(\App\Enums\Role::SUPER_USER->value, 'sanctum');
 

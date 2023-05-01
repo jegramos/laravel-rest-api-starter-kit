@@ -151,7 +151,7 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
     }
 
     /**
-     * Set username to lowercase
+     * Set email to lowercase
      */
     public function email(): Attribute
     {
