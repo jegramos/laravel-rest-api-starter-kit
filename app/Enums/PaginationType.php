@@ -11,4 +11,5 @@ enum PaginationType: string
     case LENGTH_AWARE = LengthAwarePaginator::class;
     case SIMPLE = Paginator::class;
     case CURSOR = CursorPaginator::class;
+    
 }
