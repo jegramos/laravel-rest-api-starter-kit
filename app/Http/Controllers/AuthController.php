@@ -198,14 +198,14 @@ class AuthController extends ApiController
     /**
      * Create a token for the user with expiration
      */
-    private function bindAuthToken(User $user, string $tokenName, int $expires_at_hours = 12): array
+    private function bindAuthToken(User $user, string $tokenName, int $expiresAtHours = 12): array
     {
         /**
          * We'll set the abilities to allow everything [*]. Authorization will be handled by Spatie
          *
          * @see https://spatie.be/docs/laravel-permission/v5/introduction
          */
-        $expiresAt = now()->addHours($expires_at_hours);
+        $expiresAt = now()->addHours($expiresAtHours);
         $token = $user->createToken($tokenName, ['*'], $expiresAt)->plainTextToken;
 
         return ['token' => $token, 'token_name' => $tokenName, 'expires_at' => $expiresAt];
