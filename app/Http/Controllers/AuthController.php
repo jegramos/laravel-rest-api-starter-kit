@@ -5,10 +5,10 @@ namespace App\Http\Controllers;
 use App\Enums\ApiErrorCode;
 use App\Events\UserCreated;
 use App\Http\Requests\AuthRequest;
+use App\Http\Requests\NoAuthEmailVerificationRequest;
 use App\Interfaces\HttpResources\UserServiceInterface;
 use App\Models\User;
 use Hash;
-use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\JsonResponse;
 use Laravel\Sanctum\PersonalAccessToken;
 use Password;
@@ -124,7 +124,7 @@ class AuthController extends ApiController
     /**
      * Verify Email
      */
-    public function verifyEmail(EmailVerificationRequest $request): JsonResponse
+    public function verifyEmail(NoAuthEmailVerificationRequest $request): JsonResponse
     {
         $request->fulfill();
 
