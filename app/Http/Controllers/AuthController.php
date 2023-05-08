@@ -36,7 +36,7 @@ class AuthController extends ApiController
         $tokenName = $request->get('client_name') ?? 'api_token';
 
         /** @var User $user */
-        $data = $this->bindAuthToken($user, $tokenName, 12);
+        $data = $this->bindAuthToken($user, $tokenName);
 
         if ($request->get('with_user')) {
             $data['user'] = $user;
